@@ -13,11 +13,12 @@ export default function Dashboard() {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    if (!loading && !user) {
-      navigate("/auth");
-    }
-  }, [user, loading, navigate]);
+  // Auth redirect temporarily disabled for testing
+  // useEffect(() => {
+  //   if (!loading && !user) {
+  //     navigate("/auth");
+  //   }
+  // }, [user, loading, navigate]);
 
   const { data: validationHistory, refetch: refetchHistory } = useQuery({
     queryKey: ["validation-history", user?.id],
