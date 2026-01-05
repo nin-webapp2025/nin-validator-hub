@@ -69,13 +69,15 @@ export function ValidationForm({ onSuccess }: ValidationFormProps) {
       const balanceMsg = payload?.message?.balance;
       const isSuccess = payload?.status === "success" || payload?.success === true;
 
-      // Save to history (including failed/billing responses)
-      await supabase.from("validation_history").insert({
-        user_id: user!.id,
-        nin: nin,
-        status: isSuccess ? "success" : "failed",
-        result: payload,
-      });
+      // Save to history (including failed/billing responses) – only if logged in
+      if (user?.id) {
+        await supabase.from("validation_history").insert({
+          user_id: user.id,
+          nin: nin,
+          status: isSuccess ? "success" : "failed",
+          result: payload,
+        });
+      }
 
       // Only show result card for actual validation payloads
       if (typeof payload?.status === "string") {
