@@ -81,9 +81,22 @@ export function ValidationForm({ onSuccess }: ValidationFormProps) {
         variant: data.status === "success" ? "default" : "destructive",
       });
     } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : "Failed to validate NIN";
+      let errorTitle = "Error";
+      let errorMessage = "Failed to validate NIN";
+      
+      if (error instanceof Error) {
+        // Check for billing/balance errors from API
+        const message = error.message;
+        if (message.includes("balance") || message.includes("fund")) {
+          errorTitle = "Insufficient Balance";
+          errorMessage = "Your API account has insufficient funds. Please top up your RobostTech account to continue validating.";
+        } else {
+          errorMessage = message;
+        }
+      }
+      
       toast({
-        title: "Error",
+        title: errorTitle,
         description: errorMessage,
         variant: "destructive",
       });
