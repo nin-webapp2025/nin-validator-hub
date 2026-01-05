@@ -65,21 +65,45 @@ export function ValidationForm({ onSuccess }: ValidationFormProps) {
 
       if (error) throw error;
 
-      // Save to history
+      const payload: any = data;
+      const balanceMsg = payload?.message?.balance;
+      const isSuccess = payload?.status === "success" || payload?.success === true;
+
+      // Save to history (including failed/billing responses)
       await supabase.from("validation_history").insert({
         user_id: user!.id,
         nin: nin,
-        status: data.status === "success" ? "success" : "failed",
-        result: data,
+        status: isSuccess ? "success" : "failed",
+        result: payload,
       });
 
-      setResult(data);
+      // Only show result card for actual validation payloads
+      if (typeof payload?.status === "string") {
+        setResult(payload as ValidationResult);
+      } else {
+        setResult(null);
+      }
+
       onSuccess();
 
+      if (!isSuccess && typeof balanceMsg === "string") {
+        toast({
+          title: "Insufficient Balance",
+          description: `RobostTech billing error: ${balanceMsg}`,
+          variant: "destructive",
+        });
+        return;
+      }
+
+      const description =
+        typeof payload?.message === "string"
+          ? payload.message
+          : "NIN validation completed.";
+
       toast({
-        title: data.status === "success" ? "Validation Successful" : "Validation Failed",
-        description: data.message || "NIN validation completed.",
-        variant: data.status === "success" ? "default" : "destructive",
+        title: isSuccess ? "Validation Successful" : "Validation Failed",
+        description,
+        variant: isSuccess ? "default" : "destructive",
       });
     } catch (error: unknown) {
       let errorTitle = "Error";

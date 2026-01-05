@@ -79,11 +79,30 @@ serve(async (req) => {
       body: JSON.stringify(requestBody),
     });
 
-    const data = await response.json();
+    const raw = await response.text();
+    let data: unknown = null;
+    try {
+      data = raw ? JSON.parse(raw) : null;
+    } catch {
+      data = { success: false, error: "Upstream returned invalid JSON", raw };
+    }
+
     console.log("API response status:", response.status);
 
+    // Supabase `functions.invoke` treats non-2xx as exceptions. For upstream 4xx (business errors like
+    // insufficient balance), return 200 so the client can handle the payload without a hard error.
+    const outgoingStatus = response.status >= 400 && response.status < 500 ? 200 : response.status;
+
+    if (outgoingStatus !== response.status) {
+      if (data && typeof data === "object" && !Array.isArray(data)) {
+        (data as Record<string, unknown>).__upstream_status = response.status;
+      } else {
+        data = { data, __upstream_status: response.status };
+      }
+    }
+
     return new Response(JSON.stringify(data), {
-      status: response.status,
+      status: outgoingStatus,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (error: unknown) {
