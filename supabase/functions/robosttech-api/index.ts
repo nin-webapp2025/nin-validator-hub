@@ -5,7 +5,7 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-const ROBOSTTECH_API_URL = "https://api.robosttech.com";
+const ROBOSTTECH_API_URL = "https://robosttech.com/api";
 
 interface RequestBody {
   action: "validate" | "validation_status" | "personalization" | "personalization_status";
