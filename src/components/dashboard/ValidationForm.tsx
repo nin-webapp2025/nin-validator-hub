@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, Search, CheckCircle, XCircle } from "lucide-react";
+import { FunctionsFetchError, FunctionsHttpError, FunctionsRelayError } from "@supabase/supabase-js";
 import { z } from "zod";
 
 const ninSchema = z.string().trim().length(11, "NIN must be exactly 11 digits").regex(/^\d+$/, "NIN must contain only numbers");
@@ -83,9 +84,30 @@ export function ValidationForm({ onSuccess }: ValidationFormProps) {
     } catch (error: unknown) {
       let errorTitle = "Error";
       let errorMessage = "Failed to validate NIN";
-      
-      if (error instanceof Error) {
-        // Check for billing/balance errors from API
+
+      // Prefer structured error bodies returned by the Edge Function
+      if (error instanceof FunctionsHttpError) {
+        try {
+          const errBody: any = await error.context.json();
+          const balanceMsg = errBody?.message?.balance;
+
+          if (typeof balanceMsg === "string") {
+            errorTitle = "Insufficient Balance";
+            errorMessage = `RobostTech billing error: ${balanceMsg}`;
+          } else if (typeof errBody?.message === "string") {
+            errorMessage = errBody.message;
+          } else if (typeof errBody?.error === "string") {
+            errorMessage = errBody.error;
+          } else {
+            errorMessage = "The validation service returned an error.";
+          }
+        } catch {
+          errorMessage = "The validation service returned an error.";
+        }
+      } else if (error instanceof FunctionsRelayError || error instanceof FunctionsFetchError) {
+        errorMessage = error.message;
+      } else if (error instanceof Error) {
+        // Fallback: parse message text
         const message = error.message;
         if (message.includes("balance") || message.includes("fund")) {
           errorTitle = "Insufficient Balance";
@@ -94,7 +116,7 @@ export function ValidationForm({ onSuccess }: ValidationFormProps) {
           errorMessage = message;
         }
       }
-      
+
       toast({
         title: errorTitle,
         description: errorMessage,
