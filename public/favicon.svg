@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <!-- Lightning Bolt Icon -->
+  <g transform="translate(40, 20) scale(1.2)">
+    <path fill="#F59E0B" d="M 30 20 L 60 50 L 45 55 L 75 100 L 40 65 L 55 60 Z"/>
+    <!-- Lightning rays -->
+    <path fill="#F59E0B" d="M 25 30 L 35 35 L 30 38 Z"/>
+    <path fill="#F59E0B" d="M 75 35 L 85 40 L 80 43 Z"/>
+    <path fill="#F59E0B" d="M 50 15 L 55 10 L 58 15 Z"/>
+    <path fill="#F59E0B" d="M 40 90 L 35 95 L 32 90 Z"/>
+  </g>
+</svg>

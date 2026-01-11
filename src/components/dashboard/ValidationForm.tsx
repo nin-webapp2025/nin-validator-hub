@@ -1,14 +1,16 @@
 import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
+import { trackApiRequest } from "@/components/dashboard/RateLimitIndicator";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Search, CheckCircle, XCircle } from "lucide-react";
+import { Loader2, Search, CheckCircle, XCircle, Copy, CheckCheck } from "lucide-react";
 import { FunctionsFetchError, FunctionsHttpError, FunctionsRelayError } from "@supabase/supabase-js";
 import { z } from "zod";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const ninSchema = z.string().trim().length(11, "NIN must be exactly 11 digits").regex(/^\d+$/, "NIN must contain only numbers");
 
@@ -18,6 +20,7 @@ interface ValidationFormProps {
 
 interface ValidationResult {
   status: string;
+  tracking_id?: string;
   data?: {
     firstname?: string;
     surname?: string;
@@ -35,6 +38,7 @@ export function ValidationForm({ onSuccess }: ValidationFormProps) {
   const [nin, setNin] = useState("");
   const [isValidating, setIsValidating] = useState(false);
   const [result, setResult] = useState<ValidationResult | null>(null);
+  const [copiedTrackingId, setCopiedTrackingId] = useState(false);
 
   const handleValidate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -53,19 +57,40 @@ export function ValidationForm({ onSuccess }: ValidationFormProps) {
     }
 
     setIsValidating(true);
+    setCopiedTrackingId(false);
     setResult(null);
 
     try {
+      // Track API request for rate limiting
+      trackApiRequest();
+
       const { data, error } = await supabase.functions.invoke("robosttech-api", {
         body: {
           action: "validate",
           nin: nin,
+          number: nin,
         },
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error("Edge function invocation error:", error);
+        throw error;
+      }
+
+      console.log("Validation response:", data);
 
       const payload: any = data;
+      
+      // Check if the API key is not configured
+      if (payload?.error === "API key not configured") {
+        toast({
+          title: "Configuration Error",
+          description: "The API service is not properly configured. Please contact support.",
+          variant: "destructive",
+        });
+        return;
+      }
+      
       const balanceMsg = payload?.message?.balance;
       const isSuccess = payload?.status === "success" || payload?.success === true;
 
@@ -76,6 +101,7 @@ export function ValidationForm({ onSuccess }: ValidationFormProps) {
           nin: nin,
           status: isSuccess ? "success" : "failed",
           result: payload,
+          tracking_id: payload?.tracking_id || null,
         });
       }
 
@@ -91,7 +117,7 @@ export function ValidationForm({ onSuccess }: ValidationFormProps) {
       if (!isSuccess && typeof balanceMsg === "string") {
         toast({
           title: "Insufficient Balance",
-          description: `RobostTech billing error: ${balanceMsg}`,
+          description: `API billing error: ${balanceMsg}`,
           variant: "destructive",
         });
         return;
@@ -119,7 +145,7 @@ export function ValidationForm({ onSuccess }: ValidationFormProps) {
 
           if (typeof balanceMsg === "string") {
             errorTitle = "Insufficient Balance";
-            errorMessage = `RobostTech billing error: ${balanceMsg}`;
+            errorMessage = `API billing error: ${balanceMsg}`;
           } else if (typeof errBody?.message === "string") {
             errorMessage = errBody.message;
           } else if (typeof errBody?.error === "string") {
@@ -137,7 +163,7 @@ export function ValidationForm({ onSuccess }: ValidationFormProps) {
         const message = error.message;
         if (message.includes("balance") || message.includes("fund")) {
           errorTitle = "Insufficient Balance";
-          errorMessage = "Your API account has insufficient funds. Please top up your RobostTech account to continue validating.";
+          errorMessage = "Your API account has insufficient funds. Please top up your account to continue validating.";
         } else {
           errorMessage = message;
         }
@@ -257,6 +283,49 @@ export function ValidationForm({ onSuccess }: ValidationFormProps) {
             {result.message && (
               <p className="text-sm text-muted-foreground mt-2">{result.message}</p>
             )}
+          </div>
+        )}
+
+        {result?.tracking_id && (
+          <div className="mt-4 rounded-lg border border-primary/20 bg-primary/5 p-4">
+            <div className="flex items-start justify-between gap-3">
+              <div className="flex-1">
+                <p className="text-xs font-medium text-muted-foreground mb-1">
+                  Tracking ID (Use for Personalization)
+                </p>
+                <p className="font-mono text-sm font-medium break-all">
+                  {result.tracking_id}
+                </p>
+              </div>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => {
+                  navigator.clipboard.writeText(result.tracking_id!);
+                  setCopiedTrackingId(true);
+                  setTimeout(() => setCopiedTrackingId(false), 2000);
+                  toast({
+                    title: "Copied!",
+                    description: "Tracking ID copied to clipboard",
+                  });
+                }}
+              >
+                {copiedTrackingId ? (
+                  <>
+                    <CheckCheck className="h-4 w-4 mr-1" />
+                    Copied
+                  </>
+                ) : (
+                  <>
+                    <Copy className="h-4 w-4 mr-1" />
+                    Copy
+                  </>
+                )}
+              </Button>
+            </div>
+            <p className="text-xs text-muted-foreground mt-2">
+              💡 Save this tracking ID to check personalization status or submit personalization requests
+            </p>
           </div>
         )}
       </CardContent>

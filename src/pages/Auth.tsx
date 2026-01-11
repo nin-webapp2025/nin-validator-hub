@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { Shield, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { z } from "zod";
 
 const emailSchema = z.string().trim().email("Please enter a valid email address");
@@ -102,9 +102,10 @@ export default function Auth() {
       }
     } else {
       toast({
-        title: "Account Created",
-        description: "Please check your email to verify your account.",
+        title: "Account Created Successfully!",
+        description: "You can now access your dashboard.",
       });
+      // User will be automatically redirected by the useEffect when user state updates
     }
   };
 
@@ -120,10 +121,14 @@ export default function Auth() {
     <div className="flex min-h-screen items-center justify-center bg-background p-4">
       <Card className="w-full max-w-md shadow-card">
         <CardHeader className="space-y-1 text-center">
-          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-xl bg-primary">
-            <Shield className="h-8 w-8 text-primary-foreground" />
+          <div className="mx-auto mb-4 flex items-center justify-center">
+            <img 
+              src="/logo.svg" 
+              alt="SparkLab Technology Limited" 
+              className="h-16 w-auto"
+            />
           </div>
-          <CardTitle className="text-2xl font-bold">RobostTech NIN Portal</CardTitle>
+          <CardTitle className="text-2xl font-bold">NIN Validation Portal</CardTitle>
           <CardDescription>Validate and personalize National Identification Numbers</CardDescription>
         </CardHeader>
         <CardContent>

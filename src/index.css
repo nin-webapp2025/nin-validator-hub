@@ -2,45 +2,47 @@
 @tailwind components;
 @tailwind utilities;
 
-/* RobostTech NIN Validation Dashboard - Professional Blue & Gray Design System */
+/* SparkLab NIN Portal - Professional Blue & Gray Design System */
 
 @layer base {
   :root {
-    --background: 210 20% 98%;
-    --foreground: 222 47% 11%;
+    /* Enterprise Design System - 2025 */
+    --background: 216 20% 98%;
+    --foreground: 215 25% 15%;
 
     --card: 0 0% 100%;
-    --card-foreground: 222 47% 11%;
+    --card-foreground: 215 25% 15%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222 47% 11%;
+    --popover-foreground: 215 25% 15%;
 
-    --primary: 221 83% 53%;
+    /* Professional Blue Palette */
+    --primary: 217 91% 60%;
     --primary-foreground: 0 0% 100%;
+    
+    --secondary: 214 32% 95%;
+    --secondary-foreground: 215 25% 25%;
 
-    --secondary: 215 20% 95%;
-    --secondary-foreground: 222 47% 11%;
+    --muted: 214 32% 97%;
+    --muted-foreground: 215 16% 50%;
 
-    --muted: 215 20% 95%;
-    --muted-foreground: 215 16% 47%;
+    --accent: 217 91% 97%;
+    --accent-foreground: 217 91% 45%;
 
-    --accent: 221 83% 95%;
-    --accent-foreground: 221 83% 40%;
-
-    --destructive: 0 84% 60%;
+    --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
 
-    --success: 142 76% 36%;
+    --success: 142 71% 45%;
     --success-foreground: 0 0% 100%;
 
     --warning: 38 92% 50%;
     --warning-foreground: 0 0% 100%;
 
-    --border: 214 32% 91%;
+    --border: 214 32% 88%;
     --input: 214 32% 91%;
-    --ring: 221 83% 53%;
+    --ring: 217 91% 60%;
 
-    --radius: 0.75rem;
+    --radius: 0.875rem;
 
     --sidebar-background: 222 47% 11%;
     --sidebar-foreground: 210 40% 98%;
@@ -109,15 +111,191 @@
 }
 
 @layer components {
-  .gradient-primary {
-    @apply bg-gradient-to-r from-primary to-blue-700;
+  /* Enterprise Card Styles */
+  .card-enterprise {
+    @apply bg-card rounded-xl border border-border/50 shadow-sm transition-all duration-300;
   }
   
+  .card-enterprise:hover {
+    @apply shadow-md translate-y-[-2px];
+  }
+  
+  /* Smooth Animations */
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  @keyframes slideInRight {
+    from {
+      opacity: 0;
+      transform: translateX(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+  
+  @keyframes scaleIn {
+    from {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+  
+  @keyframes shimmer {
+    0% {
+      background-position: -1000px 0;
+    }
+    100% {
+      background-position: 1000px 0;
+    }
+  }
+  
+  @keyframes countUp {
+    from {
+      opacity: 0;
+      transform: scale(0.8);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+  
+  .animate-fade-in-up {
+    animation: fadeInUp 0.5s ease-out forwards;
+  }
+  
+  .animate-slide-in-right {
+    animation: slideInRight 0.4s ease-out forwards;
+  }
+  
+  .animate-scale-in {
+    animation: scaleIn 0.3s ease-out forwards;
+  }
+  
+  .animate-count-up {
+    animation: countUp 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  }
+  
+  /* Loading Skeleton */
+  .skeleton {
+    @apply bg-gradient-to-r from-muted via-muted/50 to-muted;
+    background-size: 1000px 100%;
+    animation: shimmer 2s infinite linear;
+  }
+  
+  /* Status Badges */
+  .badge-success {
+    @apply bg-success/10 text-success border border-success/20;
+  }
+  
+  .badge-warning {
+    @apply bg-warning/10 text-warning border border-warning/20;
+  }
+  
+  .badge-error {
+    @apply bg-destructive/10 text-destructive border border-destructive/20;
+  }
+  
+  .badge-info {
+    @apply bg-primary/10 text-primary border border-primary/20;
+  }
+  
+  /* Gradient Effects */
+  .gradient-primary {
+    @apply bg-gradient-to-br from-primary via-blue-500 to-blue-600;
+  }
+  
+  .gradient-mesh {
+    background: 
+      radial-gradient(at 0% 0%, hsla(217, 91%, 60%, 0.1) 0px, transparent 50%),
+      radial-gradient(at 100% 0%, hsla(142, 71%, 45%, 0.05) 0px, transparent 50%),
+      radial-gradient(at 100% 100%, hsla(217, 91%, 60%, 0.08) 0px, transparent 50%);
+  }
+  
+  /* Enterprise Shadows */
   .shadow-card {
-    box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+    box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.05), 0 1px 2px -1px rgb(0 0 0 / 0.05);
   }
   
   .shadow-card-hover {
-    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    box-shadow: 0 10px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+  }
+  
+  .shadow-elevation-1 {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+  }
+  
+  .shadow-elevation-2 {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  }
+  
+  .shadow-elevation-3 {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  }
+  
+  /* Button Hover Effects */
+  .btn-enterprise {
+    @apply relative overflow-hidden transition-all duration-300;
+  }
+  
+  .btn-enterprise::before {
+    content: '';
+    @apply absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent;
+    transform: translateX(-100%);
+    transition: transform 0.6s;
+  }
+  
+  .btn-enterprise:hover::before {
+    transform: translateX(100%);
+  }
+  
+  /* Focus Rings (Accessibility) */
+  .focus-ring {
+    @apply focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2;
+  }
+  
+  /* Smooth Transitions */
+  .transition-smooth {
+    @apply transition-all duration-300 ease-in-out;
+  }
+  
+  /* Premium Grid Pattern */
+  .bg-grid-slate-100 {
+    background-image: 
+      linear-gradient(to right, rgb(241 245 249 / 0.5) 1px, transparent 1px),
+      linear-gradient(to bottom, rgb(241 245 249 / 0.5) 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
+  
+  /* Glassmorphism Effects */
+  .glass {
+    @apply bg-white/80 backdrop-blur-xl border border-white/20;
+  }
+  
+  .glass-dark {
+    @apply bg-slate-900/80 backdrop-blur-xl border border-white/10;
+  }
+  
+  /* Premium Text Gradients */
+  .text-gradient-blue {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-blue-600 via-blue-500 to-cyan-500;
+  }
+  
+  .text-gradient-premium {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-slate-900 via-blue-900 to-slate-900;
   }
 }

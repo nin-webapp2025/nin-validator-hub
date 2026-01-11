@@ -1,0 +1,46 @@
+{
+  "name": "NIN Validator Hub",
+  "short_name": "NIN Validator",
+  "description": "Secure Nigerian National Identification Number validation and verification platform",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#2563eb",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/logo.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/logo.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "/logo.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml"
+    }
+  ],
+  "categories": ["business", "finance", "productivity"],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "Validate NIN",
+      "short_name": "Validate",
+      "description": "Quickly validate a National Identification Number",
+      "url": "/dashboard?tab=validate",
+      "icons": [{ "src": "/logo.svg", "sizes": "96x96" }]
+    },
+    {
+      "name": "View Analytics",
+      "short_name": "Analytics",
+      "description": "View validation analytics and statistics",
+      "url": "/dashboard?tab=analytics",
+      "icons": [{ "src": "/logo.svg", "sizes": "96x96" }]
+    }
+  ]
+}
