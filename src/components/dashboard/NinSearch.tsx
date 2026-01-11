@@ -276,22 +276,22 @@ export default function NinSearch() {
   return (
     <div className="space-y-4">
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="nin">
-            <User className="h-4 w-4 mr-2" />
-            By NIN
+        <TabsList className="grid w-full grid-cols-4 gap-1 sm:gap-0">
+          <TabsTrigger value="nin" className="flex items-center justify-center gap-1 sm:gap-2 px-1 sm:px-3">
+            <User className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+            <span className="hidden xs:inline text-xs sm:text-sm">By NIN</span>
           </TabsTrigger>
-          <TabsTrigger value="basic">
-            <Search className="h-4 w-4 mr-2" />
-            Basic Verification
+          <TabsTrigger value="basic" className="flex items-center justify-center gap-1 sm:gap-2 px-1 sm:px-3">
+            <Search className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+            <span className="hidden xs:inline text-xs sm:text-sm">Basic</span>
           </TabsTrigger>
-          <TabsTrigger value="phone">
-            <Phone className="h-4 w-4 mr-2" />
-            By Phone
+          <TabsTrigger value="phone" className="flex items-center justify-center gap-1 sm:gap-2 px-1 sm:px-3">
+            <Phone className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+            <span className="hidden xs:inline text-xs sm:text-sm">Phone</span>
           </TabsTrigger>
-          <TabsTrigger value="demo">
-            <FileText className="h-4 w-4 mr-2" />
-            Demo
+          <TabsTrigger value="demo" className="flex items-center justify-center gap-1 sm:gap-2 px-1 sm:px-3">
+            <FileText className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+            <span className="hidden xs:inline text-xs sm:text-sm">Demo</span>
           </TabsTrigger>
         </TabsList>
 
@@ -383,17 +383,17 @@ export default function NinSearch() {
 
                   <div className="space-y-2 text-sm">
                     {(result.verification?.data?.first_name || result.data?.first_name) && (
-                      <div className="flex justify-between">
-                        <span className="text-slate-600 dark:text-slate-400">First Name:</span>
-                        <span className="font-medium text-slate-900 dark:text-slate-100">
+                      <div className="flex flex-col xs:flex-row xs:justify-between gap-1 xs:gap-2">
+                        <span className="text-slate-600 dark:text-slate-400 text-xs xs:text-sm">First Name:</span>
+                        <span className="font-medium text-slate-900 dark:text-slate-100 text-sm xs:text-base">
                           {result.verification?.data?.first_name || result.data?.first_name}
                         </span>
                       </div>
                     )}
                     {(result.verification?.data?.last_name || result.data?.last_name) && (
-                      <div className="flex justify-between">
-                        <span className="text-slate-600 dark:text-slate-400">Last Name:</span>
-                        <span className="font-medium text-slate-900 dark:text-slate-100">
+                      <div className="flex flex-col xs:flex-row xs:justify-between gap-1 xs:gap-2">
+                        <span className="text-slate-600 dark:text-slate-400 text-xs xs:text-sm">Last Name:</span>
+                        <span className="font-medium text-slate-900 dark:text-slate-100 text-sm xs:text-base">
                           {result.verification?.data?.last_name || result.data?.last_name}
                         </span>
                       </div>

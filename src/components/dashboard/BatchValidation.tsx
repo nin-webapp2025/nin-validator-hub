@@ -210,11 +210,11 @@ export function BatchValidation() {
       {/* Upload Card */}
       <Card className="border-slate-200 dark:border-slate-700 shadow-lg dark:bg-slate-800">
         <CardHeader>
-          <CardTitle className="text-xl font-bold flex items-center gap-2">
-            <FileSpreadsheet className="h-5 w-5 text-blue-600" />
-            Batch NIN Validation
+          <CardTitle className="text-lg sm:text-xl font-bold flex items-center gap-2">
+            <FileSpreadsheet className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600" />
+            <span className="text-base sm:text-xl">Batch NIN Validation</span>
           </CardTitle>
-          <CardDescription className="text-slate-600 dark:text-slate-400">
+          <CardDescription className="text-xs sm:text-sm text-slate-600 dark:text-slate-400">
             Upload a CSV file with NINs for bulk validation (max 100 NINs)
           </CardDescription>
         </CardHeader>
@@ -223,14 +223,14 @@ export function BatchValidation() {
           <div className="space-y-4">
             <div 
               onClick={() => fileInputRef.current?.click()}
-              className="border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-xl p-8 text-center hover:border-blue-400 dark:hover:border-blue-600 transition-colors cursor-pointer bg-slate-50 dark:bg-slate-900/50"
+              className="border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-xl p-6 sm:p-8 text-center hover:border-blue-400 dark:hover:border-blue-600 transition-colors cursor-pointer bg-slate-50 dark:bg-slate-900/50"
             >
-              <Upload className="h-12 w-12 mx-auto mb-4 text-slate-400" />
-              <p className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+              <Upload className="h-10 w-10 sm:h-12 sm:w-12 mx-auto mb-3 sm:mb-4 text-slate-400" />
+              <p className="text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
                 {file ? file.name : "Click to upload CSV file"}
               </p>
               <p className="text-xs text-slate-500 dark:text-slate-400">
-                CSV format: NIN in first column (with or without header)
+                CSV format: NIN in first column
               </p>
               <Input
                 ref={fileInputRef}

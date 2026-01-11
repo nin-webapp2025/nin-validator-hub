@@ -53,30 +53,30 @@ export function DashboardHeader({ onNavigateToProfile, onNavigateToSettings }: D
             variant="ghost"
             size="icon"
             onClick={toggleTheme}
-            className="h-9 w-9 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800"
+            className="h-8 w-8 sm:h-9 sm:w-9 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800"
           >
             {theme === "light" ? (
-              <Moon className="h-4 w-4 text-slate-600 dark:text-slate-400" />
+              <Moon className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-slate-600 dark:text-slate-400" />
             ) : (
-              <Sun className="h-4 w-4 text-slate-600 dark:text-slate-400" />
+              <Sun className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-slate-600 dark:text-slate-400" />
             )}
           </Button>
 
           <Button
             variant="ghost"
             size="icon"
-            className="relative h-9 w-9 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800"
+            className="relative h-8 w-8 sm:h-9 sm:w-9 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 hidden sm:flex"
           >
-            <Bell className="h-4 w-4 text-slate-600 dark:text-slate-400" />
+            <Bell className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-slate-600 dark:text-slate-400" />
             <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-blue-600" />
           </Button>
 
           <Button
             variant="ghost"
             size="icon"
-            className="h-9 w-9 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800"
+            className="h-8 w-8 sm:h-9 sm:w-9 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 hidden md:flex"
           >
-            <Settings className="h-4 w-4 text-slate-600 dark:text-slate-400" />
+            <Settings className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-slate-600 dark:text-slate-400" />
           </Button>
 
           <DropdownMenu>

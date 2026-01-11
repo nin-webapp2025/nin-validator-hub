@@ -133,9 +133,9 @@ export function BvnVerification({ onSuccess }: BvnFormProps) {
       </CardHeader>
       <CardContent>
         <Tabs value={verificationType} onValueChange={(v) => setVerificationType(v as "basic" | "advance")}>
-          <TabsList className="grid w-full grid-cols-2 mb-6">
-            <TabsTrigger value="basic">Basic Verification</TabsTrigger>
-            <TabsTrigger value="advance">Advanced Verification</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-2 gap-1 mb-4 sm:mb-6">
+            <TabsTrigger value="basic" className="text-xs sm:text-sm">Basic</TabsTrigger>
+            <TabsTrigger value="advance" className="text-xs sm:text-sm">Advanced</TabsTrigger>
           </TabsList>
 
           <TabsContent value="basic" className="mt-0">
