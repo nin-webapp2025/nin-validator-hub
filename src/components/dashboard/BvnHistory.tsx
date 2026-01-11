@@ -46,7 +46,19 @@ export function BvnHistory({ history }: BvnHistoryProps) {
             <p>No BVN verifications yet</p>
             <p className="text-sm mt-1">Your verification history will appear here</p>
           </div>
-        </CardContent>3">
+        </CardContent>
+      </Card>
+    );
+  }
+
+  return (
+    <Card className="border-slate-200 dark:border-slate-700 shadow-lg dark:bg-slate-800">
+      <CardHeader>
+        <CardTitle className="text-xl font-bold">BVN Verification History</CardTitle>
+        <CardDescription>Recent verification requests and results</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-3">
           {history.map((item) => {
             const isSuccess = item.status === "success" || item.status === "completed" || item.result?.status === "success" || item.result?.verification?.status === "success";
             const isFailed = item.status === "failed" || item.error_message;
@@ -137,19 +149,7 @@ export function BvnHistory({ history }: BvnHistoryProps) {
                 </div>
               </Collapsible>
             );
-          }           </div>
-                    )}
-                  </div>
-                </div>
-              )}
-
-              {item.error_message && (
-                <div className="mt-3 p-2 bg-red-50 dark:bg-red-950/30 rounded text-sm text-red-700 dark:text-red-400">
-                  {item.error_message}
-                </div>
-              )}
-            </div>
-          ))}
+          })}
         </div>
       </CardContent>
     </Card>

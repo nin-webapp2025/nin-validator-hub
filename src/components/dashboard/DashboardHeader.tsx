@@ -36,7 +36,7 @@ export function DashboardHeader({ onNavigateToProfile, onNavigateToSettings }: D
         <div className="flex items-center gap-3">
           <img 
             src="/logo.svg" 
-            alt="SparkLab Technology Limited" 
+            alt="SparkID" 
             className="h-10 w-auto dark:brightness-110"
           />
           <Badge 

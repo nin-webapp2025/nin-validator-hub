@@ -1,4 +1,4 @@
-const CACHE_NAME = 'nin-validator-v1';
+const CACHE_NAME = 'sparkid-v1';
 const urlsToCache = [
   '/',
   '/dashboard',

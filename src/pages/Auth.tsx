@@ -124,11 +124,11 @@ export default function Auth() {
           <div className="mx-auto mb-4 flex items-center justify-center">
             <img 
               src="/logo.svg" 
-              alt="SparkLab Technology Limited" 
-              className="h-16 w-auto"
+              alt="SparkID" 
+              className="h-14 w-auto"
             />
           </div>
-          <CardTitle className="text-2xl font-bold">NIN Validation Portal</CardTitle>
+          <CardTitle className="text-2xl font-bold">SparkID</CardTitle>
           <CardDescription>Validate and personalize National Identification Numbers</CardDescription>
         </CardHeader>
         <CardContent>

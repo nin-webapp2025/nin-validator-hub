@@ -295,7 +295,7 @@ export default function Landing() {
                 Ready to get started?
               </h2>
               <p className="text-xl text-blue-100 mb-10 max-w-2xl mx-auto">
-                Join thousands of businesses using SparkLab for secure identity verification
+                Join thousands of businesses using SparkID for secure identity verification
               </p>
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                 <Button 
@@ -329,7 +329,7 @@ export default function Landing() {
             <div className="col-span-1 md:col-span-2">
               <img 
                 src="/logo.svg" 
-                alt="SparkLab Technology Limited" 
+                alt="SparkID" 
                 className="h-12 w-auto mb-4 dark:brightness-110"
               />
               <p className="text-sm text-slate-600 dark:text-slate-400 max-w-md leading-relaxed mb-4">
@@ -365,7 +365,7 @@ export default function Landing() {
                   <Linkedin className="h-4 w-4 text-slate-700 dark:text-slate-300" />
                 </a>
                 <a
-                  href="mailto:support@sparklab.com"
+                  href="mailto:support@sparkid.ng"
                   aria-label="Email support"
                   className="h-9 w-9 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 flex items-center justify-center transition-colors"
                 >
@@ -433,7 +433,7 @@ export default function Landing() {
           <div className="pt-8 border-t border-slate-200/80 dark:border-slate-800">
             <div className="flex flex-col md:flex-row items-center justify-between gap-4">
               <p className="text-sm text-slate-600 dark:text-slate-400">
-                © {new Date().getFullYear()} SparkLab Technology Limited. All rights reserved.
+                © {new Date().getFullYear()} SparkID. All rights reserved.
               </p>
               <div className="flex items-center gap-6">
                 <a href="#features" className="text-sm text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">

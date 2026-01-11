@@ -101,6 +101,17 @@ export function ValidationHistory({ history }: ValidationHistoryProps) {
           >
             <Download className="h-4 w-4" />
             Export CSV
+          </Button>
+        </div>
+      </CardHeader>
+      <CardContent>
+        {history.length === 0 ? (
+          <div className="text-center py-12 text-slate-500 dark:text-slate-400">
+            <History className="h-12 w-12 mx-auto mb-3 opacity-50" />
+            <p>No validation history yet</p>
+            <p className="text-sm mt-1">Your validation requests will appear here</p>
+          </div>
+        ) : (
           <div className="space-y-3 max-h-[400px] overflow-y-auto pr-2">
             {history.map((record) => {
               const isSuccess = record.status === "success";
@@ -176,18 +187,7 @@ export function ValidationHistory({ history }: ValidationHistoryProps) {
                 </Collapsible>
               );
             })}
-          </divdiv>
-                  </div>
-                  <Badge 
-                    variant={record.status === "success" ? "default" : "destructive"}
-                    className="flex-shrink-0"
-                  >
-                    {record.status}
-                  </Badge>
-                </div>
-              ))}
-            </div>
-          </ScrollArea>
+          </div>
         )}
       </CardContent>
     </Card>

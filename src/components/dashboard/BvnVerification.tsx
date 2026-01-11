@@ -24,7 +24,6 @@ export function BvnVerification({ onSuccess }: BvnFormProps) {
   const [result, setResult] = useState<any>(null);
   const [verificationType, setVerificationType] = useState<"basic" | "advance">("basic");
   const [modalOpen, setModalOpen] = useState(false);
-  const [modalOpen, setModalOpen] = useState(false);
 
   const handleVerify = async (e: React.FormEvent) => {
     e.preventDefault();
