@@ -125,29 +125,29 @@ export function Profile() {
   const MembershipIcon = membership.icon;
 
   return (
-    <div className="space-y-6 max-w-6xl mx-auto">
+    <div className="space-y-4 sm:space-y-6 max-w-6xl mx-auto px-2 sm:px-0">
       {/* Hero Profile Card */}
-      <Card className="border-slate-200 dark:border-slate-700 shadow-xl overflow-hidden relative">
+      <Card className="border-slate-200 dark:border-slate-700 shadow-lg sm:shadow-xl overflow-hidden relative">
         {/* Gradient Background */}
         <div className="absolute inset-0 bg-gradient-to-br from-blue-500 via-blue-600 to-blue-700 dark:from-blue-600 dark:via-blue-700 dark:to-blue-800" />
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4xIj48cGF0aCBkPSJNMzYgMzRjMC0yLjIwOS0xLjc5MS00LTQtNHMtNCAxLjc5MS00IDQgMS43OTEgNCA0IDQgNC0xLjc5MSA0LTR6bTAgMThjMC0yLjIwOS0xLjc5MS00LTQtNHMtNCAxLjc5MS00IDQgMS43OTEgNCA0IDQgNC0xLjc5MSA0LTR6bTE4LTE4YzAtMi4yMDktMS43OTEtNC00LTRzLTQgMS43OTEtNCA0IDEuNzkxIDQgNCA0IDQtMS43OTEgNC00eiIvPjwvZz48L2c+PC9zdmc+')] opacity-30" />
         
-        <CardContent className="relative pt-8 pb-6">
-          <div className="flex flex-col lg:flex-row items-start lg:items-center gap-6">
+        <CardContent className="relative pt-6 sm:pt-8 pb-4 sm:pb-6 px-4 sm:px-6">
+          <div className="flex flex-col lg:flex-row items-start lg:items-center gap-4 sm:gap-6">
             {/* Avatar Section */}
-            <div className="flex items-center gap-6">
-              <Avatar className="h-28 w-28 border-4 border-white/20 shadow-2xl ring-4 ring-white/10">
-                <AvatarFallback className="text-3xl font-bold bg-white/10 backdrop-blur-sm text-white">
+            <div className="flex items-center gap-3 sm:gap-6 w-full sm:w-auto">
+              <Avatar className="h-20 w-20 sm:h-28 sm:w-28 border-4 border-white/20 shadow-2xl ring-2 sm:ring-4 ring-white/10">
+                <AvatarFallback className="text-2xl sm:text-3xl font-bold bg-white/10 backdrop-blur-sm text-white">
                   {getInitials()}
                 </AvatarFallback>
               </Avatar>
               
-              <div className="text-white">
-                <h2 className="text-3xl font-bold mb-2">
+              <div className="text-white flex-1">
+                <h2 className="text-xl sm:text-2xl md:text-3xl font-bold mb-1 sm:mb-2 break-words">
                   {profile?.display_name || user?.email?.split('@')[0] || "User"}
                 </h2>
-                <div className="flex items-center gap-2 mb-3">
-                  <Mail className="h-4 w-4 opacity-90" />
+                <div className="flex items-center gap-2 mb-2 sm:mb-3">
+                  <Mail className="h-3 w-3 sm:h-4 sm:w-4 opacity-90 flex-shrink-0" />
                   <p className="text-blue-100 text-sm font-medium">{user?.email}</p>
                 </div>
                 <Badge className={`${membership.color} text-white border-0 shadow-lg gap-1.5 px-3 py-1`}>

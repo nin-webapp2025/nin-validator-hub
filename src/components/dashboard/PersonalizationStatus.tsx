@@ -81,19 +81,19 @@ export function PersonalizationStatus() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       <Card className="shadow-card">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Search className="h-5 w-5 text-primary" />
+        <CardHeader className="p-4 sm:p-6">
+          <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+            <Search className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
             Check Personalization Status
           </CardTitle>
-          <CardDescription>
+          <CardDescription className="text-xs sm:text-sm">
             View the status and details of your personalization request
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          <form onSubmit={handleCheckStatus} className="space-y-4">
+        <CardContent className="p-4 sm:p-6">
+          <form onSubmit={handleCheckStatus} className="space-y-3 sm:space-y-4">
             <div className="space-y-2">
               <Label htmlFor="status-tracking-id">Tracking ID</Label>
               <Input
@@ -122,11 +122,11 @@ export function PersonalizationStatus() {
           </form>
 
           {result && (
-            <div className="mt-6 space-y-4">
+            <div className="mt-4 sm:mt-6 space-y-3 sm:space-y-4">
               {/* Status Overview */}
-              <div className="rounded-lg border p-4">
+              <div className="rounded-lg border p-3 sm:p-4">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-medium">Status</span>
+                  <span className="text-xs sm:text-sm font-medium">Status</span>
                   <Badge variant={result.success ? "default" : "secondary"}>
                     {result.status || "Unknown"}
                   </Badge>

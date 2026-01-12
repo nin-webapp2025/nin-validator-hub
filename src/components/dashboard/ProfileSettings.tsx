@@ -201,24 +201,24 @@ export function ProfileSettings() {
   }
 
   return (
-    <div className="space-y-6 max-w-4xl mx-auto">
+    <div className="space-y-4 sm:space-y-6 max-w-4xl mx-auto px-2 sm:px-0">
       {/* Profile Information Card */}
       <Card className="border-slate-200 dark:border-slate-700 shadow-lg dark:bg-slate-800">
-        <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold flex items-center gap-2">
-            <User className="h-6 w-6 text-blue-600" />
+        <CardHeader className="space-y-1 p-4 sm:p-6">
+          <CardTitle className="text-lg sm:text-2xl font-bold flex items-center gap-2">
+            <User className="h-5 w-5 sm:h-6 sm:w-6 text-blue-600" />
             Profile Information
           </CardTitle>
-          <CardDescription className="text-slate-600 dark:text-slate-400">
+          <CardDescription className="text-xs sm:text-sm text-slate-600 dark:text-slate-400">
             Update your personal information and profile picture
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-6">
+        <CardContent className="space-y-4 sm:space-y-6 p-4 sm:p-6">
           {/* Avatar Section */}
-          <div className="flex items-center gap-6">
-            <Avatar className="h-24 w-24 border-4 border-blue-100 dark:border-blue-900">
+          <div className="flex flex-col xs:flex-row items-center gap-3 sm:gap-6">
+            <Avatar className="h-20 w-20 sm:h-24 sm:w-24 border-4 border-blue-100 dark:border-blue-900">
               <AvatarImage src={profile?.avatar_url} />
-              <AvatarFallback className="text-2xl font-bold bg-gradient-to-br from-blue-500 to-blue-600 text-white">
+              <AvatarFallback className="text-xl sm:text-2xl font-bold bg-gradient-to-br from-blue-500 to-blue-600 text-white">
                 {getInitials()}
               </AvatarFallback>
             </Avatar>

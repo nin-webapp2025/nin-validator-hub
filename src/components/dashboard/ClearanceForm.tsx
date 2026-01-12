@@ -82,19 +82,19 @@ export default function ClearanceForm({ onSuccess }: { onSuccess?: () => void })
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3 sm:space-y-4">
       <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <ShieldCheck className="h-5 w-5" />
+        <CardHeader className="p-4 sm:p-6">
+          <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+            <ShieldCheck className="h-4 w-4 sm:h-5 sm:w-5" />
             Submit Clearance Request
           </CardTitle>
-          <CardDescription>
+          <CardDescription className="text-xs sm:text-sm">
             Submit a Tracking ID for clearance verification
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
+        <CardContent className="p-4 sm:p-6">
+          <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
             <div className="space-y-2">
               <Label htmlFor="trackingId">Tracking ID</Label>
               <Input
@@ -122,13 +122,13 @@ export default function ClearanceForm({ onSuccess }: { onSuccess?: () => void })
 
       {result && (
         <Card className="border-green-200 bg-green-50">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-green-700">
-              <CheckCircle className="h-5 w-5" />
+          <CardHeader className="p-4 sm:p-6">
+            <CardTitle className="flex items-center gap-2 text-green-700 text-sm sm:text-base">
+              <CheckCircle className="h-4 w-4 sm:h-5 sm:w-5" />
               Clearance Submitted Successfully
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-2">
+          <CardContent className="p-4 sm:p-6 space-y-2">
             <div className="grid gap-2">
               <div className="flex justify-between items-center">
                 <span className="text-sm font-medium">Tracking ID:</span>

@@ -144,29 +144,29 @@ export function Analytics() {
   });
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6 px-2 sm:px-0">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col xs:flex-row items-start xs:items-center justify-between gap-2">
         <div>
-          <h2 className="text-3xl font-bold text-slate-900 dark:text-slate-100">Analytics</h2>
-          <p className="text-slate-600 dark:text-slate-400 mt-1">
+          <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-slate-100">Analytics</h2>
+          <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 mt-1">
             Insights and trends from your validation activities
           </p>
         </div>
       </div>
 
       {/* Stats Summary */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         <Card className="border-slate-200 dark:border-slate-700">
-          <CardContent className="pt-6">
+          <CardContent className="pt-4 sm:pt-6 px-3 sm:px-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-slate-600 dark:text-slate-400">Total Validations</p>
-                <p className="text-2xl font-bold text-slate-900 dark:text-slate-100 mt-1">
+                <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400">Total Validations</p>
+                <p className="text-lg sm:text-2xl font-bold text-slate-900 dark:text-slate-100 mt-1">
                   {validationData?.length || 0}
                 </p>
               </div>
-              <Activity className="h-10 w-10 text-blue-600 dark:text-blue-400" />
+              <Activity className="h-8 w-8 sm:h-10 sm:w-10 text-blue-600 dark:text-blue-400" />
             </div>
           </CardContent>
         </Card>

@@ -87,19 +87,19 @@ export function ValidationStatus() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       <Card className="shadow-card">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Search className="h-5 w-5 text-primary" />
+        <CardHeader className="p-4 sm:p-6">
+          <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+            <Search className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
             Check Validation Status
           </CardTitle>
-          <CardDescription>
+          <CardDescription className="text-xs sm:text-sm">
             Check the current status of a NIN validation request
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          <form onSubmit={handleCheckStatus} className="space-y-4">
+        <CardContent className="p-4 sm:p-6">
+          <form onSubmit={handleCheckStatus} className="space-y-3 sm:space-y-4">
             <div className="space-y-2">
               <Label htmlFor="status-nin">National Identification Number</Label>
               <Input
@@ -130,13 +130,13 @@ export function ValidationStatus() {
           </form>
 
           {result && (
-            <div className="mt-6 rounded-lg border p-4">
-              <div className="flex items-center gap-2 mb-3">
+            <div className="mt-4 sm:mt-6 rounded-lg border p-3 sm:p-4">
+              <div className="flex items-center gap-2 mb-2 sm:mb-3">
                 {getStatusIcon()}
-                <span className="font-medium">Validation Status</span>
+                <span className="text-sm sm:text-base font-medium">Validation Status</span>
               </div>
               
-              <div className="space-y-3">
+              <div className="space-y-2 sm:space-y-3">
                 {result.status && (
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-muted-foreground">Status:</span>

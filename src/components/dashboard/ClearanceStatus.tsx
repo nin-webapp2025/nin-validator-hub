@@ -85,19 +85,19 @@ export default function ClearanceStatus() {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3 sm:space-y-4">
       <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Search className="h-5 w-5" />
+        <CardHeader className="p-4 sm:p-6">
+          <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+            <Search className="h-4 w-4 sm:h-5 sm:w-5" />
             Check Clearance Status
           </CardTitle>
-          <CardDescription>
+          <CardDescription className="text-xs sm:text-sm">
             Enter Tracking ID to check the status of your clearance request
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
+        <CardContent className="p-4 sm:p-6">
+          <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
             <div className="space-y-2">
               <Label htmlFor="status-trackingId">Tracking ID</Label>
               <Input
@@ -126,11 +126,11 @@ export default function ClearanceStatus() {
       {result && (
         <>
           <Card className={getStatusColor(result.status)}>
-            <CardHeader>
-              <CardTitle className="flex items-center justify-between">
+            <CardHeader className="p-4 sm:p-6">
+              <CardTitle className="flex flex-col xs:flex-row items-start xs:items-center justify-between gap-2 text-sm sm:text-base">
                 <div className="flex items-center gap-2">
                   {getStatusIcon(result.status)}
-                  Clearance Status
+                  <span>Clearance Status</span>
                 </div>
                 <Badge variant="outline" className="capitalize">
                   {result.status}

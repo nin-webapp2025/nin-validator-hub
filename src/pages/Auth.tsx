@@ -118,24 +118,24 @@ export default function Auth() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background p-4">
+    <div className="flex min-h-screen items-center justify-center bg-background p-3 sm:p-4">
       <Card className="w-full max-w-md shadow-card">
-        <CardHeader className="space-y-1 text-center">
-          <div className="mx-auto mb-4 flex items-center justify-center">
+        <CardHeader className="space-y-1 text-center p-4 sm:p-6">
+          <div className="mx-auto mb-3 sm:mb-4 flex items-center justify-center">
             <img 
               src="/logo.svg" 
               alt="SparkID" 
-              className="h-14 w-auto"
+              className="h-12 sm:h-14 w-auto"
             />
           </div>
-          <CardTitle className="text-2xl font-bold">SparkID</CardTitle>
-          <CardDescription>Validate and personalize National Identification Numbers</CardDescription>
+          <CardTitle className="text-xl sm:text-2xl font-bold">SparkID</CardTitle>
+          <CardDescription className="text-xs sm:text-sm">Validate and personalize National Identification Numbers</CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-4 sm:p-6">
           <Tabs defaultValue="login" className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="login">Login</TabsTrigger>
-              <TabsTrigger value="signup">Sign Up</TabsTrigger>
+            <TabsList className="grid w-full grid-cols-2 mb-4 sm:mb-6">
+              <TabsTrigger value="login" className="text-xs sm:text-sm">Login</TabsTrigger>
+              <TabsTrigger value="signup" className="text-xs sm:text-sm">Sign Up</TabsTrigger>
             </TabsList>
             
             <TabsContent value="login">
