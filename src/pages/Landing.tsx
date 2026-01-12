@@ -54,8 +54,8 @@ export default function Landing() {
     },
     {
       icon: CreditCard,
-      title: "Clearance Verification",
-      description: "Check NIN clearance status for employment, visa processing, and background verification. Get instant clearance reports with tracking IDs.",
+      title: "BVN Verification",
+      description: "Verify Bank Verification Numbers instantly. Get comprehensive identity details with basic and advanced BVN validation options for banking and financial services.",
       color: "bg-emerald-500",
       lightBg: "bg-emerald-50 dark:bg-emerald-950/30",
     },
@@ -176,15 +176,15 @@ export default function Landing() {
           </Badge>
           
           <h1 className="text-5xl lg:text-7xl font-bold text-slate-900 dark:text-slate-100 mb-6 tracking-tight">
-            Validate Nigerian NINs
+            Verify NIN & BVN
             <span className="block mt-2 bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent">
               in Real-Time
             </span>
           </h1>
           
           <p className="text-xl text-slate-600 dark:text-slate-400 mb-10 max-w-2xl mx-auto leading-relaxed">
-            Instantly verify National Identification Numbers (NIN), check clearance status, 
-            and personalize NIN slips. Fast, secure, and easy-to-use web portal.
+            Instantly verify National Identification Numbers (NIN) and Bank Verification Numbers (BVN). 
+            Check clearance status, validate identity data, and personalize verification slips. Fast, secure, and reliable.
           </p>
           
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -246,7 +246,7 @@ export default function Landing() {
             Features
           </Badge>
           <h2 className="text-4xl lg:text-5xl font-bold text-slate-900 dark:text-slate-100 mb-4">
-            Complete NIN Verification Suite
+            Complete Identity Verification Suite
           </h2>
           <p className="text-lg text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
             Powerful tools and features designed for businesses of all sizes
@@ -333,8 +333,8 @@ export default function Landing() {
                 className="h-12 w-auto mb-4 dark:brightness-110"
               />
               <p className="text-sm text-slate-600 dark:text-slate-400 max-w-md leading-relaxed mb-4">
-                Providing secure and reliable identity verification services for Nigerian 
-                National Identification Numbers and Bank Verification Numbers with enterprise-grade technology.
+                SparkID provides secure and reliable identity verification services for Nigerian 
+                National Identification Numbers (NIN) and Bank Verification Numbers (BVN) with enterprise-grade technology.
               </p>
               <div className="flex items-center gap-3">
                 <a

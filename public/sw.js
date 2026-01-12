@@ -81,7 +81,7 @@ self.addEventListener('push', (event) => {
   };
 
   event.waitUntil(
-    self.registration.showNotification('NIN Validator Hub', options)
+    self.registration.showNotification('SparkID - Identity Verification', options)
   );
 });
 
