@@ -1,7 +1,7 @@
 {
-  "name": "NIN Validator Hub",
-  "short_name": "NIN Validator",
-  "description": "Secure Nigerian National Identification Number validation and verification platform",
+  "name": "SparkID - Identity Verification",
+  "short_name": "SparkID",
+  "description": "Lightning-fast Nigerian identity verification. Verify NIN, BVN, and more with SparkID",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",

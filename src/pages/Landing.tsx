@@ -104,7 +104,7 @@ export default function Landing() {
           <div className="flex h-16 items-center justify-between">
             <img 
               src="/logo.svg" 
-              alt="SparkLab Technology Limited" 
+              alt="SparkID Identity Verification" 
               className="h-10 w-auto dark:brightness-110 cursor-pointer"
               onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
             />
