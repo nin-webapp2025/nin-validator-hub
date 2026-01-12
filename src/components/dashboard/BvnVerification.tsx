@@ -10,6 +10,7 @@ import { Loader2, CreditCard, CheckCircle2, AlertCircle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { DataDisplayModal } from "@/components/ui/data-display-modal";
 import { trackApiRequest } from "./RateLimitIndicator";
 
 interface BvnFormProps {
