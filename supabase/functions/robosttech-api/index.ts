@@ -27,7 +27,6 @@ serve(async (req) => {
   try {
     const robosttechApiKey = Deno.env.get("ROBOSTTECH_API_KEY");
     const premblyApiKey = Deno.env.get("PREMBLY_API_KEY");
-    const premblyAppId = Deno.env.get("PREMBLY_APP_ID");
     
     const body: RequestBody = await req.json();
     console.log("Received request:", { action: body.action, body: JSON.stringify(body) });
@@ -39,8 +38,6 @@ serve(async (req) => {
     
     console.log(`Using ${isPrembly ? "Prembly" : "RobostTech"} API`);
     console.log(`API Key exists: ${!!apiKey}`);
-    console.log(`Prembly Key exists: ${!!premblyApiKey}`);
-    console.log(`RobostTech Key exists: ${!!robosttechApiKey}`);
     
     if (!apiKey) {
       console.error(`${isPrembly ? "PREMBLY" : "ROBOSTTECH"}_API_KEY not configured`);
