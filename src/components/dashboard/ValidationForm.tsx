@@ -77,7 +77,14 @@ export function ValidationForm({ onSuccess }: ValidationFormProps) {
         throw error;
       }
 
-      console.log("Validation response:", data);
+      console.log("NIN API Response:", JSON.stringify(data, null, 2));
+      console.log("Response structure:", {
+        hasVerification: !!data?.verification,
+        hasData: !!data?.data,
+        hasVerificationData: !!data?.verification?.data,
+        status: data?.status,
+        verificationStatus: data?.verification?.status
+      });
 
       const payload: any = data;
       
@@ -222,67 +229,119 @@ export function ValidationForm({ onSuccess }: ValidationFormProps) {
         </form>
 
         {result && (
-          <div className="mt-6 rounded-lg border p-4">
-            <div className="flex items-center gap-2 mb-3">
-              {result.status === "success" ? (
-                <CheckCircle className="h-5 w-5 text-success" />
-              ) : (
-                <XCircle className="h-5 w-5 text-destructive" />
-              )}
-              <span className={`font-medium ${result.status === "success" ? "text-success" : "text-destructive"}`}>
-                {result.status === "success" ? "Valid NIN" : "Invalid NIN"}
-              </span>
-            </div>
-            
-            {result.data && (
-              <div className="space-y-2 text-sm">
-                {result.data.photo && (
-                  <div className="mb-4">
-                    <img 
-                      src={`data:image/jpeg;base64,${result.data.photo}`} 
-                      alt="Profile" 
-                      className="h-24 w-24 rounded-lg object-cover"
-                    />
-                  </div>
-                )}
-                <div className="grid grid-cols-2 gap-2">
-                  {result.data.firstname && (
-                    <div>
-                      <span className="text-muted-foreground">First Name:</span>
-                      <p className="font-medium">{result.data.firstname}</p>
-                    </div>
+          <div className="mt-6 space-y-4">
+            <div className="p-4 sm:p-6 bg-gradient-to-br from-blue-50 to-white dark:from-blue-900/20 dark:to-slate-900 rounded-lg border-2 border-blue-200 dark:border-blue-800">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  {result.status === "success" ? (
+                    <CheckCircle className="h-5 w-5 sm:h-6 sm:w-6 text-green-600" />
+                  ) : (
+                    <XCircle className="h-5 w-5 sm:h-6 sm:w-6 text-red-600" />
                   )}
-                  {result.data.surname && (
-                    <div>
-                      <span className="text-muted-foreground">Surname:</span>
-                      <p className="font-medium">{result.data.surname}</p>
-                    </div>
-                  )}
-                  {result.data.middlename && (
-                    <div>
-                      <span className="text-muted-foreground">Middle Name:</span>
-                      <p className="font-medium">{result.data.middlename}</p>
-                    </div>
-                  )}
-                  {result.data.birthdate && (
-                    <div>
-                      <span className="text-muted-foreground">Date of Birth:</span>
-                      <p className="font-medium">{result.data.birthdate}</p>
-                    </div>
-                  )}
-                  {result.data.gender && (
-                    <div>
-                      <span className="text-muted-foreground">Gender:</span>
-                      <p className="font-medium">{result.data.gender}</p>
-                    </div>
-                  )}
+                  <h3 className="font-bold text-lg sm:text-xl text-blue-900 dark:text-blue-100">
+                    {result.status === "success" ? "✅ Validation Successful" : "❌ Validation Failed"}
+                  </h3>
                 </div>
+                <Badge className={result.status === "success" ? "bg-green-100 text-green-700 border-green-300" : "bg-red-100 text-red-700 border-red-300"}>
+                  {result.status}
+                </Badge>
               </div>
-            )}
-            
-            {result.message && (
-              <p className="text-sm text-muted-foreground mt-2">{result.message}</p>
-            )}
+
+              {result.data && (
+                <div className="space-y-4">
+                  {result.data.photo && (
+                    <div className="flex justify-center mb-4">
+                      <img 
+                        src={`data:image/jpeg;base64,${result.data.photo}`} 
+                        alt="Profile" 
+                        className="h-32 w-32 sm:h-40 sm:w-40 rounded-lg object-cover border-4 border-white shadow-lg"
+                      />
+                    </div>
+                  )}
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                    {result.data.firstname && (
+                      <div className="p-3 bg-white dark:bg-slate-800 rounded-lg border border-blue-100 dark:border-slate-700">
+                        <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">FIRST NAME</p>
+                        <p className="font-semibold text-sm sm:text-base text-slate-900 dark:text-slate-100">
+                          {result.data.firstname}
+                        </p>
+                      </div>
+                    )}
+                    {result.data.surname && (
+                      <div className="p-3 bg-white dark:bg-slate-800 rounded-lg border border-blue-100 dark:border-slate-700">
+                        <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">SURNAME</p>
+                        <p className="font-semibold text-sm sm:text-base text-slate-900 dark:text-slate-100">
+                          {result.data.surname}
+                        </p>
+                      </div>
+                    )}
+                    {result.data.middlename && (
+                      <div className="p-3 bg-white dark:bg-slate-800 rounded-lg border border-blue-100 dark:border-slate-700">
+                        <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">MIDDLE NAME</p>
+                        <p className="font-semibold text-sm sm:text-base text-slate-900 dark:text-slate-100">
+                          {result.data.middlename}
+                        </p>
+                      </div>
+                    )}
+                    {result.data.birthdate && (
+                      <div className="p-3 bg-white dark:bg-slate-800 rounded-lg border border-blue-100 dark:border-slate-700">
+                        <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">DATE OF BIRTH</p>
+                        <p className="font-semibold text-sm sm:text-base text-slate-900 dark:text-slate-100">
+                          {result.data.birthdate}
+                        </p>
+                      </div>
+                    )}
+                    {result.data.gender && (
+                      <div className="p-3 bg-white dark:bg-slate-800 rounded-lg border border-blue-100 dark:border-slate-700">
+                        <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">GENDER</p>
+                        <p className="font-semibold text-sm sm:text-base text-slate-900 dark:text-slate-100">
+                          {result.data.gender}
+                        </p>
+                      </div>
+                    )}
+                    {result.data.maritalstatus && (
+                      <div className="p-3 bg-white dark:bg-slate-800 rounded-lg border border-blue-100 dark:border-slate-700">
+                        <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">MARITAL STATUS</p>
+                        <p className="font-semibold text-sm sm:text-base text-slate-900 dark:text-slate-100">
+                          {result.data.maritalstatus}
+                        </p>
+                      </div>
+                    )}
+                    {result.data.telephoneno && (
+                      <div className="p-3 bg-white dark:bg-slate-800 rounded-lg border border-blue-100 dark:border-slate-700">
+                        <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">PHONE NUMBER</p>
+                        <p className="font-semibold text-sm sm:text-base text-slate-900 dark:text-slate-100">
+                          {result.data.telephoneno}
+                        </p>
+                      </div>
+                    )}
+                    {result.data.email && (
+                      <div className="p-3 bg-white dark:bg-slate-800 rounded-lg border border-blue-100 dark:border-slate-700 sm:col-span-2">
+                        <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">EMAIL</p>
+                        <p className="font-semibold text-sm sm:text-base text-slate-900 dark:text-slate-100 break-all">
+                          {result.data.email}
+                        </p>
+                      </div>
+                    )}
+                    {result.data.residence_address && (
+                      <div className="p-3 bg-white dark:bg-slate-800 rounded-lg border border-blue-100 dark:border-slate-700 sm:col-span-2">
+                        <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">RESIDENCE ADDRESS</p>
+                        <p className="font-semibold text-sm sm:text-base text-slate-900 dark:text-slate-100">
+                          {result.data.residence_address}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+              
+              {result.message && (
+                <div className="mt-4 p-3 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
+                  <p className="text-sm text-blue-900 dark:text-blue-100">{result.message}</p>
+                </div>
+              )}
+            </div>
           </div>
         )}
 

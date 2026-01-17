@@ -1,9 +1,9 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { History, CheckCircle, XCircle, Copy, Download } from "lucide-react";
-import { formatDistanceToNow } from "date-fns";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Button } from "@/components/ui/button";
+import { History, CheckCircle, XCircle, Copy, Download, ChevronDown, Calendar } from "lucide-react";
+import { format } from "date-fns";
 import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
 import { exportToCSV, copyToClipboard } from "@/lib/export";
@@ -23,6 +23,17 @@ interface PersonalizationHistoryProps {
 export function PersonalizationHistory({ history }: PersonalizationHistoryProps) {
   const { toast } = useToast();
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
+
+  const toggleItem = (id: string) => {
+    const newExpanded = new Set(expandedItems);
+    if (newExpanded.has(id)) {
+      newExpanded.delete(id);
+    } else {
+      newExpanded.add(id);
+    }
+    setExpandedItems(newExpanded);
+  };
 
   const maskTrackingId = (trackingId: string) => {
     if (trackingId.length <= 8) return trackingId;
@@ -100,52 +111,80 @@ export function PersonalizationHistory({ history }: PersonalizationHistoryProps)
             <p className="text-xs text-muted-foreground">Submit a personalization request to get started</p>
           </div>
         ) : (
-          <ScrollArea className="h-[300px]">
-            <div className="space-y-3">
-              {history.map((record) => (
-                <div
-                  key={record.id}
-                  className="flex items-center justify-between rounded-lg border p-3 transition-colors hover:bg-muted/50"
-                >
-                  <div className="flex items-center gap-3 flex-1 min-w-0">
-                    {record.status === "success" ? (
-                      <CheckCircle className="h-5 w-5 text-success flex-shrink-0" />
-                    ) : (
-                      <XCircle className="h-5 w-5 text-destructive flex-shrink-0" />
-                    )}
-                    <div className="flex-1 min-w-0">
-                      {record.tracking_id ? (
-                        <div className="flex items-center gap-2">
-                          <p className="font-mono text-sm font-medium truncate">
-                            {maskTrackingId(record.tracking_id)}
-                          </p>
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            className="h-6 w-6 p-0 flex-shrink-0"
-                            onClick={() => handleCopy(record.tracking_id!, record.id)}
-                          >
-                            <Copy className="h-3 w-3" />
-                          </Button>
+          <div className="space-y-3 max-h-[400px] overflow-y-auto pr-2">
+            {history.map((record) => {
+              const isSuccess = record.status === "success";
+              const isExpanded = expandedItems.has(record.id);
+
+              return (
+                <Collapsible key={record.id} open={isExpanded} onOpenChange={() => toggleItem(record.id)}>
+                  <div className="p-4 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 hover:shadow-md transition-all">
+                    <div className="flex items-start justify-between">
+                      <div className="flex items-center gap-3 flex-1 min-w-0">
+                        <div className={`p-2 rounded-lg ${isSuccess ? 'bg-green-50 dark:bg-green-950/30' : 'bg-red-50 dark:bg-red-950/30'}`}>
+                          <History className={`h-5 w-5 ${isSuccess ? 'text-green-600' : 'text-red-600'}`} />
                         </div>
-                      ) : (
-                        <p className="text-sm text-muted-foreground">No tracking ID</p>
-                      )}
-                      <p className="text-xs text-muted-foreground">
-                        {formatDistanceToNow(new Date(record.created_at), { addSuffix: true })}
-                      </p>
+                        <div className="flex-1 min-w-0">
+                          {record.tracking_id ? (
+                            <div className="flex items-center gap-2">
+                              <p className="font-mono text-sm font-medium truncate text-slate-900 dark:text-slate-100">
+                                {maskTrackingId(record.tracking_id)}
+                              </p>
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                className="h-6 w-6 p-0 flex-shrink-0"
+                                onClick={() => handleCopy(record.tracking_id!, record.id)}
+                              >
+                                <Copy className="h-3 w-3" />
+                              </Button>
+                            </div>
+                          ) : (
+                            <p className="text-sm text-muted-foreground">No tracking ID</p>
+                          )}
+                          <div className="flex items-center gap-1.5 mt-1">
+                            <Calendar className="h-3 w-3 text-slate-500" />
+                            <span className="text-xs text-slate-500 dark:text-slate-400">
+                              {format(new Date(record.created_at), "MMM d, HH:mm")}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Badge
+                          variant={isSuccess ? "default" : "destructive"}
+                          className="flex items-center gap-1 flex-shrink-0"
+                        >
+                          {isSuccess ? (
+                            <CheckCircle className="h-3 w-3" />
+                          ) : (
+                            <XCircle className="h-3 w-3" />
+                          )}
+                          {record.status}
+                        </Badge>
+                        <CollapsibleTrigger asChild>
+                          <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                            <ChevronDown className={`h-4 w-4 transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
+                          </Button>
+                        </CollapsibleTrigger>
+                      </div>
                     </div>
+
+                    <CollapsibleContent className="mt-3 pt-3 border-t border-slate-200 dark:border-slate-700">
+                      {record.tracking_id && (
+                        <div className="text-sm space-y-1">
+                          <span className="text-slate-500 dark:text-slate-400">Full Tracking ID:</span>
+                          <p className="font-mono text-xs text-slate-900 dark:text-slate-100 break-all">
+                            {record.tracking_id}
+                          </p>
+                        </div>
+                      )}
+                    </CollapsibleContent>
                   </div>
-                  <Badge 
-                    variant={record.status === "success" ? "default" : "destructive"}
-                    className="flex-shrink-0"
-                  >
-                    {record.status}
-                  </Badge>
-                </div>
-              ))}
-            </div>
-          </ScrollArea>
+                </Collapsible>
+              );
+            })}
+          </div>
         )}
       </CardContent>
     </Card>

@@ -116,24 +116,33 @@ serve(async (req) => {
         endpoint = "/vnin-basic";
         requestBody = { number: body.nin || body.number };
         headers["X-Api-Key"] = apiKey!;
+        headers["content-type"] = "application/json";
         headers["accept"] = "application/json";
         break;
       case "nin_advance":
-        endpoint = "/nin_advance";
-        requestBody = { number: body.nin || body.number };
+        endpoint = "/vnin";
+        requestBody = { number_nin: body.nin || body.number };
         headers["X-Api-Key"] = apiKey!;
+        headers["content-type"] = "application/json";
         headers["accept"] = "application/json";
+        console.log("NIN Advance Request:", {
+          url: `${PREMBLY_API_URL}${endpoint}`,
+          headers: { ...headers, "X-Api-Key": "***" },
+          body: requestBody
+        });
         break;
       case "bvn_basic":
         endpoint = "/bvn_validation";
         requestBody = { number: body.bvn || body.number };
         headers["X-Api-Key"] = apiKey!;
+        headers["content-type"] = "application/json";
         headers["accept"] = "application/json";
         break;
       case "bvn_advance":
         endpoint = "/bvn";
         requestBody = { number: body.bvn || body.number };
         headers["X-Api-Key"] = apiKey!;
+        headers["content-type"] = "application/json";
         headers["accept"] = "application/json";
         break;
       default:
