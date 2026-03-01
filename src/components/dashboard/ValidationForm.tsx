@@ -15,7 +15,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 const ninSchema = z.string().trim().length(11, "NIN must be exactly 11 digits").regex(/^\d+$/, "NIN must contain only numbers");
 
 interface ValidationFormProps {
-  onSuccess: () => void;
+  onSuccess?: () => void;
 }
 
 interface ValidationResult {
@@ -119,7 +119,7 @@ export function ValidationForm({ onSuccess }: ValidationFormProps) {
         setResult(null);
       }
 
-      onSuccess();
+      onSuccess?.();
 
       if (!isSuccess && typeof balanceMsg === "string") {
         toast({

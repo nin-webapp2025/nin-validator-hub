@@ -120,8 +120,8 @@ serve(async (req) => {
         headers["accept"] = "application/json";
         break;
       case "nin_advance":
-        endpoint = "/vnin";
-        requestBody = { number_nin: body.nin || body.number };
+        endpoint = "/nin_advance";
+        requestBody = { number: body.nin || body.number };
         headers["X-Api-Key"] = apiKey!;
         headers["content-type"] = "application/json";
         headers["accept"] = "application/json";

@@ -17,10 +17,10 @@ interface BvnHistoryItem {
 }
 
 interface BvnHistoryProps {
-  history: BvnHistoryItem[];
+  history?: BvnHistoryItem[];
 }
 
-export function BvnHistory({ history }: BvnHistoryProps) {
+export function BvnHistory({ history = [] }: BvnHistoryProps = {}) {
   const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
 
   const toggleItem = (id: string) => {

@@ -17,10 +17,10 @@ interface PersonalizationRecord {
 }
 
 interface PersonalizationHistoryProps {
-  history: PersonalizationRecord[];
+  history?: PersonalizationRecord[];
 }
 
-export function PersonalizationHistory({ history }: PersonalizationHistoryProps) {
+export function PersonalizationHistory({ history = [] }: PersonalizationHistoryProps = {}) {
   const { toast } = useToast();
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());

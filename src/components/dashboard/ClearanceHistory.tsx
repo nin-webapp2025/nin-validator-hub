@@ -9,7 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
 
 interface ClearanceHistoryProps {
-  history: Array<{
+  history?: Array<{
     id: string;
     nin: string;
     response: {
@@ -22,7 +22,7 @@ interface ClearanceHistoryProps {
   }>;
 }
 
-export function ClearanceHistory({ history }: ClearanceHistoryProps) {
+export function ClearanceHistory({ history = [] }: ClearanceHistoryProps = {}) {
   const { toast } = useToast();
   const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
 

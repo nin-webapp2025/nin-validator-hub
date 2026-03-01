@@ -5,9 +5,9 @@ import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 
 interface StatsCardsProps {
-  totalValidations: number;
-  successfulValidations: number;
-  totalPersonalizations: number;
+  totalValidations?: number;
+  successfulValidations?: number;
+  totalPersonalizations?: number;
   totalClearances?: number;
 }
 
@@ -35,7 +35,12 @@ function AnimatedNumber({ value, duration = 1000 }: { value: number; duration?: 
   return <span>{displayValue}</span>;
 }
 
-export function StatsCards({ totalValidations, successfulValidations, totalPersonalizations, totalClearances = 0 }: StatsCardsProps) {
+export function StatsCards({ 
+  totalValidations = 0, 
+  successfulValidations = 0, 
+  totalPersonalizations = 0, 
+  totalClearances = 0 
+}: StatsCardsProps = {}) {
   const stats = [
     {
       title: "Total Validations",

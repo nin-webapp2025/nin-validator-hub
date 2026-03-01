@@ -5,8 +5,10 @@ import { Button } from "@/components/ui/button";
 import { History, CheckCircle, XCircle, Copy, Download, Shield, Calendar, ChevronDown } from "lucide-react";
 import { format } from "date-fns";
 import { useToast } from "@/hooks/use-toast";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { exportToCSV, copyToClipboard } from "@/lib/export";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 
 interface ValidationRecord {
   id: string;
@@ -18,13 +20,32 @@ interface ValidationRecord {
 }
 
 interface ValidationHistoryProps {
-  history: ValidationRecord[];
+  history?: ValidationRecord[];
 }
 
-export function ValidationHistory({ history }: ValidationHistoryProps) {
+export function ValidationHistory({ history: historyProp }: ValidationHistoryProps = {}) {
+  const [history, setHistory] = useState<ValidationRecord[]>(historyProp || []);
+  const { user } = useAuth();
   const { toast } = useToast();
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
+
+  useEffect(() => {
+    if (historyProp) {
+      setHistory(historyProp);
+    } else if (user) {
+      // Fetch history from database
+      supabase
+        .from('validation_history')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+        .then(({ data }) => {
+          if (data) setHistory(data as ValidationRecord[]);
+        });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [historyProp, user]);
 
   const toggleItem = (id: string) => {
     const newExpanded = new Set(expandedItems);
