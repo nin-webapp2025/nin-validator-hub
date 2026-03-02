@@ -293,19 +293,19 @@ export default function NinSearch() {
         <TabsList className="grid w-full grid-cols-4 gap-1 sm:gap-0">
           <TabsTrigger value="nin" className="flex items-center justify-center gap-1 sm:gap-2 px-1 sm:px-3">
             <User className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-            <span className="hidden xs:inline text-xs sm:text-sm">By NIN</span>
+            <span className="text-xs sm:text-sm">By NIN</span>
           </TabsTrigger>
           <TabsTrigger value="basic" className="flex items-center justify-center gap-1 sm:gap-2 px-1 sm:px-3">
             <Search className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-            <span className="hidden xs:inline text-xs sm:text-sm">Basic</span>
+            <span className="text-xs sm:text-sm">Basic</span>
           </TabsTrigger>
           <TabsTrigger value="phone" className="flex items-center justify-center gap-1 sm:gap-2 px-1 sm:px-3">
             <Phone className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-            <span className="hidden xs:inline text-xs sm:text-sm">Phone</span>
+            <span className="text-xs sm:text-sm">Phone</span>
           </TabsTrigger>
           <TabsTrigger value="demo" className="flex items-center justify-center gap-1 sm:gap-2 px-1 sm:px-3">
             <FileText className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-            <span className="hidden xs:inline text-xs sm:text-sm">Demo</span>
+            <span className="text-xs sm:text-sm">Demo</span>
           </TabsTrigger>
         </TabsList>
 

@@ -28,40 +28,40 @@ export default function VipDashboard() {
         </div>
 
         <Tabs defaultValue="modification" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-2 lg:grid-cols-6 gap-2 bg-purple-900/50 backdrop-blur-lg border border-amber-500/20">
+          <TabsList className="flex w-full overflow-x-auto gap-1 p-1 no-scrollbar bg-purple-900/50 backdrop-blur-lg border border-amber-500/20">
             <TabsTrigger 
               value="modification" 
-              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-yellow-600 data-[state=active]:text-black"
+              className="whitespace-nowrap flex-shrink-0 text-xs sm:text-sm data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-yellow-600 data-[state=active]:text-black"
             >
               Modify NIN
             </TabsTrigger>
             <TabsTrigger 
               value="validation" 
-              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-yellow-600 data-[state=active]:text-black"
+              className="whitespace-nowrap flex-shrink-0 text-xs sm:text-sm data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-yellow-600 data-[state=active]:text-black"
             >
-              Validation History
+              Validation
             </TabsTrigger>
             <TabsTrigger 
               value="personalization"
-              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-yellow-600 data-[state=active]:text-black"
+              className="whitespace-nowrap flex-shrink-0 text-xs sm:text-sm data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-yellow-600 data-[state=active]:text-black"
             >
               Personalization
             </TabsTrigger>
             <TabsTrigger 
               value="clearance"
-              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-yellow-600 data-[state=active]:text-black"
+              className="whitespace-nowrap flex-shrink-0 text-xs sm:text-sm data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-yellow-600 data-[state=active]:text-black"
             >
               Clearance
             </TabsTrigger>
             <TabsTrigger 
               value="bvn"
-              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-yellow-600 data-[state=active]:text-black"
+              className="whitespace-nowrap flex-shrink-0 text-xs sm:text-sm data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-yellow-600 data-[state=active]:text-black"
             >
-              BVN History
+              BVN
             </TabsTrigger>
             <TabsTrigger 
               value="profile"
-              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-yellow-600 data-[state=active]:text-black"
+              className="whitespace-nowrap flex-shrink-0 text-xs sm:text-sm data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-yellow-600 data-[state=active]:text-black"
             >
               Profile
             </TabsTrigger>

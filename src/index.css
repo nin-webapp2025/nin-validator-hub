@@ -298,4 +298,13 @@
   .text-gradient-premium {
     @apply bg-clip-text text-transparent bg-gradient-to-r from-slate-900 via-blue-900 to-slate-900;
   }
+
+  /* Hide scrollbar for horizontal scroll tabs */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
 }

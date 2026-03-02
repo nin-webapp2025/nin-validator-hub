@@ -179,18 +179,18 @@ export function UserRoleManagement() {
                 key={user.id}
                 className="border rounded-lg p-4 hover:bg-gray-50 transition-colors"
               >
-                <div className="flex items-center justify-between gap-4">
+                <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:justify-between">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
                       <UserCog className="h-4 w-4 text-gray-500 flex-shrink-0" />
-                      <p className="font-medium truncate">{user.email}</p>
+                      <p className="font-medium text-sm sm:text-base truncate">{user.email}</p>
                     </div>
                     <p className="text-xs text-gray-500">
                       Joined: {new Date(user.created_at).toLocaleDateString()}
                     </p>
                   </div>
 
-                  <div className="flex items-center gap-3 flex-shrink-0">
+                  <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
                     <Badge className={ROLE_COLORS[user.role]}>
                       {user.role.toUpperCase()}
                     </Badge>
@@ -200,7 +200,7 @@ export function UserRoleManagement() {
                       onValueChange={(value) => handleRoleChange(user.id, value as UserRole)}
                       disabled={updatingUserId === user.id}
                     >
-                      <SelectTrigger className="w-[130px]">
+                      <SelectTrigger className="w-[110px] sm:w-[130px]">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>

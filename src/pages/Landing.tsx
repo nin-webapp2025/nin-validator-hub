@@ -24,10 +24,13 @@ import {
   Twitter,
   Linkedin,
   Mail,
-  BookOpen
+  BookOpen,
+  Menu,
+  X
 } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { Sheet, SheetContent, SheetTrigger, SheetClose } from "@/components/ui/sheet";
 
 export default function Landing() {
   const navigate = useNavigate();
@@ -130,7 +133,7 @@ export default function Landing() {
               </a>
             </div>
 
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 sm:gap-3">
               <Button
                 variant="ghost"
                 size="icon"
@@ -146,24 +149,72 @@ export default function Landing() {
               <Button 
                 variant="ghost" 
                 onClick={() => navigate("/auth")}
-                className="text-slate-600 dark:text-slate-400"
+                className="hidden sm:inline-flex text-slate-600 dark:text-slate-400"
               >
                 Login
               </Button>
               <Button 
                 onClick={() => navigate("/auth")}
-                className="bg-blue-600 hover:bg-blue-700"
+                className="hidden sm:inline-flex bg-blue-600 hover:bg-blue-700"
               >
                 Get Started
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
+
+              {/* Mobile bottom sheet menu */}
+              <Sheet>
+                <SheetTrigger asChild>
+                  <Button variant="ghost" size="icon" className="md:hidden h-9 w-9 rounded-lg">
+                    <Menu className="h-5 w-5 text-slate-600 dark:text-slate-400" />
+                  </Button>
+                </SheetTrigger>
+                <SheetContent side="bottom" className="rounded-t-2xl pb-8">
+                  <div className="mx-auto w-12 h-1.5 flex-shrink-0 rounded-full bg-slate-300 dark:bg-slate-600 mb-6 mt-2" />
+                  <nav className="flex flex-col gap-2 mb-6">
+                    <SheetClose asChild>
+                      <a href="#features" className="flex items-center gap-3 px-4 py-3 rounded-xl text-base font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+                        <Sparkles className="h-5 w-5 text-blue-600" />
+                        Features
+                      </a>
+                    </SheetClose>
+                    <SheetClose asChild>
+                      <a href="#services" className="flex items-center gap-3 px-4 py-3 rounded-xl text-base font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+                        <Shield className="h-5 w-5 text-blue-600" />
+                        Services
+                      </a>
+                    </SheetClose>
+                    <SheetClose asChild>
+                      <a href="#about" className="flex items-center gap-3 px-4 py-3 rounded-xl text-base font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+                        <Users className="h-5 w-5 text-blue-600" />
+                        About
+                      </a>
+                    </SheetClose>
+                  </nav>
+                  <div className="flex flex-col gap-3 px-4">
+                    <Button 
+                      variant="outline" 
+                      onClick={() => navigate("/auth")}
+                      className="w-full py-3 text-base rounded-xl"
+                    >
+                      Login
+                    </Button>
+                    <Button 
+                      onClick={() => navigate("/auth")}
+                      className="w-full py-3 text-base rounded-xl bg-blue-600 hover:bg-blue-700"
+                    >
+                      Get Started
+                      <ArrowRight className="ml-2 h-4 w-4" />
+                    </Button>
+                  </div>
+                </SheetContent>
+              </Sheet>
             </div>
           </div>
         </div>
       </nav>
 
       {/* Hero Section */}
-      <section className="container mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-20 lg:pt-16 lg:pb-32">
+      <section className="container mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-12 sm:pt-12 sm:pb-20 lg:pt-16 lg:pb-32">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -175,14 +226,14 @@ export default function Landing() {
             Trusted Identity Verification
           </Badge>
           
-          <h1 className="text-5xl lg:text-7xl font-bold text-slate-900 dark:text-slate-100 mb-6 tracking-tight">
+          <h1 className="text-3xl sm:text-5xl lg:text-7xl font-bold text-slate-900 dark:text-slate-100 mb-4 sm:mb-6 tracking-tight">
             Verify NIN & BVN
-            <span className="block mt-2 bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent">
+            <span className="block mt-1 sm:mt-2 bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent">
               in Real-Time
             </span>
           </h1>
           
-          <p className="text-xl text-slate-600 dark:text-slate-400 mb-10 max-w-2xl mx-auto leading-relaxed">
+          <p className="text-base sm:text-xl text-slate-600 dark:text-slate-400 mb-6 sm:mb-10 max-w-2xl mx-auto leading-relaxed">
             Instantly verify National Identification Numbers (NIN) and Bank Verification Numbers (BVN). 
             Check clearance status, validate identity data, and personalize verification slips. Fast, secure, and reliable.
           </p>
@@ -208,7 +259,7 @@ export default function Landing() {
           </div>
 
           {/* Stats */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mt-20">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mt-10 sm:mt-20">
             {stats.map((stat, index) => (
               <motion.div
                 key={stat.label}
@@ -217,9 +268,9 @@ export default function Landing() {
                 transition={{ duration: 0.5, delay: index * 0.1 }}
               >
                 <Card className="border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900">
-                  <CardContent className="p-6 text-center">
-                    <stat.icon className="h-8 w-8 mx-auto mb-3 text-blue-600" />
-                    <p className="text-3xl font-bold text-slate-900 dark:text-slate-100 mb-1">
+                  <CardContent className="p-3 sm:p-6 text-center">
+                    <stat.icon className="h-6 w-6 sm:h-8 sm:w-8 mx-auto mb-2 sm:mb-3 text-blue-600" />
+                    <p className="text-xl sm:text-3xl font-bold text-slate-900 dark:text-slate-100 mb-1">
                       {stat.value}
                     </p>
                     <p className="text-sm text-slate-600 dark:text-slate-400">
@@ -245,7 +296,7 @@ export default function Landing() {
           <Badge className="mb-4 px-4 py-1.5 bg-blue-50 dark:bg-blue-950/30 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800">
             Features
           </Badge>
-          <h2 className="text-4xl lg:text-5xl font-bold text-slate-900 dark:text-slate-100 mb-4">
+          <h2 className="text-2xl sm:text-4xl lg:text-5xl font-bold text-slate-900 dark:text-slate-100 mb-4">
             Complete Identity Verification Suite
           </h2>
           <p className="text-lg text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
@@ -290,11 +341,11 @@ export default function Landing() {
           transition={{ duration: 0.6 }}
         >
           <Card className="bg-gradient-to-br from-blue-600 to-blue-700 border-0 shadow-2xl">
-            <CardContent className="p-12 lg:p-16 text-center">
-              <h2 className="text-4xl lg:text-5xl font-bold text-white mb-6">
+            <CardContent className="p-6 sm:p-12 lg:p-16 text-center">
+              <h2 className="text-2xl sm:text-4xl lg:text-5xl font-bold text-white mb-4 sm:mb-6">
                 Ready to get started?
               </h2>
-              <p className="text-xl text-blue-100 mb-10 max-w-2xl mx-auto">
+              <p className="text-base sm:text-xl text-blue-100 mb-6 sm:mb-10 max-w-2xl mx-auto">
                 Join thousands of businesses using SparkID for secure identity verification
               </p>
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4">

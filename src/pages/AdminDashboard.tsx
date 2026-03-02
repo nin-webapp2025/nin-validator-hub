@@ -36,14 +36,14 @@ export default function AdminDashboard() {
         </div>
 
         <Tabs defaultValue="modifications" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-2 lg:grid-cols-7 gap-2">
-            <TabsTrigger value="modifications">Modification Requests</TabsTrigger>
-            <TabsTrigger value="users">User Roles</TabsTrigger>
-            <TabsTrigger value="validation">Validation History</TabsTrigger>
-            <TabsTrigger value="personalization">Personalization</TabsTrigger>
-            <TabsTrigger value="clearance">Clearance</TabsTrigger>
-            <TabsTrigger value="bvn">BVN History</TabsTrigger>
-            <TabsTrigger value="profile">Profile</TabsTrigger>
+          <TabsList className="flex w-full overflow-x-auto gap-1 p-1 no-scrollbar">
+            <TabsTrigger value="modifications" className="whitespace-nowrap flex-shrink-0 text-xs sm:text-sm">Modifications</TabsTrigger>
+            <TabsTrigger value="users" className="whitespace-nowrap flex-shrink-0 text-xs sm:text-sm">User Roles</TabsTrigger>
+            <TabsTrigger value="validation" className="whitespace-nowrap flex-shrink-0 text-xs sm:text-sm">Validation</TabsTrigger>
+            <TabsTrigger value="personalization" className="whitespace-nowrap flex-shrink-0 text-xs sm:text-sm">Personalization</TabsTrigger>
+            <TabsTrigger value="clearance" className="whitespace-nowrap flex-shrink-0 text-xs sm:text-sm">Clearance</TabsTrigger>
+            <TabsTrigger value="bvn" className="whitespace-nowrap flex-shrink-0 text-xs sm:text-sm">BVN</TabsTrigger>
+            <TabsTrigger value="profile" className="whitespace-nowrap flex-shrink-0 text-xs sm:text-sm">Profile</TabsTrigger>
           </TabsList>
 
           <TabsContent value="modifications" className="space-y-6">

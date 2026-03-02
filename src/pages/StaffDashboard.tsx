@@ -28,15 +28,15 @@ export default function StaffDashboard() {
         </div>
 
         <Tabs defaultValue="tasks" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-2 lg:grid-cols-8 gap-2">
-            <TabsTrigger value="tasks">My Tasks</TabsTrigger>
-            <TabsTrigger value="validation">Validate NIN</TabsTrigger>
-            <TabsTrigger value="search">NIN Search</TabsTrigger>
-            <TabsTrigger value="personalization">Personalization</TabsTrigger>
-            <TabsTrigger value="clearance">Clearance</TabsTrigger>
-            <TabsTrigger value="bvn">BVN Verify</TabsTrigger>
-            <TabsTrigger value="batch">Batch</TabsTrigger>
-            <TabsTrigger value="profile">Profile</TabsTrigger>
+          <TabsList className="flex w-full overflow-x-auto gap-1 p-1 no-scrollbar">
+            <TabsTrigger value="tasks" className="whitespace-nowrap flex-shrink-0 text-xs sm:text-sm">My Tasks</TabsTrigger>
+            <TabsTrigger value="validation" className="whitespace-nowrap flex-shrink-0 text-xs sm:text-sm">Validate NIN</TabsTrigger>
+            <TabsTrigger value="search" className="whitespace-nowrap flex-shrink-0 text-xs sm:text-sm">NIN Search</TabsTrigger>
+            <TabsTrigger value="personalization" className="whitespace-nowrap flex-shrink-0 text-xs sm:text-sm">Personalization</TabsTrigger>
+            <TabsTrigger value="clearance" className="whitespace-nowrap flex-shrink-0 text-xs sm:text-sm">Clearance</TabsTrigger>
+            <TabsTrigger value="bvn" className="whitespace-nowrap flex-shrink-0 text-xs sm:text-sm">BVN Verify</TabsTrigger>
+            <TabsTrigger value="batch" className="whitespace-nowrap flex-shrink-0 text-xs sm:text-sm">Batch</TabsTrigger>
+            <TabsTrigger value="profile" className="whitespace-nowrap flex-shrink-0 text-xs sm:text-sm">Profile</TabsTrigger>
           </TabsList>
 
           <TabsContent value="tasks" className="space-y-6">
