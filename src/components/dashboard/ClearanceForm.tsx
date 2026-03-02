@@ -58,6 +58,7 @@ export default function ClearanceForm({ onSuccess }: { onSuccess?: () => void })
             user_id: user.id,
             nin: trackingId,
             response: data,
+            status: "success",
           });
         }
 

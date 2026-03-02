@@ -1,15 +1,23 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
 import { Footer } from "@/components/dashboard/Footer";
+import { ValidationForm } from "@/components/dashboard/ValidationForm";
 import { ValidationHistory } from "@/components/dashboard/ValidationHistory";
+import { ValidationStatus } from "@/components/dashboard/ValidationStatus";
+import { Personalization } from "@/components/dashboard/Personalization";
 import { PersonalizationHistory } from "@/components/dashboard/PersonalizationHistory";
+import { PersonalizationStatus } from "@/components/dashboard/PersonalizationStatus";
+import ClearanceForm from "@/components/dashboard/ClearanceForm";
+import ClearanceStatus from "@/components/dashboard/ClearanceStatus";
 import { ClearanceHistory } from "@/components/dashboard/ClearanceHistory";
+import { BvnVerification } from "@/components/dashboard/BvnVerification";
 import { BvnHistory } from "@/components/dashboard/BvnHistory";
+import NinSearch from "@/components/dashboard/NinSearch";
 import { Profile } from "@/components/dashboard/Profile";
 import { User } from "lucide-react";
 
 /**
- * User Dashboard - Basic access to personal verification history
+ * User Dashboard - Full access to all NIN/BVN verification services
  * No API stats, no modification requests
  */
 export default function UserDashboard() {
@@ -23,29 +31,47 @@ export default function UserDashboard() {
           <h1 className="text-2xl font-bold text-gray-900">My Dashboard</h1>
         </div>
 
-        <Tabs defaultValue="validation" className="space-y-6">
+        <Tabs defaultValue="validate" className="space-y-6">
           <TabsList className="flex w-full overflow-x-auto gap-1 p-1 no-scrollbar">
-            <TabsTrigger value="validation" className="whitespace-nowrap flex-shrink-0 text-xs sm:text-sm">Validation</TabsTrigger>
-            <TabsTrigger value="personalization" className="whitespace-nowrap flex-shrink-0 text-xs sm:text-sm">Personalization</TabsTrigger>
+            <TabsTrigger value="validate" className="whitespace-nowrap flex-shrink-0 text-xs sm:text-sm">Validate NIN</TabsTrigger>
+            <TabsTrigger value="bvn" className="whitespace-nowrap flex-shrink-0 text-xs sm:text-sm">BVN Verify</TabsTrigger>
             <TabsTrigger value="clearance" className="whitespace-nowrap flex-shrink-0 text-xs sm:text-sm">Clearance</TabsTrigger>
-            <TabsTrigger value="bvn" className="whitespace-nowrap flex-shrink-0 text-xs sm:text-sm">BVN</TabsTrigger>
+            <TabsTrigger value="search" className="whitespace-nowrap flex-shrink-0 text-xs sm:text-sm">NIN Search</TabsTrigger>
+            <TabsTrigger value="personalization" className="whitespace-nowrap flex-shrink-0 text-xs sm:text-sm">Personalization</TabsTrigger>
             <TabsTrigger value="profile" className="whitespace-nowrap flex-shrink-0 text-xs sm:text-sm">Profile</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="validation" className="space-y-6">
+          <TabsContent value="validate" className="space-y-6">
+            <div className="grid gap-6 lg:grid-cols-2">
+              <ValidationForm />
+              <ValidationStatus />
+            </div>
             <ValidationHistory />
           </TabsContent>
 
-          <TabsContent value="personalization" className="space-y-6">
-            <PersonalizationHistory />
+          <TabsContent value="bvn" className="space-y-6">
+            <BvnVerification />
+            <BvnHistory />
           </TabsContent>
 
           <TabsContent value="clearance" className="space-y-6">
+            <div className="grid gap-6 lg:grid-cols-2">
+              <ClearanceForm />
+              <ClearanceStatus />
+            </div>
             <ClearanceHistory />
           </TabsContent>
 
-          <TabsContent value="bvn" className="space-y-6">
-            <BvnHistory />
+          <TabsContent value="search" className="space-y-6">
+            <NinSearch />
+          </TabsContent>
+
+          <TabsContent value="personalization" className="space-y-6">
+            <div className="grid gap-6 lg:grid-cols-2">
+              <Personalization />
+              <PersonalizationStatus />
+            </div>
+            <PersonalizationHistory />
           </TabsContent>
 
           <TabsContent value="profile" className="space-y-6">

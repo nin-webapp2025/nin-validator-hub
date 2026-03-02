@@ -73,26 +73,31 @@ export function AdminModificationRequests() {
 
   const fetchStaffUsers = async () => {
     try {
-      const { data, error } = await supabase
+      // Join user_roles with profiles to get staff emails (no admin API needed)
+      const { data: staffRoles, error: rolesError } = await supabase
         .from("user_roles")
         .select("user_id")
         .eq("role", "staff");
 
-      if (error) throw error;
+      if (rolesError) throw rolesError;
 
-      if (data && data.length > 0) {
-        // Get user profiles from Supabase Auth
-        const { data: { users }, error: usersError } = await supabase.auth.admin.listUsers();
+      if (staffRoles && staffRoles.length > 0) {
+        const staffIds = staffRoles.map(r => r.user_id);
+        
+        const { data: profiles, error: profilesError } = await supabase
+          .from("profiles")
+          .select("id, email")
+          .in("id", staffIds);
 
-        if (usersError) {
-          console.error("Error fetching users:", usersError);
+        if (profilesError) {
+          console.error("Error fetching staff profiles:", profilesError);
           return;
         }
 
-        const userIds = data.map(r => r.user_id);
-        const staffList = users
-          .filter(user => userIds.includes(user.id))
-          .map(user => ({ id: user.id, email: user.email || "Unknown" }));
+        const staffList = (profiles || []).map(p => ({
+          id: p.id,
+          email: p.email || "Unknown",
+        }));
 
         setStaffUsers(staffList);
       }

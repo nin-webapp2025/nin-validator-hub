@@ -88,7 +88,7 @@ export function Profile() {
       if (!user) return null;
       const { data, error } = await supabase
         .from("clearance_history")
-        .select("status, created_at")
+        .select("id, status, created_at")
         .eq("user_id", user.id);
       
       if (error) throw error;

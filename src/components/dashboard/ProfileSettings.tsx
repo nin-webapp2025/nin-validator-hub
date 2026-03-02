@@ -122,17 +122,25 @@ export function ProfileSettings() {
     mutationFn: async () => {
       if (!user) throw new Error("Not authenticated");
       
-      // Delete user data from profiles
+      // Delete user data from profiles (cascades to user_roles via FK)
       const { error: profileError } = await supabase
         .from("profiles")
         .delete()
         .eq("id", user.id);
       
       if (profileError) throw profileError;
+
+      // Delete history data
+      await supabase.from("validation_history").delete().eq("user_id", user.id);
+      await supabase.from("personalization_history").delete().eq("user_id", user.id);
+      await supabase.from("clearance_history").delete().eq("user_id", user.id);
+      await supabase.from("bvn_history").delete().eq("user_id", user.id);
+      await supabase.from("nin_modification_requests").delete().eq("user_id", user.id);
       
-      // Delete auth user
-      const { error: authError } = await supabase.auth.admin.deleteUser(user.id);
-      if (authError) throw authError;
+      // Sign out — the user account remains in auth.users but all app data is wiped
+      // Full auth deletion requires a server-side edge function with service_role key
+      const { error: signOutError } = await supabase.auth.signOut();
+      if (signOutError) throw signOutError;
     },
     onSuccess: () => {
       toast({
