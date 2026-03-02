@@ -17,6 +17,7 @@ import NinSearch from "@/components/dashboard/NinSearch";
 import { Profile } from "@/components/dashboard/Profile";
 import { ProfileSettings } from "@/components/dashboard/ProfileSettings";
 import { VipModificationForm } from "@/components/dashboard/VipModificationForm";
+import { PrintNinSlip } from "@/components/dashboard/PrintNinSlip";
 import { Crown } from "lucide-react";
 
 /**
@@ -43,52 +44,58 @@ export default function VipDashboard() {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="flex w-full overflow-x-auto gap-1 p-1 no-scrollbar bg-purple-900/50 backdrop-blur-lg border border-amber-500/20">
+          <TabsList className="grid grid-cols-3 md:grid-cols-4 lg:flex lg:flex-row w-full gap-1 p-1.5 h-auto bg-purple-900/50 backdrop-blur-lg border border-amber-500/20">
             <TabsTrigger 
               value="modification" 
-              className="whitespace-nowrap flex-shrink-0 text-xs sm:text-sm data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-yellow-600 data-[state=active]:text-black"
+              className="text-xs sm:text-sm py-2.5 data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-yellow-600 data-[state=active]:text-black"
             >
               Modify NIN
             </TabsTrigger>
             <TabsTrigger 
               value="validate" 
-              className="whitespace-nowrap flex-shrink-0 text-xs sm:text-sm data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-yellow-600 data-[state=active]:text-black"
+              className="text-xs sm:text-sm py-2.5 data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-yellow-600 data-[state=active]:text-black"
             >
               Validate NIN
             </TabsTrigger>
             <TabsTrigger 
               value="bvn" 
-              className="whitespace-nowrap flex-shrink-0 text-xs sm:text-sm data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-yellow-600 data-[state=active]:text-black"
+              className="text-xs sm:text-sm py-2.5 data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-yellow-600 data-[state=active]:text-black"
             >
               BVN Verify
             </TabsTrigger>
             <TabsTrigger 
               value="clearance" 
-              className="whitespace-nowrap flex-shrink-0 text-xs sm:text-sm data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-yellow-600 data-[state=active]:text-black"
+              className="text-xs sm:text-sm py-2.5 data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-yellow-600 data-[state=active]:text-black"
             >
               Clearance
             </TabsTrigger>
             <TabsTrigger 
               value="search"
-              className="whitespace-nowrap flex-shrink-0 text-xs sm:text-sm data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-yellow-600 data-[state=active]:text-black"
+              className="text-xs sm:text-sm py-2.5 data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-yellow-600 data-[state=active]:text-black"
             >
               NIN Search
             </TabsTrigger>
             <TabsTrigger 
               value="personalization"
-              className="whitespace-nowrap flex-shrink-0 text-xs sm:text-sm data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-yellow-600 data-[state=active]:text-black"
+              className="text-xs sm:text-sm py-2.5 data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-yellow-600 data-[state=active]:text-black"
             >
-              Personalization
+              Personalize
+            </TabsTrigger>
+            <TabsTrigger 
+              value="print-nin"
+              className="text-xs sm:text-sm py-2.5 data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-yellow-600 data-[state=active]:text-black"
+            >
+              Print NIN
             </TabsTrigger>
             <TabsTrigger 
               value="profile"
-              className="whitespace-nowrap flex-shrink-0 text-xs sm:text-sm data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-yellow-600 data-[state=active]:text-black"
+              className="text-xs sm:text-sm py-2.5 data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-yellow-600 data-[state=active]:text-black"
             >
               Profile
             </TabsTrigger>
             <TabsTrigger 
               value="settings"
-              className="whitespace-nowrap flex-shrink-0 text-xs sm:text-sm data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-yellow-600 data-[state=active]:text-black"
+              className="text-xs sm:text-sm py-2.5 data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-yellow-600 data-[state=active]:text-black"
             >
               Settings
             </TabsTrigger>
@@ -146,6 +153,12 @@ export default function VipDashboard() {
               <div className="mt-6">
                 <PersonalizationHistory />
               </div>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="print-nin" className="space-y-6">
+            <div className="bg-purple-900/30 backdrop-blur-lg border border-amber-500/20 rounded-lg p-6">
+              <PrintNinSlip />
             </div>
           </TabsContent>
 

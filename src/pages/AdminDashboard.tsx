@@ -13,6 +13,7 @@ import { ProfileSettings } from "@/components/dashboard/ProfileSettings";
 import { AdminModificationRequests } from "@/components/dashboard/AdminModificationRequests";
 import { UserRoleManagement } from "@/components/dashboard/UserRoleManagement";
 import { AuditLog } from "@/components/dashboard/AuditLog";
+import { PrintNinSlip } from "@/components/dashboard/PrintNinSlip";
 import { Shield } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useQuery } from "@tanstack/react-query";
@@ -79,16 +80,17 @@ export default function AdminDashboard() {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="flex w-full overflow-x-auto gap-1 p-1 no-scrollbar">
-            <TabsTrigger value="modifications" className="whitespace-nowrap flex-shrink-0 text-xs sm:text-sm">Modifications</TabsTrigger>
-            <TabsTrigger value="users" className="whitespace-nowrap flex-shrink-0 text-xs sm:text-sm">User Roles</TabsTrigger>
-            <TabsTrigger value="audit" className="whitespace-nowrap flex-shrink-0 text-xs sm:text-sm">Audit Log</TabsTrigger>
-            <TabsTrigger value="validation" className="whitespace-nowrap flex-shrink-0 text-xs sm:text-sm">Validation</TabsTrigger>
-            <TabsTrigger value="personalization" className="whitespace-nowrap flex-shrink-0 text-xs sm:text-sm">Personalization</TabsTrigger>
-            <TabsTrigger value="clearance" className="whitespace-nowrap flex-shrink-0 text-xs sm:text-sm">Clearance</TabsTrigger>
-            <TabsTrigger value="bvn" className="whitespace-nowrap flex-shrink-0 text-xs sm:text-sm">BVN</TabsTrigger>
-            <TabsTrigger value="profile" className="whitespace-nowrap flex-shrink-0 text-xs sm:text-sm">Profile</TabsTrigger>
-            <TabsTrigger value="settings" className="whitespace-nowrap flex-shrink-0 text-xs sm:text-sm">Settings</TabsTrigger>
+          <TabsList className="grid grid-cols-3 md:grid-cols-5 lg:flex lg:flex-row w-full gap-1 p-1.5 h-auto">
+            <TabsTrigger value="modifications" className="text-xs sm:text-sm py-2.5">Modifications</TabsTrigger>
+            <TabsTrigger value="users" className="text-xs sm:text-sm py-2.5">User Roles</TabsTrigger>
+            <TabsTrigger value="audit" className="text-xs sm:text-sm py-2.5">Audit Log</TabsTrigger>
+            <TabsTrigger value="validation" className="text-xs sm:text-sm py-2.5">Validation</TabsTrigger>
+            <TabsTrigger value="personalization" className="text-xs sm:text-sm py-2.5">Personalize</TabsTrigger>
+            <TabsTrigger value="clearance" className="text-xs sm:text-sm py-2.5">Clearance</TabsTrigger>
+            <TabsTrigger value="bvn" className="text-xs sm:text-sm py-2.5">BVN</TabsTrigger>
+            <TabsTrigger value="print-nin" className="text-xs sm:text-sm py-2.5">Print NIN</TabsTrigger>
+            <TabsTrigger value="profile" className="text-xs sm:text-sm py-2.5">Profile</TabsTrigger>
+            <TabsTrigger value="settings" className="text-xs sm:text-sm py-2.5">Settings</TabsTrigger>
           </TabsList>
 
           <TabsContent value="modifications" className="space-y-6">
@@ -117,6 +119,10 @@ export default function AdminDashboard() {
 
           <TabsContent value="bvn" className="space-y-6">
             <BvnHistory isAdmin />
+          </TabsContent>
+
+          <TabsContent value="print-nin" className="space-y-6">
+            <PrintNinSlip />
           </TabsContent>
 
           <TabsContent value="profile" className="space-y-6">
