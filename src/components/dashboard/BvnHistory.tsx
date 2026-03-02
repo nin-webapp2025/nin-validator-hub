@@ -2,9 +2,17 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Button } from "@/components/ui/button";
-import { CreditCard, Calendar, CheckCircle2, XCircle, Clock, ChevronDown } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { CreditCard, Calendar, CheckCircle2, XCircle, Clock, ChevronDown, Download, ChevronLeft, ChevronRight, Search } from "lucide-react";
 import { format } from "date-fns";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { exportToCSV } from "@/lib/export";
+import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
+
+const PAGE_SIZE = 10;
 
 interface BvnHistoryItem {
   id: string;
@@ -18,10 +26,87 @@ interface BvnHistoryItem {
 
 interface BvnHistoryProps {
   history?: BvnHistoryItem[];
+  isAdmin?: boolean;
 }
 
-export function BvnHistory({ history = [] }: BvnHistoryProps = {}) {
+export function BvnHistory({ history: historyProp, isAdmin }: BvnHistoryProps) {
+  const [history, setHistory] = useState<BvnHistoryItem[]>(historyProp || []);
+  const { user } = useAuth();
+  const { toast } = useToast();
   const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
+  const [page, setPage] = useState(0);
+  const [totalCount, setTotalCount] = useState(0);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState<string>("all");
+
+  useEffect(() => {
+    if (historyProp) {
+      setHistory(historyProp);
+      setTotalCount(historyProp.length);
+    } else if (user) {
+      fetchHistory();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [historyProp, user, page, searchQuery, statusFilter]);
+
+  // Reset to first page when filters change
+  useEffect(() => {
+    setPage(0);
+  }, [searchQuery, statusFilter]);
+
+  const fetchHistory = async () => {
+    if (!user) return;
+    const from = page * PAGE_SIZE;
+    const to = from + PAGE_SIZE - 1;
+
+    let query = supabase
+      .from('bvn_history')
+      .select('*', { count: 'exact' })
+      .order('created_at', { ascending: false });
+
+    if (!isAdmin) {
+      query = query.eq('user_id', user.id);
+    }
+
+    if (statusFilter !== "all") {
+      query = query.eq('status', statusFilter);
+    }
+    if (searchQuery.trim()) {
+      query = query.ilike('bvn', `%${searchQuery.trim()}%`);
+    }
+
+    const { data, count } = await query.range(from, to);
+
+    if (data) setHistory(data as BvnHistoryItem[]);
+    if (count !== null) setTotalCount(count);
+  };
+
+  const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
+
+  const handleExport = () => {
+    if (history.length === 0) {
+      toast({
+        title: "No data to export",
+        description: "There are no BVN verification records to export",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const exportData = history.map(record => ({
+      bvn: record.bvn,
+      verification_type: record.verification_type,
+      status: record.status,
+      error_message: record.error_message || "N/A",
+      created_at: new Date(record.created_at).toLocaleString(),
+    }));
+
+    exportToCSV(exportData, "bvn-history");
+    toast({
+      title: "Exported successfully",
+      description: `${history.length} records exported to CSV`,
+    });
+  };
 
   const toggleItem = (id: string) => {
     const newExpanded = new Set(expandedItems);
@@ -37,8 +122,22 @@ export function BvnHistory({ history = [] }: BvnHistoryProps = {}) {
     return (
       <Card className="border-slate-200 dark:border-slate-700 shadow-lg dark:bg-slate-800">
         <CardHeader>
-          <CardTitle className="text-xl font-bold">BVN Verification History</CardTitle>
-          <CardDescription>Your recent BVN verification requests</CardDescription>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="text-xl font-bold">BVN Verification History</CardTitle>
+              <CardDescription>Your recent BVN verification requests</CardDescription>
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleExport}
+              className="gap-2"
+              disabled
+            >
+              <Download className="h-4 w-4" />
+              Export CSV
+            </Button>
+          </div>
         </CardHeader>
         <CardContent>
           <div className="text-center py-8 text-slate-500 dark:text-slate-400">
@@ -54,10 +153,46 @@ export function BvnHistory({ history = [] }: BvnHistoryProps = {}) {
   return (
     <Card className="border-slate-200 dark:border-slate-700 shadow-lg dark:bg-slate-800">
       <CardHeader>
-        <CardTitle className="text-xl font-bold">BVN Verification History</CardTitle>
-        <CardDescription>Recent verification requests and results</CardDescription>
+        <div className="flex items-center justify-between">
+          <div>
+            <CardTitle className="text-xl font-bold">BVN Verification History</CardTitle>
+            <CardDescription>Recent verification requests and results</CardDescription>
+          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleExport}
+            className="gap-2"
+          >
+            <Download className="h-4 w-4" />
+            Export CSV
+          </Button>
+        </div>
       </CardHeader>
       <CardContent>
+        {/* Search & Filter Bar */}
+        <div className="flex flex-col sm:flex-row gap-2 mb-4">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+            <Input
+              placeholder="Search by BVN..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-9 h-9 text-sm dark:bg-slate-900 dark:border-slate-700"
+            />
+          </div>
+          <Select value={statusFilter} onValueChange={setStatusFilter}>
+            <SelectTrigger className="w-full sm:w-[140px] h-9 text-sm dark:bg-slate-900 dark:border-slate-700">
+              <SelectValue placeholder="All Status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Status</SelectItem>
+              <SelectItem value="success">Success</SelectItem>
+              <SelectItem value="failed">Failed</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
         <div className="space-y-3">
           {history.map((item) => {
             const isSuccess = item.status === "success" || item.status === "completed" || item.result?.status === "success" || item.result?.verification?.status === "success";
@@ -151,6 +286,33 @@ export function BvnHistory({ history = [] }: BvnHistoryProps = {}) {
             );
           })}
         </div>
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="flex items-center justify-between mt-4 pt-4 border-t border-slate-200 dark:border-slate-700">
+            <p className="text-xs text-slate-500 dark:text-slate-400">
+              Page {page + 1} of {totalPages} ({totalCount} records)
+            </p>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setPage(p => Math.max(0, p - 1))}
+                disabled={page === 0}
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setPage(p => Math.min(totalPages - 1, p + 1))}
+                disabled={page >= totalPages - 1}
+              >
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+        )}
       </CardContent>
     </Card>
   );

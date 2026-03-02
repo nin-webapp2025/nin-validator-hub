@@ -2,11 +2,17 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Button } from "@/components/ui/button";
-import { History, CheckCircle, XCircle, Copy, Download, ChevronDown, Calendar } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { History, CheckCircle, XCircle, Copy, Download, ChevronDown, Calendar, ChevronLeft, ChevronRight, Search } from "lucide-react";
 import { format } from "date-fns";
 import { useToast } from "@/hooks/use-toast";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { exportToCSV, copyToClipboard } from "@/lib/export";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
+
+const PAGE_SIZE = 10;
 
 interface PersonalizationRecord {
   id: string;
@@ -18,12 +24,57 @@ interface PersonalizationRecord {
 
 interface PersonalizationHistoryProps {
   history?: PersonalizationRecord[];
+  isAdmin?: boolean;
 }
 
-export function PersonalizationHistory({ history = [] }: PersonalizationHistoryProps = {}) {
+export function PersonalizationHistory({ history: historyProp, isAdmin }: PersonalizationHistoryProps) {
+  const [history, setHistory] = useState<PersonalizationRecord[]>(historyProp || []);
+  const { user } = useAuth();
   const { toast } = useToast();
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
+  const [page, setPage] = useState(0);
+  const [totalCount, setTotalCount] = useState(0);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState<string>("all");
+
+  useEffect(() => {
+    if (historyProp) {
+      setHistory(historyProp);
+      setTotalCount(historyProp.length);
+    } else if (user) {
+      const from = page * PAGE_SIZE;
+      const to = from + PAGE_SIZE - 1;
+      let query = supabase
+        .from('personalization_history')
+        .select('*', { count: 'exact' })
+        .order('created_at', { ascending: false });
+
+      if (!isAdmin) {
+        query = query.eq('user_id', user.id);
+      }
+
+      if (statusFilter !== "all") {
+        query = query.eq('status', statusFilter);
+      }
+      if (searchQuery.trim()) {
+        query = query.ilike('tracking_id', `%${searchQuery.trim()}%`);
+      }
+
+      query.range(from, to).then(({ data, count }) => {
+        if (data) setHistory(data as PersonalizationRecord[]);
+        if (count !== null) setTotalCount(count);
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [historyProp, user, page, searchQuery, statusFilter]);
+
+  // Reset to first page when filters change
+  useEffect(() => {
+    setPage(0);
+  }, [searchQuery, statusFilter]);
+
+  const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
 
   const toggleItem = (id: string) => {
     const newExpanded = new Set(expandedItems);
@@ -104,6 +155,29 @@ export function PersonalizationHistory({ history = [] }: PersonalizationHistoryP
         </div>
       </CardHeader>
       <CardContent>
+        {/* Search & Filter Bar */}
+        <div className="flex flex-col sm:flex-row gap-2 mb-4">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+            <Input
+              placeholder="Search by tracking ID..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-9 h-9 text-sm dark:bg-slate-900 dark:border-slate-700"
+            />
+          </div>
+          <Select value={statusFilter} onValueChange={setStatusFilter}>
+            <SelectTrigger className="w-full sm:w-[140px] h-9 text-sm dark:bg-slate-900 dark:border-slate-700">
+              <SelectValue placeholder="All Status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Status</SelectItem>
+              <SelectItem value="success">Success</SelectItem>
+              <SelectItem value="failed">Failed</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
         {history.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-8 text-center">
             <History className="h-12 w-12 text-muted-foreground/50" />
@@ -111,6 +185,7 @@ export function PersonalizationHistory({ history = [] }: PersonalizationHistoryP
             <p className="text-xs text-muted-foreground">Submit a personalization request to get started</p>
           </div>
         ) : (
+          <>
           <div className="space-y-3 max-h-[400px] overflow-y-auto pr-2">
             {history.map((record) => {
               const isSuccess = record.status === "success";
@@ -185,6 +260,34 @@ export function PersonalizationHistory({ history = [] }: PersonalizationHistoryP
               );
             })}
           </div>
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="flex items-center justify-between mt-4 pt-4 border-t border-slate-200 dark:border-slate-700">
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                Page {page + 1} of {totalPages} ({totalCount} records)
+              </p>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setPage(p => Math.max(0, p - 1))}
+                  disabled={page === 0}
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setPage(p => Math.min(totalPages - 1, p + 1))}
+                  disabled={page >= totalPages - 1}
+                >
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          )}
+          </>
         )}
       </CardContent>
     </Card>

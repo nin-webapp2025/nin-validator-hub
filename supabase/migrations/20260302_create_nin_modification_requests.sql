@@ -42,20 +42,20 @@ ALTER TABLE public.nin_modification_requests ENABLE ROW LEVEL SECURITY;
 -- VIP users can view their own requests
 CREATE POLICY "Users can view own modification requests"
   ON public.nin_modification_requests FOR SELECT
-  USING (auth.uid() = user_id);
+  USING (auth.uid() = nin_modification_requests.user_id);
 
 -- VIP users can create requests
 CREATE POLICY "Users can create modification requests"
   ON public.nin_modification_requests FOR INSERT
-  WITH CHECK (auth.uid() = user_id);
+  WITH CHECK (auth.uid() = nin_modification_requests.user_id);
 
 -- Admins can view all requests
 CREATE POLICY "Admins can view all modification requests"
   ON public.nin_modification_requests FOR SELECT
   USING (
     EXISTS (
-      SELECT 1 FROM public.user_roles
-      WHERE user_id = auth.uid() AND role = 'admin'
+      SELECT 1 FROM public.user_roles ur
+      WHERE ur.user_id = auth.uid() AND ur.role = 'admin'
     )
   );
 
@@ -64,20 +64,20 @@ CREATE POLICY "Admins can update modification requests"
   ON public.nin_modification_requests FOR UPDATE
   USING (
     EXISTS (
-      SELECT 1 FROM public.user_roles
-      WHERE user_id = auth.uid() AND role = 'admin'
+      SELECT 1 FROM public.user_roles ur
+      WHERE ur.user_id = auth.uid() AND ur.role = 'admin'
     )
   );
 
 -- Staff can view requests assigned to them
 CREATE POLICY "Staff can view assigned requests"
   ON public.nin_modification_requests FOR SELECT
-  USING (auth.uid() = assigned_to);
+  USING (auth.uid() = nin_modification_requests.assigned_to);
 
 -- Staff can update requests assigned to them (status, notes)
 CREATE POLICY "Staff can update assigned requests"
   ON public.nin_modification_requests FOR UPDATE
-  USING (auth.uid() = assigned_to);
+  USING (auth.uid() = nin_modification_requests.assigned_to);
 
 -- Indexes for performance
 CREATE INDEX IF NOT EXISTS idx_mod_requests_user_id ON public.nin_modification_requests(user_id);

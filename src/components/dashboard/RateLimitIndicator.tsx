@@ -121,6 +121,9 @@ export function RateLimitIndicator() {
             <Clock className="inline h-3 w-3 mr-1" />
             Resets in {minutesUntilReset} minutes
           </p>
+          <p className="text-xs text-slate-400 dark:text-slate-500 italic mt-1">
+            Note: This is a client-side usage tracker. Actual API rate limits are enforced server-side.
+          </p>
         </div>
       </div>
     </Alert>

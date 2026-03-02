@@ -152,15 +152,15 @@ export function StaffTasks() {
         <CardContent>
           {tasks.length === 0 ? (
             <div className="text-center py-12">
-              <Briefcase className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-500">No tasks assigned to you</p>
+              <Briefcase className="h-12 w-12 text-gray-400 dark:text-slate-500 mx-auto mb-4" />
+              <p className="text-gray-500 dark:text-slate-400">No tasks assigned to you</p>
             </div>
           ) : (
             <div className="space-y-4">
               {tasks.map((task) => (
                 <div
                   key={task.id}
-                  className="border rounded-lg p-4 hover:bg-gray-50 transition-colors"
+                  className="border rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-slate-800 dark:border-slate-700 transition-colors"
                 >
                   <div className="flex flex-col sm:flex-row sm:items-start gap-3 sm:justify-between">
                     <div className="flex-1 min-w-0">
@@ -175,7 +175,7 @@ export function StaffTasks() {
                       <p className="font-semibold text-lg">
                         {task.modification_type.replace("_", " ").toUpperCase()}
                       </p>
-                      <p className="text-sm text-gray-600 mb-2">NIN: {task.nin}</p>
+                      <p className="text-sm text-gray-600 dark:text-slate-400 mb-2">NIN: {task.nin}</p>
                       <div className="mt-2 text-sm space-y-1">
                         <p>
                           <span className="font-medium">Requested Value:</span> {task.requested_value}
@@ -189,17 +189,17 @@ export function StaffTasks() {
                           <span className="font-medium">Reason:</span> {task.reason}
                         </p>
                         {task.admin_notes && (
-                          <p className="mt-2 p-2 bg-blue-50 rounded text-blue-900">
+                          <p className="mt-2 p-2 bg-blue-50 dark:bg-blue-950/30 rounded text-blue-900 dark:text-blue-300">
                             <span className="font-medium">Admin Notes:</span> {task.admin_notes}
                           </p>
                         )}
                         {task.staff_notes && (
-                          <p className="mt-2 p-2 bg-green-50 rounded text-green-900">
+                          <p className="mt-2 p-2 bg-green-50 dark:bg-green-950/30 rounded text-green-900 dark:text-green-300">
                             <span className="font-medium">My Notes:</span> {task.staff_notes}
                           </p>
                         )}
                       </div>
-                      <p className="text-xs text-gray-500 mt-3">
+                      <p className="text-xs text-gray-500 dark:text-slate-400 mt-3">
                         Assigned: {new Date(task.assigned_at!).toLocaleString()}
                       </p>
                     </div>

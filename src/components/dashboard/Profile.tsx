@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
 import { 
   User, 
   Mail, 
@@ -14,14 +15,19 @@ import {
   TrendingUp,
   Shield,
   Award,
-  Zap
+  Zap,
+  Pencil
 } from "lucide-react";
 import { formatDistanceToNow, format } from "date-fns";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Progress } from "@/components/ui/progress";
 
-export function Profile() {
+interface ProfileProps {
+  onNavigateToSettings?: () => void;
+}
+
+export function Profile({ onNavigateToSettings }: ProfileProps = {}) {
   const { user } = useAuth();
 
   const { data: profile } = useQuery({
@@ -154,6 +160,17 @@ export function Profile() {
                   <MembershipIcon className="h-3.5 w-3.5" />
                   {membership.level} Member
                 </Badge>
+                {onNavigateToSettings && (
+                  <Button
+                    onClick={onNavigateToSettings}
+                    size="sm"
+                    variant="secondary"
+                    className="ml-2 gap-1.5 bg-white/20 hover:bg-white/30 text-white border-0 backdrop-blur-sm"
+                  >
+                    <Pencil className="h-3.5 w-3.5" />
+                    Edit Profile
+                  </Button>
+                )}
               </div>
             </div>
 

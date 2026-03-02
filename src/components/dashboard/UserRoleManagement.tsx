@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Input } from "@/components/ui/input";
 import { Shield, Search, Loader2, UserCog } from "lucide-react";
 import type { UserRole } from "@/hooks/useRole";
+import { logAuditEvent } from "@/lib/audit";
 
 interface UserWithRole {
   id: string;
@@ -118,6 +119,15 @@ export function UserRoleManagement() {
         description: `User role changed to ${newRole.toUpperCase()}`,
       });
 
+      // Audit log
+      const targetUser = users.find(u => u.id === userId);
+      logAuditEvent({
+        action: "role_change",
+        target_type: "user_role",
+        target_id: userId,
+        metadata: { new_role: newRole, email: targetUser?.email },
+      });
+
       // Refresh users list
       fetchUsers();
     } catch (error) {
@@ -157,7 +167,7 @@ export function UserRoleManagement() {
         {/* Search */}
         <div className="mb-6">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 dark:text-slate-500" />
             <Input
               placeholder="Search users by email..."
               value={searchTerm}
@@ -169,7 +179,7 @@ export function UserRoleManagement() {
 
         {/* Users List */}
         {filteredUsers.length === 0 ? (
-          <p className="text-center text-gray-500 py-8">
+          <p className="text-center text-gray-500 dark:text-slate-400 py-8">
             {searchTerm ? "No users found matching your search" : "No users found"}
           </p>
         ) : (
@@ -177,15 +187,15 @@ export function UserRoleManagement() {
             {filteredUsers.map((user) => (
               <div
                 key={user.id}
-                className="border rounded-lg p-4 hover:bg-gray-50 transition-colors"
+                className="border rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-slate-800 dark:border-slate-700 transition-colors"
               >
                 <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:justify-between">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
-                      <UserCog className="h-4 w-4 text-gray-500 flex-shrink-0" />
+                      <UserCog className="h-4 w-4 text-gray-500 dark:text-slate-400 flex-shrink-0" />
                       <p className="font-medium text-sm sm:text-base truncate">{user.email}</p>
                     </div>
-                    <p className="text-xs text-gray-500">
+                    <p className="text-xs text-gray-500 dark:text-slate-400">
                       Joined: {new Date(user.created_at).toLocaleDateString()}
                     </p>
                   </div>
@@ -228,25 +238,25 @@ export function UserRoleManagement() {
               <p className="text-2xl font-bold text-blue-600">
                 {users.filter(u => u.role === 'user').length}
               </p>
-              <p className="text-xs text-gray-600">Users</p>
+              <p className="text-xs text-gray-600 dark:text-slate-400">Users</p>
             </div>
             <div>
               <p className="text-2xl font-bold text-purple-600">
                 {users.filter(u => u.role === 'vip').length}
               </p>
-              <p className="text-xs text-gray-600">VIP</p>
+              <p className="text-xs text-gray-600 dark:text-slate-400">VIP</p>
             </div>
             <div>
               <p className="text-2xl font-bold text-green-600">
                 {users.filter(u => u.role === 'staff').length}
               </p>
-              <p className="text-xs text-gray-600">Staff</p>
+              <p className="text-xs text-gray-600 dark:text-slate-400">Staff</p>
             </div>
             <div>
               <p className="text-2xl font-bold text-red-600">
                 {users.filter(u => u.role === 'admin').length}
               </p>
-              <p className="text-xs text-gray-600">Admins</p>
+              <p className="text-xs text-gray-600 dark:text-slate-400">Admins</p>
             </div>
           </div>
         </div>

@@ -2,6 +2,8 @@ import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { trackApiRequest } from "@/components/dashboard/RateLimitIndicator";
+import { createNotification } from "@/lib/notifications";
+import { deductCredit } from "@/lib/credits";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -64,6 +66,20 @@ export function ValidationForm({ onSuccess }: ValidationFormProps) {
       // Track API request for rate limiting
       trackApiRequest();
 
+      // Check & deduct credit
+      if (user?.id) {
+        const creditResult = await deductCredit(user.id);
+        if (!creditResult.success) {
+          toast({
+            title: "No Credits",
+            description: "You have no API credits remaining. Contact an admin to top up.",
+            variant: "destructive",
+          });
+          setIsValidating(false);
+          return;
+        }
+      }
+
       const { data, error } = await supabase.functions.invoke("robosttech-api", {
         body: {
           action: "validate",
@@ -120,6 +136,15 @@ export function ValidationForm({ onSuccess }: ValidationFormProps) {
       }
 
       onSuccess?.();
+
+      // Create in-app notification
+      createNotification({
+        title: isSuccess ? "NIN Validation Success" : "NIN Validation Failed",
+        message: isSuccess
+          ? `NIN ${nin.substring(0, 3)}****${nin.substring(7)} validated successfully.`
+          : `Validation failed for NIN ${nin.substring(0, 3)}****${nin.substring(7)}.`,
+        type: isSuccess ? "success" : "error",
+      });
 
       if (!isSuccess && typeof balanceMsg === "string") {
         toast({

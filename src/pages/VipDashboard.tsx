@@ -1,11 +1,21 @@
+import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
 import { Footer } from "@/components/dashboard/Footer";
+import { ValidationForm } from "@/components/dashboard/ValidationForm";
 import { ValidationHistory } from "@/components/dashboard/ValidationHistory";
+import { ValidationStatus } from "@/components/dashboard/ValidationStatus";
+import { Personalization } from "@/components/dashboard/Personalization";
 import { PersonalizationHistory } from "@/components/dashboard/PersonalizationHistory";
+import { PersonalizationStatus } from "@/components/dashboard/PersonalizationStatus";
+import ClearanceForm from "@/components/dashboard/ClearanceForm";
+import ClearanceStatus from "@/components/dashboard/ClearanceStatus";
 import { ClearanceHistory } from "@/components/dashboard/ClearanceHistory";
+import { BvnVerification } from "@/components/dashboard/BvnVerification";
 import { BvnHistory } from "@/components/dashboard/BvnHistory";
+import NinSearch from "@/components/dashboard/NinSearch";
 import { Profile } from "@/components/dashboard/Profile";
+import { ProfileSettings } from "@/components/dashboard/ProfileSettings";
 import { VipModificationForm } from "@/components/dashboard/VipModificationForm";
 import { Crown } from "lucide-react";
 
@@ -15,9 +25,14 @@ import { Crown } from "lucide-react";
  * Can submit NIN modification requests that go through admin approval
  */
 export default function VipDashboard() {
+  const [activeTab, setActiveTab] = useState("modification");
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-900 via-purple-800 to-black">
-      <DashboardHeader />
+      <DashboardHeader 
+        onNavigateToProfile={() => setActiveTab("profile")} 
+        onNavigateToSettings={() => setActiveTab("settings")} 
+      />
       
       <main className="container mx-auto px-4 py-8">
         <div className="mb-6 flex items-center gap-3">
@@ -27,7 +42,7 @@ export default function VipDashboard() {
           </h1>
         </div>
 
-        <Tabs defaultValue="modification" className="space-y-6">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <TabsList className="flex w-full overflow-x-auto gap-1 p-1 no-scrollbar bg-purple-900/50 backdrop-blur-lg border border-amber-500/20">
             <TabsTrigger 
               value="modification" 
@@ -36,10 +51,28 @@ export default function VipDashboard() {
               Modify NIN
             </TabsTrigger>
             <TabsTrigger 
-              value="validation" 
+              value="validate" 
               className="whitespace-nowrap flex-shrink-0 text-xs sm:text-sm data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-yellow-600 data-[state=active]:text-black"
             >
-              Validation
+              Validate NIN
+            </TabsTrigger>
+            <TabsTrigger 
+              value="bvn" 
+              className="whitespace-nowrap flex-shrink-0 text-xs sm:text-sm data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-yellow-600 data-[state=active]:text-black"
+            >
+              BVN Verify
+            </TabsTrigger>
+            <TabsTrigger 
+              value="clearance" 
+              className="whitespace-nowrap flex-shrink-0 text-xs sm:text-sm data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-yellow-600 data-[state=active]:text-black"
+            >
+              Clearance
+            </TabsTrigger>
+            <TabsTrigger 
+              value="search"
+              className="whitespace-nowrap flex-shrink-0 text-xs sm:text-sm data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-yellow-600 data-[state=active]:text-black"
+            >
+              NIN Search
             </TabsTrigger>
             <TabsTrigger 
               value="personalization"
@@ -48,22 +81,16 @@ export default function VipDashboard() {
               Personalization
             </TabsTrigger>
             <TabsTrigger 
-              value="clearance"
-              className="whitespace-nowrap flex-shrink-0 text-xs sm:text-sm data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-yellow-600 data-[state=active]:text-black"
-            >
-              Clearance
-            </TabsTrigger>
-            <TabsTrigger 
-              value="bvn"
-              className="whitespace-nowrap flex-shrink-0 text-xs sm:text-sm data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-yellow-600 data-[state=active]:text-black"
-            >
-              BVN
-            </TabsTrigger>
-            <TabsTrigger 
               value="profile"
               className="whitespace-nowrap flex-shrink-0 text-xs sm:text-sm data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-yellow-600 data-[state=active]:text-black"
             >
               Profile
+            </TabsTrigger>
+            <TabsTrigger 
+              value="settings"
+              className="whitespace-nowrap flex-shrink-0 text-xs sm:text-sm data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-yellow-600 data-[state=active]:text-black"
+            >
+              Settings
             </TabsTrigger>
           </TabsList>
 
@@ -71,33 +98,66 @@ export default function VipDashboard() {
             <VipModificationForm />
           </TabsContent>
 
-          <TabsContent value="validation" className="space-y-6">
+          <TabsContent value="validate" className="space-y-6">
             <div className="bg-purple-900/30 backdrop-blur-lg border border-amber-500/20 rounded-lg p-6">
-              <ValidationHistory />
-            </div>
-          </TabsContent>
-
-          <TabsContent value="personalization" className="space-y-6">
-            <div className="bg-purple-900/30 backdrop-blur-lg border border-amber-500/20 rounded-lg p-6">
-              <PersonalizationHistory />
-            </div>
-          </TabsContent>
-
-          <TabsContent value="clearance" className="space-y-6">
-            <div className="bg-purple-900/30 backdrop-blur-lg border border-amber-500/20 rounded-lg p-6">
-              <ClearanceHistory />
+              <div className="grid gap-6 lg:grid-cols-2">
+                <ValidationForm />
+                <ValidationStatus />
+              </div>
+              <div className="mt-6">
+                <ValidationHistory />
+              </div>
             </div>
           </TabsContent>
 
           <TabsContent value="bvn" className="space-y-6">
             <div className="bg-purple-900/30 backdrop-blur-lg border border-amber-500/20 rounded-lg p-6">
-              <BvnHistory />
+              <BvnVerification />
+              <div className="mt-6">
+                <BvnHistory />
+              </div>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="clearance" className="space-y-6">
+            <div className="bg-purple-900/30 backdrop-blur-lg border border-amber-500/20 rounded-lg p-6">
+              <div className="grid gap-6 lg:grid-cols-2">
+                <ClearanceForm />
+                <ClearanceStatus />
+              </div>
+              <div className="mt-6">
+                <ClearanceHistory />
+              </div>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="search" className="space-y-6">
+            <div className="bg-purple-900/30 backdrop-blur-lg border border-amber-500/20 rounded-lg p-6">
+              <NinSearch />
+            </div>
+          </TabsContent>
+
+          <TabsContent value="personalization" className="space-y-6">
+            <div className="bg-purple-900/30 backdrop-blur-lg border border-amber-500/20 rounded-lg p-6">
+              <div className="grid gap-6 lg:grid-cols-2">
+                <Personalization />
+                <PersonalizationStatus />
+              </div>
+              <div className="mt-6">
+                <PersonalizationHistory />
+              </div>
             </div>
           </TabsContent>
 
           <TabsContent value="profile" className="space-y-6">
             <div className="bg-purple-900/30 backdrop-blur-lg border border-amber-500/20 rounded-lg p-6">
-              <Profile />
+              <Profile onNavigateToSettings={() => setActiveTab("settings")} />
+            </div>
+          </TabsContent>
+
+          <TabsContent value="settings" className="space-y-6">
+            <div className="bg-purple-900/30 backdrop-blur-lg border border-amber-500/20 rounded-lg p-6">
+              <ProfileSettings />
             </div>
           </TabsContent>
         </Tabs>

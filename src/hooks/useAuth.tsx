@@ -1,5 +1,5 @@
 import { useEffect, useState, createContext, useContext, ReactNode } from "react";
-import { User, Session } from "@supabase/supabase-js";
+import { User, Session, AuthMFAEnrollResponse, AuthMFAChallengeResponse, AuthMFAVerifyResponse } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 
 interface AuthContextType {
@@ -7,8 +7,13 @@ interface AuthContextType {
   session: Session | null;
   loading: boolean;
   signUp: (email: string, password: string, fullName: string) => Promise<{ error: Error | null }>;
-  signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
+  signIn: (email: string, password: string) => Promise<{ error: Error | null; mfaRequired?: boolean }>;
   signOut: () => Promise<void>;
+  // MFA methods
+  enrollMFA: () => Promise<AuthMFAEnrollResponse>;
+  challengeMFA: (factorId: string) => Promise<AuthMFAChallengeResponse>;
+  verifyMFA: (factorId: string, challengeId: string, code: string) => Promise<AuthMFAVerifyResponse>;
+  unenrollMFA: (factorId: string) => Promise<{ error: Error | null }>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -59,19 +64,34 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const signIn = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({
+    const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
-    return { error: error as Error | null };
+    if (error) return { error: error as Error | null };
+
+    // Check if MFA verification is needed
+    const { data: factors } = await supabase.auth.mfa.listFactors();
+    const hasTOTP = factors?.totp?.some((f) => f.status === "verified");
+
+    return { error: null, mfaRequired: !!hasTOTP };
   };
 
   const signOut = async () => {
     await supabase.auth.signOut();
   };
 
+  const enrollMFA = () => supabase.auth.mfa.enroll({ factorType: "totp" });
+  const challengeMFA = (factorId: string) => supabase.auth.mfa.challenge({ factorId });
+  const verifyMFA = (factorId: string, challengeId: string, code: string) =>
+    supabase.auth.mfa.verify({ factorId, challengeId, code });
+  const unenrollMFA = async (factorId: string) => {
+    const { error } = await supabase.auth.mfa.unenroll({ factorId });
+    return { error: error as Error | null };
+  };
+
   return (
-    <AuthContext.Provider value={{ user, session, loading, signUp, signIn, signOut }}>
+    <AuthContext.Provider value={{ user, session, loading, signUp, signIn, signOut, enrollMFA, challengeMFA, verifyMFA, unenrollMFA }}>
       {children}
     </AuthContext.Provider>
   );

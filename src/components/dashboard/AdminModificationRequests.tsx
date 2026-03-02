@@ -208,13 +208,13 @@ export function AdminModificationRequests() {
         </CardHeader>
         <CardContent>
           {requests.length === 0 ? (
-            <p className="text-center text-gray-500 py-8">No modification requests found</p>
+            <p className="text-center text-gray-500 dark:text-slate-400 py-8">No modification requests found</p>
           ) : (
             <div className="space-y-4">
               {requests.map((request) => (
                 <div
                   key={request.id}
-                  className="border rounded-lg p-4 hover:bg-gray-50 transition-colors"
+                  className="border rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-slate-800 dark:border-slate-700 transition-colors"
                 >
                   <div className="flex flex-col sm:flex-row sm:items-start gap-3 sm:justify-between">
                     <div className="flex-1 min-w-0">
@@ -229,7 +229,7 @@ export function AdminModificationRequests() {
                       <p className="font-semibold text-lg">
                         {request.modification_type.replace("_", " ").toUpperCase()}
                       </p>
-                      <p className="text-sm text-gray-600">NIN: {request.nin}</p>
+                      <p className="text-sm text-gray-600 dark:text-slate-400">NIN: {request.nin}</p>
                       <div className="mt-2 text-sm">
                         <p>
                           <span className="font-medium">Requested Value:</span> {request.requested_value}
@@ -243,7 +243,7 @@ export function AdminModificationRequests() {
                           <span className="font-medium">Reason:</span> {request.reason}
                         </p>
                       </div>
-                      <p className="text-xs text-gray-500 mt-2">
+                      <p className="text-xs text-gray-500 dark:text-slate-400 mt-2">
                         Submitted: {new Date(request.created_at).toLocaleString()}
                       </p>
                     </div>
@@ -269,7 +269,7 @@ export function AdminModificationRequests() {
                         </>
                       )}
                       {request.status === "assigned" && (
-                        <Badge variant="outline" className="bg-purple-100">
+                        <Badge variant="outline" className="bg-purple-100 dark:bg-purple-950/30 dark:text-purple-300">
                           <UserCog className="h-3 w-3 mr-1" />
                           Assigned to Staff
                         </Badge>
