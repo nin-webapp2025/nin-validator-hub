@@ -103,113 +103,322 @@ function formatNin(nin: string): string {
 }
 
 // ======================== PREMIUM NIN SLIP (Green Card) ========================
+// Exact replica of the official NIMC High Resolution Digital NIN Slip
+// Front card + upside-down disclaimer back (designed to cut, fold & laminate)
 function PremiumNinSlip({ data }: { data: NinData }) {
+  const photoSrc = data.photo
+    ? data.photo.startsWith("data:") ? data.photo : `data:image/jpeg;base64,${data.photo}`
+    : "";
+
   return (
-    <div className="w-full max-w-[500px] mx-auto">
-      {/* FRONT */}
+    <div style={{ width: 520, margin: "0 auto", fontFamily: "Arial, Helvetica, sans-serif", color: "#000" }}>
+      {/* Instruction text above card */}
+      <div style={{ textAlign: "center", marginBottom: 28 }}>
+        <p style={{ fontSize: 15, color: "#222", margin: "0 0 6px" }}>
+          Please find below your new High Resolution NIN Slip
+        </p>
+        <p style={{ fontSize: 13, color: "#444", margin: 0 }}>
+          You may cut it out of the paper, fold and laminate as desired
+        </p>
+      </div>
+
+      {/* ===== FRONT OF CARD ===== */}
       <div
-        className="relative overflow-hidden rounded-lg border-2 border-green-700"
         style={{
-          background: "linear-gradient(135deg, #f0fdf4 0%, #d1fae5 30%, #a7f3d0 60%, #6ee7b7 100%)",
-          aspectRatio: "1.6/1",
+          background: "linear-gradient(160deg, #dae5cc 0%, #cddabc 35%, #c2d0ae 65%, #b8c8a2 100%)",
+          border: "1.5px solid #5a7a3e",
+          borderRadius: 3,
+          padding: "12px 16px 10px",
+          position: "relative",
+          overflow: "hidden",
         }}
       >
-        {/* Watermark pattern */}
-        <div className="absolute inset-0 opacity-[0.06]"
+        {/* Subtle security watermark pattern */}
+        <div
           style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23166534' fill-rule='evenodd'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/svg%3E")`,
+            position: "absolute",
+            inset: 0,
+            opacity: 0.04,
+            backgroundImage: `url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23345520' fill-rule='evenodd'%3E%3Ccircle cx='20' cy='20' r='1.5'/%3E%3Ccircle cx='60' cy='20' r='1.5'/%3E%3Ccircle cx='20' cy='60' r='1.5'/%3E%3Ccircle cx='60' cy='60' r='1.5'/%3E%3Ccircle cx='40' cy='40' r='2'/%3E%3C/g%3E%3C/svg%3E")`,
+            backgroundRepeat: "repeat",
           }}
         />
 
-        <div className="relative p-4 sm:p-5 h-full flex flex-col justify-between">
-          {/* Header */}
-          <div className="text-center mb-2">
-            <p className="text-[10px] sm:text-xs font-bold text-green-900 tracking-wider uppercase">
-              Federal Republic of Nigeria
-            </p>
-            <p className="text-[9px] sm:text-[10px] font-semibold text-green-800 uppercase">
-              Digital NIN Slip
-            </p>
-          </div>
-
-          {/* Body */}
-          <div className="flex gap-3 sm:gap-4 flex-1">
-            {/* Photo */}
-            <div className="flex-shrink-0">
-              {data.photo ? (
-                <img
-                  src={data.photo.startsWith("data:") ? data.photo : `data:image/jpeg;base64,${data.photo}`}
-                  alt="Photo"
-                  className="w-16 h-20 sm:w-20 sm:h-24 object-cover rounded border border-green-700"
-                />
-              ) : (
-                <div className="w-16 h-20 sm:w-20 sm:h-24 bg-green-100 border border-green-700 rounded flex items-center justify-center">
-                  <span className="text-[10px] text-green-700">No Photo</span>
-                </div>
-              )}
-            </div>
-
-            {/* Details */}
-            <div className="flex-1 min-w-0 space-y-1">
-              <div>
-                <p className="text-[8px] sm:text-[9px] text-green-700 uppercase tracking-wide">Surname/Nom</p>
-                <p className="text-xs sm:text-sm font-bold text-green-950 truncate">{data.surname}</p>
+        {/* Header */}
+        <div style={{ textAlign: "center", position: "relative", marginBottom: 6 }}>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "flex-start",
+              gap: 0,
+            }}
+          >
+            <div>
+              <div
+                style={{
+                  fontSize: 14,
+                  fontWeight: 800,
+                  color: "#2a4f14",
+                  letterSpacing: 2.5,
+                  textTransform: "uppercase",
+                  lineHeight: 1.3,
+                }}
+              >
+                FEDERAL REPUBLIC OF NIGERIA
               </div>
-              <div>
-                <p className="text-[8px] sm:text-[9px] text-green-700 uppercase tracking-wide">Given Names/Prénoms</p>
-                <p className="text-xs sm:text-sm font-bold text-green-950 truncate">
-                  {data.firstName} {data.middleName}
-                </p>
-              </div>
-              <div className="flex gap-4">
-                <div>
-                  <p className="text-[8px] sm:text-[9px] text-green-700 uppercase tracking-wide">Date of Birth</p>
-                  <p className="text-[10px] sm:text-xs font-semibold text-green-950">{data.dateOfBirth}</p>
-                </div>
-                <div>
-                  <p className="text-[8px] sm:text-[9px] text-green-700 uppercase tracking-wide">Sex/Sexe</p>
-                  <p className="text-[10px] sm:text-xs font-semibold text-green-950">{data.gender}</p>
-                </div>
-              </div>
-            </div>
-
-            {/* QR + Nationality */}
-            <div className="flex-shrink-0 flex flex-col items-center gap-1">
-              <QRCodeSVG value={data.nin} size={56} level="M" className="border border-green-700 p-0.5 bg-white rounded" />
-              <p className="text-lg sm:text-xl font-black text-green-800 leading-none">NGA</p>
-              <div className="text-center">
-                <p className="text-[7px] sm:text-[8px] text-green-700 uppercase">Issue Date</p>
-                <p className="text-[9px] sm:text-[10px] font-semibold text-green-950">{data.issueDate}</p>
+              <div
+                style={{
+                  fontSize: 11.5,
+                  fontWeight: 700,
+                  color: "#3a6420",
+                  textTransform: "uppercase",
+                  letterSpacing: 1.5,
+                  marginTop: 1,
+                }}
+              >
+                DIGITAL NIN SLIP
               </div>
             </div>
           </div>
+        </div>
 
-          {/* NIN Number */}
-          <div className="text-center mt-2">
-            <p className="text-[8px] text-green-700 mb-0.5">National Identification Number (NIN)</p>
-            <p className="text-2xl sm:text-3xl font-black text-green-950 tracking-[0.15em] font-mono">
-              {formatNin(data.nin)}
-            </p>
+        {/* Body: Photo | Details | QR+NGA */}
+        <div style={{ display: "flex", gap: 10, position: "relative", alignItems: "flex-start" }}>
+          {/* Photo */}
+          <div style={{ flexShrink: 0 }}>
+            {photoSrc ? (
+              <img
+                src={photoSrc}
+                alt="Photo"
+                crossOrigin="anonymous"
+                style={{
+                  width: 82,
+                  height: 100,
+                  objectFit: "cover",
+                  border: "1.5px solid #6a8a4e",
+                  borderRadius: 2,
+                  backgroundColor: "#e8f0dc",
+                }}
+              />
+            ) : (
+              <div
+                style={{
+                  width: 82,
+                  height: 100,
+                  border: "1.5px solid #6a8a4e",
+                  borderRadius: 2,
+                  backgroundColor: "#e8f0dc",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontSize: 9,
+                  color: "#6a8a4e",
+                }}
+              >
+                No Photo
+              </div>
+            )}
+          </div>
+
+          {/* Details */}
+          <div style={{ flex: 1, minWidth: 0, paddingTop: 2 }}>
+            <div style={{ fontSize: 8.5, color: "#6b8050", textTransform: "uppercase", letterSpacing: 0.8, lineHeight: 1.2 }}>
+              SURNAME/NOM
+            </div>
+            <div style={{ fontSize: 13, fontWeight: 800, color: "#111", lineHeight: 1.3, marginBottom: 4 }}>
+              {data.surname}
+            </div>
+
+            <div style={{ fontSize: 8.5, color: "#6b8050", textTransform: "uppercase", letterSpacing: 0.8, lineHeight: 1.2 }}>
+              GIVEN NAMES/PRÉNOMS
+            </div>
+            <div style={{ fontSize: 13, fontWeight: 800, color: "#111", lineHeight: 1.3, marginBottom: 5 }}>
+              {data.firstName}{data.middleName ? ` ${data.middleName}` : ""}
+            </div>
+
+            <div style={{ display: "flex", gap: 28 }}>
+              <div>
+                <div style={{ fontSize: 8.5, color: "#6b8050", textTransform: "uppercase", letterSpacing: 0.5, lineHeight: 1.2 }}>
+                  DATE OF BIRTH
+                </div>
+                <div style={{ fontSize: 11, fontWeight: 700, color: "#111", letterSpacing: 0.5 }}>
+                  {data.dateOfBirth}
+                </div>
+              </div>
+              <div>
+                <div style={{ fontSize: 8.5, color: "#6b8050", textTransform: "uppercase", letterSpacing: 0.5, lineHeight: 1.2 }}>
+                  SEX/SEXE
+                </div>
+                <div style={{ fontSize: 11, fontWeight: 700, color: "#111", letterSpacing: 0.5 }}>
+                  {data.gender}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* QR Code + NGA + Issue Date */}
+          <div style={{ flexShrink: 0, display: "flex", flexDirection: "column", alignItems: "center", gap: 3, paddingTop: 0 }}>
+            <QRCodeSVG
+              value={data.nin}
+              size={80}
+              level="M"
+              style={{
+                border: "1.5px solid #5a7a3e",
+                padding: 3,
+                backgroundColor: "#fff",
+                borderRadius: 2,
+              }}
+            />
+            <div
+              style={{
+                fontSize: 28,
+                fontWeight: 900,
+                color: "#2a4f14",
+                lineHeight: 1,
+                letterSpacing: 1,
+                marginTop: 2,
+              }}
+            >
+              NGA
+            </div>
+            <div style={{ textAlign: "center" }}>
+              <div style={{ fontSize: 7.5, color: "#6b8050", textTransform: "uppercase", letterSpacing: 0.5 }}>
+                ISSUE DATE
+              </div>
+              <div style={{ fontSize: 10, fontWeight: 700, color: "#111" }}>
+                {data.issueDate}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Security watermark text (faint, center) */}
+        <div
+          style={{
+            position: "absolute",
+            left: "50%",
+            top: "52%",
+            transform: "translate(-50%, -50%)",
+            fontSize: 6.5,
+            color: "#5a7a3e",
+            opacity: 0.12,
+            whiteSpace: "nowrap",
+            letterSpacing: 1.5,
+            textTransform: "uppercase",
+            fontWeight: 600,
+            pointerEvents: "none",
+          }}
+        >
+          PRINT AND FACTS THAT ARE PRINTED AND VERIFIED
+        </div>
+
+        {/* NIN Number */}
+        <div style={{ textAlign: "center", marginTop: 6, position: "relative" }}>
+          <div style={{ fontSize: 9, color: "#5a7a3e", marginBottom: 2, letterSpacing: 0.3 }}>
+            National Identification Number (NIN)
+          </div>
+          <div
+            style={{
+              fontSize: 40,
+              fontWeight: 900,
+              color: "#1e3d0c",
+              letterSpacing: 6,
+              fontFamily: "'Courier New', Courier, monospace",
+              lineHeight: 1,
+            }}
+          >
+            {formatNin(data.nin)}
           </div>
         </div>
       </div>
 
-      {/* BACK (Disclaimer) */}
+      {/* ===== BACK OF CARD (Upside-down for cut-fold-laminate) ===== */}
       <div
-        className="mt-3 rounded-lg border-2 border-green-700 p-4 sm:p-5"
-        style={{ background: "linear-gradient(135deg, #f0fdf4 0%, #d1fae5 100%)" }}
+        style={{
+          background: "linear-gradient(160deg, #dae5cc 0%, #cddabc 35%, #c2d0ae 65%, #b8c8a2 100%)",
+          border: "1.5px solid #5a7a3e",
+          borderTop: "none",
+          borderRadius: "0 0 3px 3px",
+          padding: "16px 22px",
+          position: "relative",
+          overflow: "hidden",
+        }}
       >
-        <h3 className="text-center text-sm sm:text-base font-black text-red-700 tracking-widest uppercase mb-3">
-          Disclaimer
-        </h3>
-        <p className="text-[10px] sm:text-xs text-green-900 italic text-center mb-2">Trust, but verify</p>
-        <div className="space-y-1.5 text-[9px] sm:text-[10px] text-green-900 leading-relaxed">
-          <p>Kindly ensure each time this ID is presented, that you verify the credentials using a Government-APPROVED verification resource.</p>
-          <p>The details on the front of this NIN Slip must EXACTLY match the verification result.</p>
-          <p className="font-bold text-red-800 uppercase text-center mt-2">Caution!</p>
-          <p>If this NIN was not issued to the person on the front of this document, please DO NOT attempt to scan, photocopy or replicate the personal data contained herein.</p>
-          <p>You are only permitted to scan the barcode for the purpose of identity verification.</p>
-          <p>The FEDERAL GOVERNMENT of NIGERIA assumes no responsibility if you accept any variance in the scan result or do not scan the 2D barcode overleaf.</p>
+        {/* Same watermark pattern */}
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            opacity: 0.04,
+            backgroundImage: `url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23345520' fill-rule='evenodd'%3E%3Ccircle cx='20' cy='20' r='1.5'/%3E%3Ccircle cx='60' cy='20' r='1.5'/%3E%3Ccircle cx='20' cy='60' r='1.5'/%3E%3Ccircle cx='60' cy='60' r='1.5'/%3E%3Ccircle cx='40' cy='40' r='2'/%3E%3C/g%3E%3C/svg%3E")`,
+            backgroundRepeat: "repeat",
+          }}
+        />
+
+        {/* All back content is rotated 180° so it reads correctly when folded */}
+        <div style={{ transform: "rotate(180deg)", position: "relative" }}>
+          <div
+            style={{
+              color: "#c41e1e",
+              fontSize: 20,
+              fontWeight: 900,
+              textAlign: "center",
+              letterSpacing: 4,
+              textTransform: "uppercase",
+              marginBottom: 8,
+            }}
+          >
+            DISCLAIMER
+          </div>
+
+          <p
+            style={{
+              fontStyle: "italic",
+              textAlign: "center",
+              fontSize: 10.5,
+              color: "#2a4f14",
+              margin: "0 0 10px",
+            }}
+          >
+            Trust, but verify
+          </p>
+
+          <div style={{ fontSize: 9.5, color: "#1e3d0c", lineHeight: 1.6, textAlign: "center" }}>
+            <p style={{ margin: "0 0 6px" }}>
+              Kindly ensure each time this ID is presented, that you verify the credentials
+              using a Government-APPROVED verification resource.
+            </p>
+            <p style={{ margin: "0 0 6px" }}>
+              The details on the front of this NIN Slip must EXACTLY match the
+              verification result.
+            </p>
+
+            <p
+              style={{
+                fontWeight: 900,
+                color: "#c41e1e",
+                textTransform: "uppercase",
+                fontSize: 12,
+                letterSpacing: 1,
+                margin: "10px 0 6px",
+              }}
+            >
+              CAUTION!
+            </p>
+
+            <p style={{ margin: "0 0 6px" }}>
+              If this NIN was not issued to the person on the front of this document, please DO
+              NOT attempt to scan, photocopy or replicate the personal data contained herein.
+            </p>
+            <p style={{ margin: "0 0 6px" }}>
+              You are only permitted to scan the barcode for the purpose of identity verification.
+            </p>
+            <p style={{ margin: 0 }}>
+              The FEDERAL GOVERNMENT of NIGERIA assumes no responsibility if you accept any
+              variance in the scan result or do not scan the 2D barcode overleaf.
+            </p>
+          </div>
         </div>
       </div>
     </div>
@@ -217,105 +426,347 @@ function PremiumNinSlip({ data }: { data: NinData }) {
 }
 
 // ======================== LONG NIN SLIP (NINS Table) ========================
+// Exact replica of the official NIMC National Identification Number Slip (NINS)
+// White background, black bordered table, Coat of Arms + NIMC logo header
 function LongNinSlip({ data }: { data: NinData }) {
+  const photoSrc = data.photo
+    ? data.photo.startsWith("data:") ? data.photo : `data:image/jpeg;base64,${data.photo}`
+    : "";
+
+  const cellStyle = {
+    borderBottom: "1px solid #000",
+    borderRight: "1px solid #000",
+    padding: "4px 8px",
+    verticalAlign: "top" as const,
+    fontSize: 11,
+  };
+
+  const labelStyle = {
+    fontWeight: 700 as const,
+    fontSize: 11,
+    color: "#000",
+  };
+
+  const valueStyle = {
+    fontWeight: 400 as const,
+    fontSize: 11,
+    color: "#000",
+    marginLeft: 6,
+  };
+
   return (
-    <div className="w-full max-w-[600px] mx-auto">
-      <div className="border-2 border-gray-800 rounded-lg overflow-hidden bg-white text-black">
-        {/* Header */}
-        <div className="text-center py-3 px-4 border-b border-gray-800">
-          <h2 className="text-sm sm:text-base font-bold">National Identity Management System</h2>
-          <p className="text-[10px] sm:text-xs text-gray-700">Federal Republic of Nigeria</p>
-          <p className="text-[10px] sm:text-xs font-semibold text-gray-800">
-            National Identification Number Slip (NINS)
-          </p>
-        </div>
+    <div style={{ width: 620, margin: "0 auto", fontFamily: "Arial, Helvetica, sans-serif", color: "#000" }}>
+      <div style={{ border: "1.5px solid #000", backgroundColor: "#fff" }}>
 
-        {/* Table body */}
-        <div className="flex">
-          {/* Left: data fields */}
-          <div className="flex-1 border-r border-gray-800">
-            <div className="grid grid-cols-2 text-[10px] sm:text-xs">
-              {/* Row 1: Tracking ID + Surname */}
-              <div className="border-b border-r border-gray-300 p-2">
-                <span className="font-bold text-gray-600">Tracking ID:</span>
-                <span className="ml-1 font-semibold">{data.trackingId || "N/A"}</span>
-              </div>
-              <div className="border-b border-gray-300 p-2">
-                <span className="font-bold text-gray-600">Surname:</span>
-                <span className="ml-1 font-semibold">{data.surname}</span>
-              </div>
+        {/* ===== HEADER: Coat of Arms | Title | NIMC Logo ===== */}
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            padding: "10px 16px 8px",
+            borderBottom: "1.5px solid #000",
+          }}
+        >
+          {/* Nigerian Coat of Arms (placeholder - styled representation) */}
+          <div
+            style={{
+              width: 52,
+              height: 52,
+              flexShrink: 0,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <svg width="48" height="48" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+              {/* Simplified Nigerian Coat of Arms */}
+              <rect x="0" y="0" width="48" height="48" fill="none" />
+              {/* Eagle */}
+              <path d="M24 2 L28 8 L32 6 L30 12 L34 10 L31 15 L35 14 L30 18 L24 16 L18 18 L13 14 L17 15 L14 10 L18 12 L16 6 L20 8 Z" fill="#2d2d2d" />
+              {/* Shield */}
+              <rect x="16" y="18" width="16" height="14" rx="1" fill="#fff" stroke="#000" strokeWidth="0.8" />
+              <rect x="16" y="18" width="5.3" height="14" fill="#008751" />
+              <rect x="26.7" y="18" width="5.3" height="14" fill="#008751" />
+              {/* Y-shaped band (black) */}
+              <path d="M16 18 L24 26 L32 18" fill="none" stroke="#000" strokeWidth="1.5" />
+              <line x1="24" y1="26" x2="24" y2="32" stroke="#000" strokeWidth="1.5" />
+              {/* Horses */}
+              <text x="8" y="30" fontSize="10" fill="#8B4513">🐴</text>
+              <text x="34" y="30" fontSize="10" fill="#8B4513" transform="scale(-1,1) translate(-76,0)">🐴</text>
+              {/* Base motto */}
+              <rect x="10" y="34" width="28" height="5" rx="1" fill="#f0e68c" stroke="#8B4513" strokeWidth="0.3" />
+              <text x="24" y="38" fontSize="3.2" fill="#000" textAnchor="middle" fontWeight="bold">UNITY AND FAITH</text>
+              {/* Flowers */}
+              <circle cx="10" y="42" r="3" fill="#e74c3c" opacity="0.8" />
+              <circle cx="38" y="42" r="3" fill="#e74c3c" opacity="0.8" />
+            </svg>
+          </div>
 
-              {/* Row 2: NIN + First Name */}
-              <div className="border-b border-r border-gray-300 p-2">
-                <span className="font-bold text-gray-600">NIN:</span>
-                <span className="ml-1 font-semibold">{data.nin}</span>
-              </div>
-              <div className="border-b border-gray-300 p-2">
-                <span className="font-bold text-gray-600">First Name:</span>
-                <span className="ml-1 font-semibold">{data.firstName}</span>
-              </div>
-
-              {/* Row 3: empty + Middle Name */}
-              <div className="border-b border-r border-gray-300 p-2">&nbsp;</div>
-              <div className="border-b border-gray-300 p-2">
-                <span className="font-bold text-gray-600">Middle Name:</span>
-                <span className="ml-1 font-semibold">{data.middleName || ""}</span>
-              </div>
-
-              {/* Row 4: empty + Gender */}
-              <div className="border-r border-gray-300 p-2">&nbsp;</div>
-              <div className="border-gray-300 p-2">
-                <span className="font-bold text-gray-600">Gender:</span>
-                <span className="ml-1 font-semibold">{data.gender}</span>
-              </div>
+          {/* Center title */}
+          <div style={{ flex: 1, textAlign: "center", padding: "0 12px" }}>
+            <div style={{ fontSize: 17, fontWeight: 800, color: "#000", lineHeight: 1.25 }}>
+              National Identity Management System
+            </div>
+            <div style={{ fontSize: 12.5, fontWeight: 600, color: "#000", lineHeight: 1.3 }}>
+              Federal Republic of Nigeria
+            </div>
+            <div style={{ fontSize: 11.5, fontWeight: 700, color: "#000", lineHeight: 1.4 }}>
+              National Identification Number Slip (NINS)
             </div>
           </div>
 
-          {/* Right: Address + Photo */}
-          <div className="w-[140px] sm:w-[160px] flex flex-col">
-            <div className="p-2 border-b border-gray-300 flex-1 text-[10px] sm:text-xs">
-              <span className="font-bold text-gray-600">Address:</span>
-              <p className="font-semibold mt-0.5 leading-tight">{data.address || "N/A"}</p>
-              <p className="mt-1 font-semibold">{data.state || ""}</p>
+          {/* NIMC Logo (styled text representation) */}
+          <div
+            style={{
+              width: 52,
+              height: 52,
+              flexShrink: 0,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <svg width="42" height="20" viewBox="0 0 42 20" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="21" cy="6" r="5" fill="#008751" opacity="0.8" />
+              <path d="M16 6 Q21 0 26 6" fill="none" stroke="#008751" strokeWidth="1.5" />
+            </svg>
+            <div
+              style={{
+                fontSize: 16,
+                fontWeight: 800,
+                fontStyle: "italic",
+                color: "#008751",
+                lineHeight: 1,
+                letterSpacing: -0.5,
+              }}
+            >
+              Nimc
             </div>
-            <div className="p-2 flex items-center justify-center">
-              {data.photo ? (
-                <img
-                  src={data.photo.startsWith("data:") ? data.photo : `data:image/jpeg;base64,${data.photo}`}
-                  alt="Photo"
-                  className="w-20 h-24 sm:w-24 sm:h-28 object-cover border border-gray-400"
-                />
-              ) : (
-                <div className="w-20 h-24 sm:w-24 sm:h-28 bg-gray-100 border border-gray-400 flex items-center justify-center">
-                  <span className="text-[9px] text-gray-500">No Photo</span>
+          </div>
+        </div>
+
+        {/* ===== TABLE BODY ===== */}
+        <table
+          style={{
+            width: "100%",
+            borderCollapse: "collapse",
+            tableLayout: "fixed",
+          }}
+          cellPadding={0}
+          cellSpacing={0}
+        >
+          <colgroup>
+            <col style={{ width: "18%" }} />
+            <col style={{ width: "17%" }} />
+            <col style={{ width: "17%" }} />
+            <col style={{ width: "18%" }} />
+            <col style={{ width: "30%" }} />
+          </colgroup>
+          <tbody>
+            {/* Row 1: Tracking ID | Surname | Address + Photo */}
+            <tr>
+              <td style={{ ...cellStyle, fontWeight: 700 }}>
+                Tracking ID:
+              </td>
+              <td style={{ ...cellStyle, fontSize: 10.5 }}>
+                {data.trackingId || "N/A"}
+              </td>
+              <td style={{ ...cellStyle, fontWeight: 700 }}>
+                Surname:
+              </td>
+              <td style={{ ...cellStyle }}>
+                {data.surname}
+              </td>
+              <td
+                rowSpan={2}
+                style={{
+                  borderBottom: "1px solid #000",
+                  padding: "4px 8px",
+                  verticalAlign: "top",
+                  fontSize: 11,
+                }}
+              >
+                <div style={{ display: "flex", gap: 8 }}>
+                  <div style={{ flex: 1 }}>
+                    <span style={labelStyle}>Address:</span>
+                    <div style={{ fontSize: 10.5, lineHeight: 1.35, marginTop: 2 }}>
+                      {data.address || "N/A"}
+                    </div>
+                  </div>
+                  {/* Photo (spans rows visually) */}
+                  <div
+                    style={{
+                      flexShrink: 0,
+                      display: "flex",
+                      alignItems: "flex-start",
+                    }}
+                  >
+                    {photoSrc ? (
+                      <img
+                        src={photoSrc}
+                        alt="Photo"
+                        crossOrigin="anonymous"
+                        style={{
+                          width: 72,
+                          height: 88,
+                          objectFit: "cover",
+                          border: "1px solid #666",
+                        }}
+                      />
+                    ) : (
+                      <div
+                        style={{
+                          width: 72,
+                          height: 88,
+                          border: "1px solid #666",
+                          backgroundColor: "#f5f5f5",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          fontSize: 8,
+                          color: "#999",
+                        }}
+                      >
+                        No Photo
+                      </div>
+                    )}
+                  </div>
                 </div>
-              )}
-            </div>
-          </div>
-        </div>
+              </td>
+            </tr>
 
-        {/* Footer note */}
-        <div className="border-t border-gray-800 px-3 py-2 text-[8px] sm:text-[9px] text-gray-600 space-y-0.5">
-          <p>
-            <strong>Note:</strong> The <em>National Identification Number (NIN) is your identity.</em>{" "}
-            It is confidential and may only be released for legitimate transactions.
+            {/* Row 2: NIN | First Name */}
+            <tr>
+              <td style={{ ...cellStyle, fontWeight: 700 }}>
+                NIN:
+              </td>
+              <td style={{ ...cellStyle }}>
+                {data.nin}
+              </td>
+              <td style={{ ...cellStyle, fontWeight: 700 }}>
+                First Name:
+              </td>
+              <td style={{ ...cellStyle }}>
+                {data.firstName}
+              </td>
+            </tr>
+
+            {/* Row 3: (empty) | Middle Name */}
+            <tr>
+              <td style={{ ...cellStyle }}>&nbsp;</td>
+              <td style={{ ...cellStyle }}>&nbsp;</td>
+              <td style={{ ...cellStyle, fontWeight: 700 }}>
+                Middle Name:
+              </td>
+              <td style={{ ...cellStyle }}>
+                {data.middleName || ""}
+              </td>
+              <td style={{ ...cellStyle, borderRight: "none" }}>&nbsp;</td>
+            </tr>
+
+            {/* Row 4: (empty) | Gender | State */}
+            <tr>
+              <td style={{ ...cellStyle }}>&nbsp;</td>
+              <td style={{ ...cellStyle }}>&nbsp;</td>
+              <td style={{ ...cellStyle, fontWeight: 700 }}>
+                Gender:
+              </td>
+              <td style={{ ...cellStyle }}>
+                {data.gender}
+              </td>
+              <td style={{ ...cellStyle, borderRight: "none" }}>
+                {data.state || ""}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        {/* ===== FOOTER NOTES ===== */}
+        <div
+          style={{
+            borderTop: "1px solid #000",
+            padding: "5px 10px",
+            fontSize: 10,
+            lineHeight: 1.4,
+            color: "#000",
+          }}
+        >
+          <p style={{ margin: "0 0 2px" }}>
+            <strong>Note:</strong> The{" "}
+            <em><strong>National Identification Number (NIN) is your identity.</strong></em>
+            {"          "}It is confidential and may only be released for legitimate transactions.
           </p>
-          <p>You will be notified when your National Identity Card is ready (for any enquiries please contact)</p>
+          <p style={{ margin: 0, fontSize: 9.5 }}>
+            You will be notified when your National Identity Card is ready{"  "}(for any enquiries please contact)
+          </p>
         </div>
 
-        {/* Footer bar */}
-        <div className="border-t border-gray-800 grid grid-cols-4 text-[7px] sm:text-[8px] text-center divide-x divide-gray-300">
-          <div className="p-1.5 text-gray-700">helpdesk@nimc.gov.ng</div>
-          <div className="p-1.5 text-gray-700">www.nimc.gov.ng</div>
-          <div className="p-1.5 text-gray-700">
-            0700-CALL-NIMC
-            <br />
-            (0700-2255-646)
+        {/* ===== FOOTER CONTACT BAR ===== */}
+        <div
+          style={{
+            borderTop: "1.5px solid #000",
+            display: "flex",
+          }}
+        >
+          {/* Email */}
+          <div
+            style={{
+              flex: 1,
+              padding: "6px 4px",
+              textAlign: "center",
+              borderRight: "1px solid #ccc",
+              fontSize: 9,
+              color: "#000",
+            }}
+          >
+            <div style={{ marginBottom: 2, fontSize: 14 }}>✉</div>
+            helpdesk@nimc.gov.ng
           </div>
-          <div className="p-1.5 text-gray-700 leading-tight">
-            National Identity Management Commission
-            <br />
-            11, Sokode Crescent, Off Dalaba Street, Zone 5 Wuse, Abuja Nigeria
+          {/* Website */}
+          <div
+            style={{
+              flex: 1,
+              padding: "6px 4px",
+              textAlign: "center",
+              borderRight: "1px solid #ccc",
+              fontSize: 9,
+              color: "#000",
+            }}
+          >
+            <div style={{ marginBottom: 2, fontSize: 14 }}>🌐</div>
+            www.nimc.gov.ng
+          </div>
+          {/* Phone */}
+          <div
+            style={{
+              flex: 1,
+              padding: "6px 4px",
+              textAlign: "center",
+              borderRight: "1px solid #ccc",
+              fontSize: 9,
+              color: "#000",
+            }}
+          >
+            <div style={{ marginBottom: 2, fontSize: 14 }}>📞</div>
+            <div>0700-CALL-NIMC</div>
+            <div style={{ fontSize: 8.5 }}>(0700-2255-646)</div>
+          </div>
+          {/* Address */}
+          <div
+            style={{
+              flex: 1.4,
+              padding: "6px 4px",
+              textAlign: "center",
+              fontSize: 8.5,
+              color: "#000",
+              lineHeight: 1.3,
+            }}
+          >
+            <div style={{ marginBottom: 2, fontSize: 14 }}>🏛</div>
+            <div style={{ fontWeight: 700, fontSize: 9 }}>National Identity Management Commission</div>
+            <div>11, Sokode Crescent, Off Dalaba Street, Zone 5 Wuse, Abuja Nigeria</div>
           </div>
         </div>
       </div>
