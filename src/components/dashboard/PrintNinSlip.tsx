@@ -8,8 +8,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Printer, Download, FileImage, FileText, ArrowLeft, Phone, Hash } from "lucide-react";
+import { Loader2, Printer, Download, FileImage, FileText, ArrowLeft, Phone, Hash, Eye } from "lucide-react";
 import { z } from "zod";
 import { QRCodeSVG } from "qrcode.react";
 import html2canvas from "html2canvas";
@@ -731,6 +732,7 @@ export function PrintNinSlip() {
 
   // Step state
   const [step, setStep] = useState<"input" | "preview">("input");
+  const [showSlipDialog, setShowSlipDialog] = useState(false);
 
   // Input state
   const [searchMode, setSearchMode] = useState<SearchMode>("nin");
@@ -950,7 +952,7 @@ export function PrintNinSlip() {
                   <Printer className="h-5 w-5 text-green-600" />
                   {slipType === "premium" ? "Premium NIN Slip" : "Long NIN Slip"}
                 </CardTitle>
-                <CardDescription>Preview your slip below, then download as PDF or image.</CardDescription>
+                <CardDescription>Your NIN slip has been generated. Preview or download it below.</CardDescription>
               </div>
               <Button variant="outline" size="sm" onClick={handleReset} className="gap-1.5">
                 <ArrowLeft className="h-4 w-4" />
@@ -959,8 +961,12 @@ export function PrintNinSlip() {
             </div>
           </CardHeader>
           <CardContent>
-            {/* Download buttons */}
-            <div className="flex flex-wrap gap-3 mb-6">
+            {/* Action buttons */}
+            <div className="flex flex-wrap gap-3">
+              <Button onClick={() => setShowSlipDialog(true)} variant="outline" className="gap-2">
+                <Eye className="h-4 w-4" />
+                Preview Slip
+              </Button>
               <Button onClick={handleDownloadPDF} disabled={!!downloading} className="gap-2 bg-red-600 hover:bg-red-700">
                 {downloading === "pdf" ? <Loader2 className="h-4 w-4 animate-spin" /> : <FileText className="h-4 w-4" />}
                 Download PDF
@@ -971,16 +977,38 @@ export function PrintNinSlip() {
               </Button>
             </div>
 
-            {/* Slip preview */}
-            <div ref={slipRef} className="p-4 sm:p-6">
+            {/* Hidden slip for html2canvas rendering */}
+            <div style={{ position: "absolute", left: "-9999px", top: 0 }}>
+              <div ref={slipRef} className="p-4 sm:p-6">
+                {slipType === "premium" ? (
+                  <PremiumNinSlip data={ninData} />
+                ) : (
+                  <LongNinSlip data={ninData} />
+                )}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Slip preview dialog */}
+        <Dialog open={showSlipDialog} onOpenChange={setShowSlipDialog}>
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <Printer className="h-5 w-5 text-green-600" />
+                {slipType === "premium" ? "Premium NIN Slip" : "Long NIN Slip"}
+              </DialogTitle>
+              <DialogDescription>Preview your NIN slip. Close this dialog and use the download buttons to save.</DialogDescription>
+            </DialogHeader>
+            <div className="p-2">
               {slipType === "premium" ? (
                 <PremiumNinSlip data={ninData} />
               ) : (
                 <LongNinSlip data={ninData} />
               )}
             </div>
-          </CardContent>
-        </Card>
+          </DialogContent>
+        </Dialog>
       </div>
     );
   }

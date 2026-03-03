@@ -15,11 +15,7 @@ import { BvnVerification } from "@/components/dashboard/BvnVerification";
 import { BvnHistory } from "@/components/dashboard/BvnHistory";
 import NinSearch from "@/components/dashboard/NinSearch";
 import { Profile } from "@/components/dashboard/Profile";
-import { ProfileSettings } from "@/components/dashboard/ProfileSettings";
-import { CreditBalance } from "@/components/dashboard/CreditBalance";
 import { OnboardingWizard } from "@/components/dashboard/OnboardingWizard";
-import { ApiKeyManagement } from "@/components/dashboard/ApiKeyManagement";
-import { WebhookManagement } from "@/components/dashboard/WebhookManagement";
 import { PrintNinSlip } from "@/components/dashboard/PrintNinSlip";
 import { User } from "lucide-react";
 
@@ -35,7 +31,6 @@ export default function UserDashboard() {
       <OnboardingWizard />
       <DashboardHeader 
         onNavigateToProfile={() => setActiveTab("profile")} 
-        onNavigateToSettings={() => setActiveTab("settings")} 
       />
       
       <main className="container mx-auto px-4 py-8">
@@ -47,18 +42,14 @@ export default function UserDashboard() {
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <TabsList className="grid grid-cols-3 md:grid-cols-4 lg:flex lg:flex-row w-full gap-1 p-1.5 h-auto">
             <TabsTrigger value="validate" className="text-xs sm:text-sm py-2.5">Validate NIN</TabsTrigger>
-            <TabsTrigger value="bvn" className="text-xs sm:text-sm py-2.5">BVN Verify</TabsTrigger>
+            <TabsTrigger value="bvn" className="text-xs sm:text-sm py-2.5">BVN Verification</TabsTrigger>
             <TabsTrigger value="clearance" className="text-xs sm:text-sm py-2.5">Clearance</TabsTrigger>
-            <TabsTrigger value="search" className="text-xs sm:text-sm py-2.5">NIN Search</TabsTrigger>
+            <TabsTrigger value="search" className="text-xs sm:text-sm py-2.5">NIN Verification</TabsTrigger>
             <TabsTrigger value="print-nin" className="text-xs sm:text-sm py-2.5">Print NIN</TabsTrigger>
             <TabsTrigger value="personalization" className="text-xs sm:text-sm py-2.5">Personalize</TabsTrigger>
-            <TabsTrigger value="profile" className="text-xs sm:text-sm py-2.5">Profile</TabsTrigger>
-            <TabsTrigger value="settings" className="text-xs sm:text-sm py-2.5">Settings</TabsTrigger>
-            <TabsTrigger value="integrations" className="text-xs sm:text-sm py-2.5">Integrations</TabsTrigger>
           </TabsList>
 
           <TabsContent value="validate" className="space-y-6">
-            <CreditBalance />
             <div className="grid gap-6 lg:grid-cols-2">
               <ValidationForm />
               <ValidationStatus />
@@ -96,16 +87,7 @@ export default function UserDashboard() {
           </TabsContent>
 
           <TabsContent value="profile" className="space-y-6">
-            <Profile onNavigateToSettings={() => setActiveTab("settings")} />
-          </TabsContent>
-
-          <TabsContent value="settings" className="space-y-6">
-            <ProfileSettings />
-          </TabsContent>
-
-          <TabsContent value="integrations" className="space-y-6">
-            <ApiKeyManagement />
-            <WebhookManagement />
+            <Profile />
           </TabsContent>
         </Tabs>
       </main>

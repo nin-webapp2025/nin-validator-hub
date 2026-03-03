@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
-import { LogOut, User, Bell, Settings, Moon, Sun, Command, BellOff, Check } from "lucide-react";
+import { LogOut, User, Bell, Moon, Sun, Command, BellOff, Check } from "lucide-react";
 import { motion } from "framer-motion";
 import { useTheme } from "@/components/theme-provider";
 import { Badge } from "@/components/ui/badge";
@@ -33,10 +33,9 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 interface DashboardHeaderProps {
   onNavigateToProfile?: () => void;
-  onNavigateToSettings?: () => void;
 }
 
-export function DashboardHeader({ onNavigateToProfile, onNavigateToSettings }: DashboardHeaderProps) {
+export function DashboardHeader({ onNavigateToProfile }: DashboardHeaderProps) {
   const { user, signOut } = useAuth();
   const { theme, setTheme } = useTheme();
   const [showSignOutDialog, setShowSignOutDialog] = useState(false);
@@ -180,15 +179,6 @@ export function DashboardHeader({ onNavigateToProfile, onNavigateToSettings }: D
             </PopoverContent>
           </Popover>
 
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={onNavigateToSettings}
-            className="h-8 w-8 sm:h-9 sm:w-9 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 hidden md:flex"
-          >
-            <Settings className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-slate-600 dark:text-slate-400" />
-          </Button>
-
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="relative h-9 w-9 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 p-0">
@@ -220,13 +210,6 @@ export function DashboardHeader({ onNavigateToProfile, onNavigateToSettings }: D
               >
                 <User className="mr-2 h-4 w-4 text-slate-600 dark:text-slate-400" />
                 <span className="text-sm font-medium text-slate-700 dark:text-slate-300">View Profile</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem 
-                onClick={onNavigateToSettings}
-                className="cursor-pointer rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 py-2.5 px-3 focus:bg-slate-50 dark:focus:bg-slate-800"
-              >
-                <Settings className="mr-2 h-4 w-4 text-slate-600 dark:text-slate-400" />
-                <span className="text-sm font-medium text-slate-700 dark:text-slate-300">Settings</span>
               </DropdownMenuItem>
               <DropdownMenuSeparator className="my-2 bg-slate-200 dark:bg-slate-700" />
               <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer rounded-lg hover:bg-red-50 dark:hover:bg-red-950/50 py-2.5 px-3 text-red-600 dark:text-red-400 focus:bg-red-50 dark:focus:bg-red-950/50 focus:text-red-600 dark:focus:text-red-400">

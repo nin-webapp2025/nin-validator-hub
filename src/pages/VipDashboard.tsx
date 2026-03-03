@@ -15,7 +15,6 @@ import { BvnVerification } from "@/components/dashboard/BvnVerification";
 import { BvnHistory } from "@/components/dashboard/BvnHistory";
 import NinSearch from "@/components/dashboard/NinSearch";
 import { Profile } from "@/components/dashboard/Profile";
-import { ProfileSettings } from "@/components/dashboard/ProfileSettings";
 import { VipModificationForm } from "@/components/dashboard/VipModificationForm";
 import { PrintNinSlip } from "@/components/dashboard/PrintNinSlip";
 import { Crown } from "lucide-react";
@@ -32,7 +31,6 @@ export default function VipDashboard() {
     <div className="min-h-screen bg-gradient-to-br from-purple-900 via-purple-800 to-black">
       <DashboardHeader 
         onNavigateToProfile={() => setActiveTab("profile")} 
-        onNavigateToSettings={() => setActiveTab("settings")} 
       />
       
       <main className="container mx-auto px-4 py-8">
@@ -61,7 +59,7 @@ export default function VipDashboard() {
               value="bvn" 
               className="text-xs sm:text-sm py-2.5 data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-yellow-600 data-[state=active]:text-black"
             >
-              BVN Verify
+              BVN Verification
             </TabsTrigger>
             <TabsTrigger 
               value="clearance" 
@@ -73,7 +71,7 @@ export default function VipDashboard() {
               value="search"
               className="text-xs sm:text-sm py-2.5 data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-yellow-600 data-[state=active]:text-black"
             >
-              NIN Search
+              NIN Verification
             </TabsTrigger>
             <TabsTrigger 
               value="personalization"
@@ -86,18 +84,6 @@ export default function VipDashboard() {
               className="text-xs sm:text-sm py-2.5 data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-yellow-600 data-[state=active]:text-black"
             >
               Print NIN
-            </TabsTrigger>
-            <TabsTrigger 
-              value="profile"
-              className="text-xs sm:text-sm py-2.5 data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-yellow-600 data-[state=active]:text-black"
-            >
-              Profile
-            </TabsTrigger>
-            <TabsTrigger 
-              value="settings"
-              className="text-xs sm:text-sm py-2.5 data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-yellow-600 data-[state=active]:text-black"
-            >
-              Settings
             </TabsTrigger>
           </TabsList>
 
@@ -164,13 +150,7 @@ export default function VipDashboard() {
 
           <TabsContent value="profile" className="space-y-6">
             <div className="bg-purple-900/30 backdrop-blur-lg border border-amber-500/20 rounded-lg p-6">
-              <Profile onNavigateToSettings={() => setActiveTab("settings")} />
-            </div>
-          </TabsContent>
-
-          <TabsContent value="settings" className="space-y-6">
-            <div className="bg-purple-900/30 backdrop-blur-lg border border-amber-500/20 rounded-lg p-6">
-              <ProfileSettings />
+              <Profile />
             </div>
           </TabsContent>
         </Tabs>

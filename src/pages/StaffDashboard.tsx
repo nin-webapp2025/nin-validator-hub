@@ -9,7 +9,6 @@ import ClearanceForm from "@/components/dashboard/ClearanceForm";
 import { BvnVerification } from "@/components/dashboard/BvnVerification";
 import { BatchValidation } from "@/components/dashboard/BatchValidation";
 import { Profile } from "@/components/dashboard/Profile";
-import { ProfileSettings } from "@/components/dashboard/ProfileSettings";
 import { StaffTasks } from "@/components/dashboard/StaffTasks";
 import { PrintNinSlip } from "@/components/dashboard/PrintNinSlip";
 import { Briefcase } from "lucide-react";
@@ -26,7 +25,6 @@ export default function StaffDashboard() {
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-green-50 to-blue-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
       <DashboardHeader 
         onNavigateToProfile={() => setActiveTab("profile")} 
-        onNavigateToSettings={() => setActiveTab("settings")} 
       />
       
       <main className="container mx-auto px-4 py-8">
@@ -39,14 +37,12 @@ export default function StaffDashboard() {
           <TabsList className="grid grid-cols-3 md:grid-cols-5 lg:flex lg:flex-row w-full gap-1 p-1.5 h-auto">
             <TabsTrigger value="tasks" className="text-xs sm:text-sm py-2.5">My Tasks</TabsTrigger>
             <TabsTrigger value="validation" className="text-xs sm:text-sm py-2.5">Validate NIN</TabsTrigger>
-            <TabsTrigger value="search" className="text-xs sm:text-sm py-2.5">NIN Search</TabsTrigger>
+            <TabsTrigger value="search" className="text-xs sm:text-sm py-2.5">NIN Verification</TabsTrigger>
             <TabsTrigger value="personalization" className="text-xs sm:text-sm py-2.5">Personalize</TabsTrigger>
             <TabsTrigger value="clearance" className="text-xs sm:text-sm py-2.5">Clearance</TabsTrigger>
-            <TabsTrigger value="bvn" className="text-xs sm:text-sm py-2.5">BVN Verify</TabsTrigger>
+            <TabsTrigger value="bvn" className="text-xs sm:text-sm py-2.5">BVN Verification</TabsTrigger>
             <TabsTrigger value="batch" className="text-xs sm:text-sm py-2.5">Batch</TabsTrigger>
             <TabsTrigger value="print-nin" className="text-xs sm:text-sm py-2.5">Print NIN</TabsTrigger>
-            <TabsTrigger value="profile" className="text-xs sm:text-sm py-2.5">Profile</TabsTrigger>
-            <TabsTrigger value="settings" className="text-xs sm:text-sm py-2.5">Settings</TabsTrigger>
           </TabsList>
 
           <TabsContent value="tasks" className="space-y-6">
@@ -82,11 +78,7 @@ export default function StaffDashboard() {
           </TabsContent>
 
           <TabsContent value="profile" className="space-y-6">
-            <Profile onNavigateToSettings={() => setActiveTab("settings")} />
-          </TabsContent>
-
-          <TabsContent value="settings" className="space-y-6">
-            <ProfileSettings />
+            <Profile />
           </TabsContent>
         </Tabs>
       </main>

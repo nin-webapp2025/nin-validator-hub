@@ -20,7 +20,6 @@ import ClearanceStatus from "@/components/dashboard/ClearanceStatus";
 import { ClearanceHistory } from "@/components/dashboard/ClearanceHistory";
 import NinSearch from "@/components/dashboard/NinSearch";
 import { Profile } from "@/components/dashboard/Profile";
-import { ProfileSettings } from "@/components/dashboard/ProfileSettings";
 import { BatchValidation } from "@/components/dashboard/BatchValidation";
 import { Analytics } from "@/components/dashboard/Analytics";
 import { RateLimitIndicator } from "@/components/dashboard/RateLimitIndicator";
@@ -140,7 +139,6 @@ export default function Dashboard() {
         <div className="min-h-screen bg-[#fafbfc] dark:bg-slate-950">
           <DashboardHeader 
             onNavigateToProfile={() => setActiveTab("profile")}
-            onNavigateToSettings={() => setActiveTab("settings")}
           />
       
       {/* Compact Professional Header */}
@@ -343,16 +341,6 @@ export default function Dashboard() {
                 transition={{ duration: 0.5 }}
               >
                 <Profile />
-              </motion.div>
-            </TabsContent>
-
-            <TabsContent value="settings" className="mt-0">
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
-              >
-                <ProfileSettings />
               </motion.div>
             </TabsContent>
 

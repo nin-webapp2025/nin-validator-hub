@@ -9,7 +9,6 @@ import { PersonalizationHistory } from "@/components/dashboard/PersonalizationHi
 import { ClearanceHistory } from "@/components/dashboard/ClearanceHistory";
 import { BvnHistory } from "@/components/dashboard/BvnHistory";
 import { Profile } from "@/components/dashboard/Profile";
-import { ProfileSettings } from "@/components/dashboard/ProfileSettings";
 import { AdminModificationRequests } from "@/components/dashboard/AdminModificationRequests";
 import { UserRoleManagement } from "@/components/dashboard/UserRoleManagement";
 import { AuditLog } from "@/components/dashboard/AuditLog";
@@ -57,7 +56,6 @@ export default function AdminDashboard() {
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-purple-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
       <DashboardHeader 
         onNavigateToProfile={() => setActiveTab("profile")} 
-        onNavigateToSettings={() => setActiveTab("settings")} 
       />
       
       <main className="container mx-auto px-4 py-8">
@@ -89,8 +87,6 @@ export default function AdminDashboard() {
             <TabsTrigger value="clearance" className="text-xs sm:text-sm py-2.5">Clearance</TabsTrigger>
             <TabsTrigger value="bvn" className="text-xs sm:text-sm py-2.5">BVN</TabsTrigger>
             <TabsTrigger value="print-nin" className="text-xs sm:text-sm py-2.5">Print NIN</TabsTrigger>
-            <TabsTrigger value="profile" className="text-xs sm:text-sm py-2.5">Profile</TabsTrigger>
-            <TabsTrigger value="settings" className="text-xs sm:text-sm py-2.5">Settings</TabsTrigger>
           </TabsList>
 
           <TabsContent value="modifications" className="space-y-6">
@@ -126,11 +122,7 @@ export default function AdminDashboard() {
           </TabsContent>
 
           <TabsContent value="profile" className="space-y-6">
-            <Profile onNavigateToSettings={() => setActiveTab("settings")} />
-          </TabsContent>
-
-          <TabsContent value="settings" className="space-y-6">
-            <ProfileSettings />
+            <Profile />
           </TabsContent>
         </Tabs>
       </main>
