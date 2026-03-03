@@ -58,7 +58,7 @@ export function CommandMenu({ onTabChange }: CommandMenuProps) {
             onSelect={() => runCommand(() => onTabChange?.("validate"))}
           >
             <Search className="mr-2 h-4 w-4" />
-            <span>Validate NIN</span>
+            <span>NIN Validation</span>
           </CommandItem>
           <CommandItem
             onSelect={() => runCommand(() => onTabChange?.("bvn"))}

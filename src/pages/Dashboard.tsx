@@ -195,7 +195,7 @@ export default function Dashboard() {
                 className="flex items-center justify-center gap-1.5 px-2 py-2.5 sm:py-3 rounded-lg sm:rounded-xl font-semibold text-xs sm:text-sm text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg transition-all duration-200"
               >
                 <Search className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                <span>Validate</span>
+                <span>NIN Validation</span>
               </TabsTrigger>
 
               <TabsTrigger 
@@ -225,7 +225,7 @@ export default function Dashboard() {
                 className="flex items-center justify-center gap-1.5 px-2 py-2.5 sm:py-3 rounded-lg sm:rounded-xl font-semibold text-xs sm:text-sm text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg transition-all duration-200"
               >
                 <UserCheck className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                <span>Personalize</span>
+                <span>Personalization</span>
               </TabsTrigger>
               <TabsTrigger 
                 value="analytics" 

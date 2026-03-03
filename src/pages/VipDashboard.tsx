@@ -53,7 +53,7 @@ export default function VipDashboard() {
               value="validate" 
               className="text-xs sm:text-sm py-2.5 data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-yellow-600 data-[state=active]:text-black"
             >
-              Validate NIN
+              NIN Validation
             </TabsTrigger>
             <TabsTrigger 
               value="bvn" 
@@ -77,7 +77,7 @@ export default function VipDashboard() {
               value="personalization"
               className="text-xs sm:text-sm py-2.5 data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-yellow-600 data-[state=active]:text-black"
             >
-              Personalize
+              Personalization
             </TabsTrigger>
             <TabsTrigger 
               value="print-nin"

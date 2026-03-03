@@ -83,7 +83,7 @@ export default function AdminDashboard() {
             <TabsTrigger value="users" className="text-xs sm:text-sm py-2.5">User Roles</TabsTrigger>
             <TabsTrigger value="audit" className="text-xs sm:text-sm py-2.5">Audit Log</TabsTrigger>
             <TabsTrigger value="validation" className="text-xs sm:text-sm py-2.5">Validation</TabsTrigger>
-            <TabsTrigger value="personalization" className="text-xs sm:text-sm py-2.5">Personalize</TabsTrigger>
+            <TabsTrigger value="personalization" className="text-xs sm:text-sm py-2.5">Personalization</TabsTrigger>
             <TabsTrigger value="clearance" className="text-xs sm:text-sm py-2.5">Clearance</TabsTrigger>
             <TabsTrigger value="bvn" className="text-xs sm:text-sm py-2.5">BVN</TabsTrigger>
             <TabsTrigger value="print-nin" className="text-xs sm:text-sm py-2.5">Print NIN</TabsTrigger>

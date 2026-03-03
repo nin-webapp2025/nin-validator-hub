@@ -36,9 +36,9 @@ export default function StaffDashboard() {
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <TabsList className="grid grid-cols-3 md:grid-cols-5 lg:flex lg:flex-row w-full gap-1 p-1.5 h-auto">
             <TabsTrigger value="tasks" className="text-xs sm:text-sm py-2.5">My Tasks</TabsTrigger>
-            <TabsTrigger value="validation" className="text-xs sm:text-sm py-2.5">Validate NIN</TabsTrigger>
+            <TabsTrigger value="validation" className="text-xs sm:text-sm py-2.5">NIN Validation</TabsTrigger>
             <TabsTrigger value="search" className="text-xs sm:text-sm py-2.5">NIN Verification</TabsTrigger>
-            <TabsTrigger value="personalization" className="text-xs sm:text-sm py-2.5">Personalize</TabsTrigger>
+            <TabsTrigger value="personalization" className="text-xs sm:text-sm py-2.5">Personalization</TabsTrigger>
             <TabsTrigger value="clearance" className="text-xs sm:text-sm py-2.5">Clearance</TabsTrigger>
             <TabsTrigger value="bvn" className="text-xs sm:text-sm py-2.5">BVN Verification</TabsTrigger>
             <TabsTrigger value="batch" className="text-xs sm:text-sm py-2.5">Batch</TabsTrigger>

@@ -41,12 +41,12 @@ export default function UserDashboard() {
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <TabsList className="grid grid-cols-3 md:grid-cols-4 lg:flex lg:flex-row w-full gap-1 p-1.5 h-auto">
-            <TabsTrigger value="validate" className="text-xs sm:text-sm py-2.5">Validate NIN</TabsTrigger>
+            <TabsTrigger value="validate" className="text-xs sm:text-sm py-2.5">NIN Validation</TabsTrigger>
             <TabsTrigger value="bvn" className="text-xs sm:text-sm py-2.5">BVN Verification</TabsTrigger>
             <TabsTrigger value="clearance" className="text-xs sm:text-sm py-2.5">Clearance</TabsTrigger>
             <TabsTrigger value="search" className="text-xs sm:text-sm py-2.5">NIN Verification</TabsTrigger>
             <TabsTrigger value="print-nin" className="text-xs sm:text-sm py-2.5">Print NIN</TabsTrigger>
-            <TabsTrigger value="personalization" className="text-xs sm:text-sm py-2.5">Personalize</TabsTrigger>
+            <TabsTrigger value="personalization" className="text-xs sm:text-sm py-2.5">Personalization</TabsTrigger>
           </TabsList>
 
           <TabsContent value="validate" className="space-y-6">
