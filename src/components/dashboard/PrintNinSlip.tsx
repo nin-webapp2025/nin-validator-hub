@@ -104,6 +104,7 @@ function formatNin(nin: string): string {
 
 // ======================== PREMIUM NIN SLIP (Green Card) ========================
 // Exact replica of the official NIMC High Resolution Digital NIN Slip
+// Dark emerald green card with white text, coat of arms watermark, decorative flora
 // Front card + upside-down disclaimer back (designed to cut, fold & laminate)
 function PremiumNinSlip({ data }: { data: NinData }) {
   const photoSrc = data.photo
@@ -111,7 +112,7 @@ function PremiumNinSlip({ data }: { data: NinData }) {
     : "";
 
   return (
-    <div style={{ width: 520, margin: "0 auto", fontFamily: "Arial, Helvetica, sans-serif", color: "#000" }}>
+    <div style={{ width: 520, margin: "0 auto", fontFamily: "Arial, Helvetica, sans-serif" }}>
       {/* Instruction text above card */}
       <div style={{ textAlign: "center", marginBottom: 28 }}>
         <p style={{ fontSize: 15, color: "#222", margin: "0 0 6px" }}>
@@ -125,66 +126,110 @@ function PremiumNinSlip({ data }: { data: NinData }) {
       {/* ===== FRONT OF CARD ===== */}
       <div
         style={{
-          background: "linear-gradient(160deg, #dae5cc 0%, #cddabc 35%, #c2d0ae 65%, #b8c8a2 100%)",
-          border: "1.5px solid #5a7a3e",
-          borderRadius: 3,
-          padding: "12px 16px 10px",
+          background: "linear-gradient(145deg, #1e6b35 0%, #1a7a3a 25%, #1f8040 50%, #2a8548 70%, #308a4e 100%)",
+          border: "3px solid #145228",
+          borderRadius: 8,
+          padding: "14px 18px 12px",
           position: "relative",
           overflow: "hidden",
+          aspectRatio: "1.586",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "space-between",
         }}
       >
-        {/* Subtle security watermark pattern */}
+        {/* === Background layers === */}
+
+        {/* Coat of Arms watermark (center-right, faint) */}
         <div
           style={{
             position: "absolute",
-            inset: 0,
-            opacity: 0.04,
-            backgroundImage: `url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23345520' fill-rule='evenodd'%3E%3Ccircle cx='20' cy='20' r='1.5'/%3E%3Ccircle cx='60' cy='20' r='1.5'/%3E%3Ccircle cx='20' cy='60' r='1.5'/%3E%3Ccircle cx='60' cy='60' r='1.5'/%3E%3Ccircle cx='40' cy='40' r='2'/%3E%3C/g%3E%3C/svg%3E")`,
-            backgroundRepeat: "repeat",
+            right: 30,
+            top: "50%",
+            transform: "translateY(-50%)",
+            opacity: 0.07,
+            pointerEvents: "none",
           }}
-        />
+        >
+          <svg width="200" height="220" viewBox="0 0 200 220" xmlns="http://www.w3.org/2000/svg">
+            {/* Eagle */}
+            <path d="M100 10 L115 30 L130 24 L122 42 L140 35 L128 55 L148 48 L125 68 L100 60 L75 68 L52 48 L72 55 L60 35 L78 42 L70 24 L85 30 Z" fill="#fff" />
+            {/* Shield body */}
+            <rect x="65" y="68" width="70" height="60" rx="4" fill="none" stroke="#fff" strokeWidth="3" />
+            <rect x="65" y="68" width="23" height="60" fill="#fff" opacity="0.5" />
+            <rect x="112" y="68" width="23" height="60" fill="#fff" opacity="0.5" />
+            {/* Y-band */}
+            <path d="M65 68 L100 105 L135 68" fill="none" stroke="#fff" strokeWidth="4" />
+            <line x1="100" y1="105" x2="100" y2="128" stroke="#fff" strokeWidth="4" />
+            {/* Supporters */}
+            <ellipse cx="40" cy="110" rx="18" ry="25" fill="#fff" opacity="0.3" />
+            <ellipse cx="160" cy="110" rx="18" ry="25" fill="#fff" opacity="0.3" />
+            {/* Motto banner */}
+            <rect x="50" y="140" width="100" height="20" rx="3" fill="#fff" opacity="0.3" />
+            <text x="100" y="154" fontSize="9" fill="#fff" textAnchor="middle" fontWeight="bold">UNITY AND FAITH</text>
+            {/* Flowers */}
+            <circle cx="42" cy="175" r="12" fill="#fff" opacity="0.2" />
+            <circle cx="158" cy="175" r="12" fill="#fff" opacity="0.2" />
+            <text x="100" y="200" fontSize="7" fill="#fff" textAnchor="middle" opacity="0.4">PEACE AND PROGRESS</text>
+          </svg>
+        </div>
 
-        {/* Header */}
-        <div style={{ textAlign: "center", position: "relative", marginBottom: 6 }}>
+        {/* Decorative green swirl/flora pattern (right side) */}
+        <div
+          style={{
+            position: "absolute",
+            right: -20,
+            top: 0,
+            bottom: 0,
+            width: 180,
+            opacity: 0.12,
+            pointerEvents: "none",
+          }}
+        >
+          <svg width="180" height="330" viewBox="0 0 180 330" xmlns="http://www.w3.org/2000/svg">
+            <path d="M80 0 Q120 40 90 80 Q60 120 100 160 Q140 200 100 240 Q60 280 90 330" fill="none" stroke="#90ee90" strokeWidth="40" opacity="0.5" />
+            <path d="M120 0 Q160 50 130 100 Q100 150 140 200 Q180 250 140 300" fill="none" stroke="#90ee90" strokeWidth="25" opacity="0.3" />
+            <circle cx="90" cy="50" r="20" fill="#90ee90" opacity="0.15" />
+            <circle cx="130" cy="150" r="25" fill="#90ee90" opacity="0.12" />
+            <circle cx="100" cy="260" r="18" fill="#90ee90" opacity="0.15" />
+          </svg>
+        </div>
+
+        {/* Horizontal green line accents */}
+        <div style={{ position: "absolute", left: 0, top: 0, right: 0, height: 3, background: "linear-gradient(90deg, #145228 0%, #4caf50 50%, #145228 100%)", opacity: 0.4 }} />
+        <div style={{ position: "absolute", left: 0, bottom: 0, right: 0, height: 3, background: "linear-gradient(90deg, #145228 0%, #4caf50 50%, #145228 100%)", opacity: 0.4 }} />
+
+        {/* === Header === */}
+        <div style={{ textAlign: "center", position: "relative", zIndex: 1, marginBottom: 4 }}>
           <div
             style={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "flex-start",
-              gap: 0,
+              fontSize: 15,
+              fontWeight: 900,
+              color: "#ffffff",
+              letterSpacing: 2,
+              textTransform: "uppercase",
+              lineHeight: 1.3,
+              textShadow: "0 1px 2px rgba(0,0,0,0.3)",
             }}
           >
-            <div>
-              <div
-                style={{
-                  fontSize: 14,
-                  fontWeight: 800,
-                  color: "#2a4f14",
-                  letterSpacing: 2.5,
-                  textTransform: "uppercase",
-                  lineHeight: 1.3,
-                }}
-              >
-                FEDERAL REPUBLIC OF NIGERIA
-              </div>
-              <div
-                style={{
-                  fontSize: 11.5,
-                  fontWeight: 700,
-                  color: "#3a6420",
-                  textTransform: "uppercase",
-                  letterSpacing: 1.5,
-                  marginTop: 1,
-                }}
-              >
-                DIGITAL NIN SLIP
-              </div>
-            </div>
+            FEDERAL REPUBLIC OF NIGERIA
+          </div>
+          <div
+            style={{
+              fontSize: 11,
+              fontWeight: 700,
+              color: "#c8e6c9",
+              textTransform: "uppercase",
+              letterSpacing: 2,
+              marginTop: 1,
+            }}
+          >
+            DIGITAL NIN SLIP
           </div>
         </div>
 
-        {/* Body: Photo | Details | QR+NGA */}
-        <div style={{ display: "flex", gap: 10, position: "relative", alignItems: "flex-start" }}>
+        {/* === Body: Photo | Details | QR+NGA === */}
+        <div style={{ display: "flex", gap: 12, position: "relative", zIndex: 1, alignItems: "flex-start", flex: 1 }}>
           {/* Photo */}
           <div style={{ flexShrink: 0 }}>
             {photoSrc ? (
@@ -193,27 +238,27 @@ function PremiumNinSlip({ data }: { data: NinData }) {
                 alt="Photo"
                 crossOrigin="anonymous"
                 style={{
-                  width: 82,
-                  height: 100,
+                  width: 88,
+                  height: 108,
                   objectFit: "cover",
-                  border: "1.5px solid #6a8a4e",
-                  borderRadius: 2,
-                  backgroundColor: "#e8f0dc",
+                  border: "2px solid rgba(255,255,255,0.4)",
+                  borderRadius: 3,
+                  backgroundColor: "#e0e0e0",
                 }}
               />
             ) : (
               <div
                 style={{
-                  width: 82,
-                  height: 100,
-                  border: "1.5px solid #6a8a4e",
-                  borderRadius: 2,
-                  backgroundColor: "#e8f0dc",
+                  width: 88,
+                  height: 108,
+                  border: "2px solid rgba(255,255,255,0.4)",
+                  borderRadius: 3,
+                  backgroundColor: "rgba(255,255,255,0.15)",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  fontSize: 9,
-                  color: "#6a8a4e",
+                  fontSize: 10,
+                  color: "rgba(255,255,255,0.6)",
                 }}
               >
                 No Photo
@@ -222,35 +267,35 @@ function PremiumNinSlip({ data }: { data: NinData }) {
           </div>
 
           {/* Details */}
-          <div style={{ flex: 1, minWidth: 0, paddingTop: 2 }}>
-            <div style={{ fontSize: 8.5, color: "#6b8050", textTransform: "uppercase", letterSpacing: 0.8, lineHeight: 1.2 }}>
+          <div style={{ flex: 1, minWidth: 0, paddingTop: 4 }}>
+            <div style={{ fontSize: 8, color: "#a5d6a7", textTransform: "uppercase", letterSpacing: 1, lineHeight: 1.2 }}>
               SURNAME/NOM
             </div>
-            <div style={{ fontSize: 13, fontWeight: 800, color: "#111", lineHeight: 1.3, marginBottom: 4 }}>
+            <div style={{ fontSize: 14, fontWeight: 800, color: "#ffffff", lineHeight: 1.3, marginBottom: 6 }}>
               {data.surname}
             </div>
 
-            <div style={{ fontSize: 8.5, color: "#6b8050", textTransform: "uppercase", letterSpacing: 0.8, lineHeight: 1.2 }}>
+            <div style={{ fontSize: 8, color: "#a5d6a7", textTransform: "uppercase", letterSpacing: 1, lineHeight: 1.2 }}>
               GIVEN NAMES/PRÉNOMS
             </div>
-            <div style={{ fontSize: 13, fontWeight: 800, color: "#111", lineHeight: 1.3, marginBottom: 5 }}>
-              {data.firstName}{data.middleName ? ` ${data.middleName}` : ""}
+            <div style={{ fontSize: 14, fontWeight: 800, color: "#ffffff", lineHeight: 1.3, marginBottom: 8 }}>
+              {data.firstName}{data.middleName ? `, ${data.middleName}` : ""}
             </div>
 
-            <div style={{ display: "flex", gap: 28 }}>
+            <div style={{ display: "flex", gap: 30 }}>
               <div>
-                <div style={{ fontSize: 8.5, color: "#6b8050", textTransform: "uppercase", letterSpacing: 0.5, lineHeight: 1.2 }}>
+                <div style={{ fontSize: 8, color: "#a5d6a7", textTransform: "uppercase", letterSpacing: 0.5, lineHeight: 1.2 }}>
                   DATE OF BIRTH
                 </div>
-                <div style={{ fontSize: 11, fontWeight: 700, color: "#111", letterSpacing: 0.5 }}>
+                <div style={{ fontSize: 12, fontWeight: 800, color: "#ffffff", letterSpacing: 0.5 }}>
                   {data.dateOfBirth}
                 </div>
               </div>
               <div>
-                <div style={{ fontSize: 8.5, color: "#6b8050", textTransform: "uppercase", letterSpacing: 0.5, lineHeight: 1.2 }}>
+                <div style={{ fontSize: 8, color: "#a5d6a7", textTransform: "uppercase", letterSpacing: 0.5, lineHeight: 1.2 }}>
                   SEX/SEXE
                 </div>
-                <div style={{ fontSize: 11, fontWeight: 700, color: "#111", letterSpacing: 0.5 }}>
+                <div style={{ fontSize: 12, fontWeight: 800, color: "#ffffff", letterSpacing: 0.5 }}>
                   {data.gender}
                 </div>
               </div>
@@ -258,74 +303,78 @@ function PremiumNinSlip({ data }: { data: NinData }) {
           </div>
 
           {/* QR Code + NGA + Issue Date */}
-          <div style={{ flexShrink: 0, display: "flex", flexDirection: "column", alignItems: "center", gap: 3, paddingTop: 0 }}>
+          <div style={{ flexShrink: 0, display: "flex", flexDirection: "column", alignItems: "center", gap: 4, paddingTop: 0 }}>
             <QRCodeSVG
               value={data.nin}
-              size={80}
+              size={88}
               level="M"
+              bgColor="#ffffff"
+              fgColor="#000000"
               style={{
-                border: "1.5px solid #5a7a3e",
-                padding: 3,
+                border: "2px solid rgba(255,255,255,0.5)",
+                padding: 4,
                 backgroundColor: "#fff",
                 borderRadius: 2,
               }}
             />
             <div
               style={{
-                fontSize: 28,
+                fontSize: 30,
                 fontWeight: 900,
-                color: "#2a4f14",
+                color: "#ffffff",
                 lineHeight: 1,
-                letterSpacing: 1,
-                marginTop: 2,
+                letterSpacing: 2,
+                marginTop: 3,
+                textShadow: "0 1px 2px rgba(0,0,0,0.3)",
               }}
             >
               NGA
             </div>
             <div style={{ textAlign: "center" }}>
-              <div style={{ fontSize: 7.5, color: "#6b8050", textTransform: "uppercase", letterSpacing: 0.5 }}>
+              <div style={{ fontSize: 7, color: "#a5d6a7", textTransform: "uppercase", letterSpacing: 0.5 }}>
                 ISSUE DATE
               </div>
-              <div style={{ fontSize: 10, fontWeight: 700, color: "#111" }}>
+              <div style={{ fontSize: 10, fontWeight: 700, color: "#ffffff" }}>
                 {data.issueDate}
               </div>
             </div>
           </div>
         </div>
 
-        {/* Security watermark text (faint, center) */}
+        {/* Motto watermark text (faint, center) */}
         <div
           style={{
             position: "absolute",
             left: "50%",
-            top: "52%",
-            transform: "translate(-50%, -50%)",
-            fontSize: 6.5,
-            color: "#5a7a3e",
-            opacity: 0.12,
+            bottom: 52,
+            transform: "translateX(-50%)",
+            fontSize: 6,
+            color: "#ffffff",
+            opacity: 0.1,
             whiteSpace: "nowrap",
-            letterSpacing: 1.5,
+            letterSpacing: 2,
             textTransform: "uppercase",
-            fontWeight: 600,
+            fontWeight: 700,
             pointerEvents: "none",
           }}
         >
-          PRINT AND FACTS THAT ARE PRINTED AND VERIFIED
+          UNITY AND FAITH, PEACE AND PROGRESS
         </div>
 
-        {/* NIN Number */}
-        <div style={{ textAlign: "center", marginTop: 6, position: "relative" }}>
-          <div style={{ fontSize: 9, color: "#5a7a3e", marginBottom: 2, letterSpacing: 0.3 }}>
+        {/* === NIN Number === */}
+        <div style={{ textAlign: "center", position: "relative", zIndex: 1, marginTop: 4 }}>
+          <div style={{ fontSize: 9, color: "#c8e6c9", marginBottom: 3, letterSpacing: 0.5 }}>
             National Identification Number (NIN)
           </div>
           <div
             style={{
-              fontSize: 40,
+              fontSize: 42,
               fontWeight: 900,
-              color: "#1e3d0c",
-              letterSpacing: 6,
+              color: "#ffffff",
+              letterSpacing: 8,
               fontFamily: "'Courier New', Courier, monospace",
               lineHeight: 1,
+              textShadow: "0 1px 3px rgba(0,0,0,0.25)",
             }}
           >
             {formatNin(data.nin)}
@@ -336,22 +385,22 @@ function PremiumNinSlip({ data }: { data: NinData }) {
       {/* ===== BACK OF CARD (Upside-down for cut-fold-laminate) ===== */}
       <div
         style={{
-          background: "linear-gradient(160deg, #dae5cc 0%, #cddabc 35%, #c2d0ae 65%, #b8c8a2 100%)",
-          border: "1.5px solid #5a7a3e",
+          background: "linear-gradient(145deg, #1e6b35 0%, #1a7a3a 25%, #1f8040 50%, #2a8548 70%, #308a4e 100%)",
+          border: "3px solid #145228",
           borderTop: "none",
-          borderRadius: "0 0 3px 3px",
-          padding: "16px 22px",
+          borderRadius: "0 0 8px 8px",
+          padding: "18px 24px",
           position: "relative",
           overflow: "hidden",
         }}
       >
-        {/* Same watermark pattern */}
+        {/* Decorative pattern */}
         <div
           style={{
             position: "absolute",
             inset: 0,
-            opacity: 0.04,
-            backgroundImage: `url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23345520' fill-rule='evenodd'%3E%3Ccircle cx='20' cy='20' r='1.5'/%3E%3Ccircle cx='60' cy='20' r='1.5'/%3E%3Ccircle cx='20' cy='60' r='1.5'/%3E%3Ccircle cx='60' cy='60' r='1.5'/%3E%3Ccircle cx='40' cy='40' r='2'/%3E%3C/g%3E%3C/svg%3E")`,
+            opacity: 0.06,
+            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%2390ee90' fill-rule='evenodd'%3E%3Ccircle cx='15' cy='15' r='2'/%3E%3Ccircle cx='45' cy='15' r='2'/%3E%3Ccircle cx='15' cy='45' r='2'/%3E%3Ccircle cx='45' cy='45' r='2'/%3E%3Ccircle cx='30' cy='30' r='2.5'/%3E%3C/g%3E%3C/svg%3E")`,
             backgroundRepeat: "repeat",
           }}
         />
@@ -360,13 +409,14 @@ function PremiumNinSlip({ data }: { data: NinData }) {
         <div style={{ transform: "rotate(180deg)", position: "relative" }}>
           <div
             style={{
-              color: "#c41e1e",
-              fontSize: 20,
+              color: "#ff4444",
+              fontSize: 22,
               fontWeight: 900,
               textAlign: "center",
-              letterSpacing: 4,
+              letterSpacing: 5,
               textTransform: "uppercase",
               marginBottom: 8,
+              textShadow: "0 1px 2px rgba(0,0,0,0.3)",
             }}
           >
             DISCLAIMER
@@ -376,15 +426,15 @@ function PremiumNinSlip({ data }: { data: NinData }) {
             style={{
               fontStyle: "italic",
               textAlign: "center",
-              fontSize: 10.5,
-              color: "#2a4f14",
+              fontSize: 11,
+              color: "#c8e6c9",
               margin: "0 0 10px",
             }}
           >
             Trust, but verify
           </p>
 
-          <div style={{ fontSize: 9.5, color: "#1e3d0c", lineHeight: 1.6, textAlign: "center" }}>
+          <div style={{ fontSize: 9.5, color: "#e8f5e9", lineHeight: 1.6, textAlign: "center" }}>
             <p style={{ margin: "0 0 6px" }}>
               Kindly ensure each time this ID is presented, that you verify the credentials
               using a Government-APPROVED verification resource.
@@ -397,11 +447,12 @@ function PremiumNinSlip({ data }: { data: NinData }) {
             <p
               style={{
                 fontWeight: 900,
-                color: "#c41e1e",
+                color: "#ff4444",
                 textTransform: "uppercase",
-                fontSize: 12,
-                letterSpacing: 1,
+                fontSize: 13,
+                letterSpacing: 1.5,
                 margin: "10px 0 6px",
+                textShadow: "0 1px 2px rgba(0,0,0,0.3)",
               }}
             >
               CAUTION!
@@ -910,7 +961,7 @@ export function PrintNinSlip() {
       const canvas = await html2canvas(slipRef.current, {
         scale: 3,
         useCORS: true,
-        backgroundColor: slipType === "premium" ? "#f0fdf4" : "#ffffff",
+        backgroundColor: slipType === "premium" ? "#ffffff" : "#ffffff",
       });
       const link = document.createElement("a");
       link.download = `NIN_Slip_${slipType === "premium" ? "Premium" : "Long"}_${ninData?.nin || "unknown"}.png`;
@@ -933,7 +984,7 @@ export function PrintNinSlip() {
       const canvas = await html2canvas(slipRef.current, {
         scale: 3,
         useCORS: true,
-        backgroundColor: slipType === "premium" ? "#f0fdf4" : "#ffffff",
+        backgroundColor: slipType === "premium" ? "#ffffff" : "#ffffff",
       });
       const imgData = canvas.toDataURL("image/png");
 
