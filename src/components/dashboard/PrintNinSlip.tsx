@@ -105,7 +105,7 @@ function formatNin(nin: string): string {
 
 // ======================== PREMIUM NIN SLIP ========================
 // Plain white background, grey bold title labels, black user data (non-bold, smaller)
-// Front card + upside-down disclaimer back (designed to cut, fold & laminate)
+// Front card + upside-down disclaimer back — both CR80 ID card size (85.6×54mm, ratio 1.585:1)
 function PremiumNinSlip({ data }: { data: NinData }) {
   const photoSrc = data.photo
     ? data.photo.startsWith("data:") ? data.photo : `data:image/jpeg;base64,${data.photo}`
@@ -115,32 +115,43 @@ function PremiumNinSlip({ data }: { data: NinData }) {
   const titleColor = "#888888"; // grey for title/label text
   const valueColor = "#000000"; // black for user data
 
+  // CR80 card dimensions (ratio 1.585:1)
+  const cardWidth = 520;
+  const cardHeight = Math.round(cardWidth / 1.585); // ~328px
+
   return (
-    <div style={{ width: 520, margin: "0 auto", fontFamily: "Arial, Helvetica, sans-serif", color: valueColor }}>
+    <div style={{ width: cardWidth, margin: "0 auto", fontFamily: "Arial, Helvetica, sans-serif", color: valueColor }}>
       {/* Instruction text above card */}
-      <div style={{ textAlign: "center", marginBottom: 28 }}>
-        <p style={{ fontSize: 15, color: "#222", margin: "0 0 6px" }}>
+      <div style={{ textAlign: "center", marginBottom: 20 }}>
+        <p style={{ fontSize: 14, color: "#222", margin: "0 0 4px" }}>
           Please find below your new High Resolution NIN Slip
         </p>
-        <p style={{ fontSize: 13, color: "#444", margin: 0 }}>
+        <p style={{ fontSize: 12, color: "#444", margin: 0 }}>
           You may cut it out of the paper, fold and laminate as desired
         </p>
       </div>
 
-      {/* ===== FRONT OF CARD ===== */}
+      {/* ===== FRONT OF CARD (CR80) ===== */}
       <div
         style={{
+          width: cardWidth,
+          height: cardHeight,
           background: "#ffffff",
           border: "2px solid #cccccc",
           borderRadius: 6,
-          padding: "16px 20px 14px",
+          padding: "12px 16px 10px",
+          boxSizing: "border-box",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "space-between",
+          overflow: "hidden",
         }}
       >
         {/* === Header (left-aligned) === */}
-        <div style={{ marginBottom: 10 }}>
+        <div style={{ marginBottom: 6 }}>
           <div
             style={{
-              fontSize: 16,
+              fontSize: 13,
               fontWeight: 800,
               color: titleColor,
               letterSpacing: 1.5,
@@ -148,24 +159,24 @@ function PremiumNinSlip({ data }: { data: NinData }) {
               lineHeight: 1.3,
             }}
           >
-            FEDERAL REPUBLIC OF NIGERIA
+            Federal Republic of Nigeria
           </div>
           <div
             style={{
-              fontSize: 12,
+              fontSize: 10,
               fontWeight: 700,
               color: titleColor,
               textTransform: "uppercase",
               letterSpacing: 1.5,
-              marginTop: 2,
+              marginTop: 1,
             }}
           >
-            DIGITAL NIN SLIP
+            Digital NIN Slip
           </div>
         </div>
 
         {/* === Body: Photo | Details | QR+NGA === */}
-        <div style={{ display: "flex", gap: 14, alignItems: "flex-start" }}>
+        <div style={{ display: "flex", gap: 10, alignItems: "flex-start", flex: 1 }}>
           {/* Photo */}
           <div style={{ flexShrink: 0 }}>
             {photoSrc ? (
@@ -174,26 +185,26 @@ function PremiumNinSlip({ data }: { data: NinData }) {
                 alt="Photo"
                 crossOrigin="anonymous"
                 style={{
-                  width: 88,
-                  height: 108,
+                  width: 72,
+                  height: 88,
                   objectFit: "cover",
-                  border: "1.5px solid #ccc",
-                  borderRadius: 3,
+                  border: "1px solid #ccc",
+                  borderRadius: 2,
                   backgroundColor: "#f0f0f0",
                 }}
               />
             ) : (
               <div
                 style={{
-                  width: 88,
-                  height: 108,
-                  border: "1.5px solid #ccc",
-                  borderRadius: 3,
+                  width: 72,
+                  height: 88,
+                  border: "1px solid #ccc",
+                  borderRadius: 2,
                   backgroundColor: "#f5f5f5",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  fontSize: 10,
+                  fontSize: 9,
                   color: "#999",
                 }}
               >
@@ -203,35 +214,35 @@ function PremiumNinSlip({ data }: { data: NinData }) {
           </div>
 
           {/* Details */}
-          <div style={{ flex: 1, minWidth: 0, paddingTop: 2 }}>
-            <div style={{ fontSize: 11, fontWeight: 700, color: titleColor, textTransform: "uppercase", letterSpacing: 0.8, lineHeight: 1.2 }}>
-              SURNAME/NOM
+          <div style={{ flex: 1, minWidth: 0, paddingTop: 1 }}>
+            <div style={{ fontSize: 9, fontWeight: 700, color: titleColor, textTransform: "uppercase", letterSpacing: 0.6, lineHeight: 1.2 }}>
+              Surname / Nom
             </div>
-            <div style={{ fontSize: 13, fontWeight: 400, color: valueColor, lineHeight: 1.3, marginBottom: 6 }}>
+            <div style={{ fontSize: 11, fontWeight: 400, color: valueColor, lineHeight: 1.3, marginBottom: 4 }}>
               {data.surname}
             </div>
 
-            <div style={{ fontSize: 11, fontWeight: 700, color: titleColor, textTransform: "uppercase", letterSpacing: 0.8, lineHeight: 1.2 }}>
-              GIVEN NAMES/PRÉNOMS
+            <div style={{ fontSize: 9, fontWeight: 700, color: titleColor, textTransform: "uppercase", letterSpacing: 0.6, lineHeight: 1.2 }}>
+              Given Names / Prénoms
             </div>
-            <div style={{ fontSize: 13, fontWeight: 400, color: valueColor, lineHeight: 1.3, marginBottom: 8 }}>
+            <div style={{ fontSize: 11, fontWeight: 400, color: valueColor, lineHeight: 1.3, marginBottom: 5 }}>
               {data.firstName}{data.middleName ? `, ${data.middleName}` : ""}
             </div>
 
-            <div style={{ display: "flex", gap: 30 }}>
+            <div style={{ display: "flex", gap: 24 }}>
               <div>
-                <div style={{ fontSize: 11, fontWeight: 700, color: titleColor, textTransform: "uppercase", letterSpacing: 0.5, lineHeight: 1.2 }}>
-                  DATE OF BIRTH
+                <div style={{ fontSize: 9, fontWeight: 700, color: titleColor, textTransform: "uppercase", letterSpacing: 0.4, lineHeight: 1.2 }}>
+                  Date of Birth
                 </div>
-                <div style={{ fontSize: 12, fontWeight: 400, color: valueColor, letterSpacing: 0.3 }}>
+                <div style={{ fontSize: 10, fontWeight: 400, color: valueColor, letterSpacing: 0.3 }}>
                   {data.dateOfBirth}
                 </div>
               </div>
               <div>
-                <div style={{ fontSize: 11, fontWeight: 700, color: titleColor, textTransform: "uppercase", letterSpacing: 0.5, lineHeight: 1.2 }}>
-                  SEX/SEXE
+                <div style={{ fontSize: 9, fontWeight: 700, color: titleColor, textTransform: "uppercase", letterSpacing: 0.4, lineHeight: 1.2 }}>
+                  Sex / Sexe
                 </div>
-                <div style={{ fontSize: 12, fontWeight: 400, color: valueColor, letterSpacing: 0.3 }}>
+                <div style={{ fontSize: 10, fontWeight: 400, color: valueColor, letterSpacing: 0.3 }}>
                   {data.gender}
                 </div>
               </div>
@@ -239,37 +250,37 @@ function PremiumNinSlip({ data }: { data: NinData }) {
           </div>
 
           {/* QR Code + NGA + Issue Date */}
-          <div style={{ flexShrink: 0, display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
+          <div style={{ flexShrink: 0, display: "flex", flexDirection: "column", alignItems: "center", gap: 2 }}>
             <QRCodeSVG
               value={data.nin}
-              size={88}
+              size={72}
               level="M"
               bgColor="#ffffff"
               fgColor="#000000"
               style={{
-                border: "1.5px solid #ccc",
-                padding: 4,
+                border: "1px solid #ccc",
+                padding: 3,
                 backgroundColor: "#fff",
                 borderRadius: 2,
               }}
             />
             <div
               style={{
-                fontSize: 28,
+                fontSize: 22,
                 fontWeight: 900,
                 color: valueColor,
                 lineHeight: 1,
                 letterSpacing: 2,
-                marginTop: 3,
+                marginTop: 2,
               }}
             >
               NGA
             </div>
             <div>
-              <div style={{ fontSize: 9, fontWeight: 700, color: titleColor, textTransform: "uppercase", letterSpacing: 0.5, textAlign: "center" }}>
-                ISSUE DATE
+              <div style={{ fontSize: 7.5, fontWeight: 700, color: titleColor, textTransform: "uppercase", letterSpacing: 0.4, textAlign: "center" }}>
+                Issue Date
               </div>
-              <div style={{ fontSize: 11, fontWeight: 400, color: valueColor, textAlign: "center" }}>
+              <div style={{ fontSize: 9, fontWeight: 400, color: valueColor, textAlign: "center" }}>
                 {data.issueDate}
               </div>
             </div>
@@ -277,16 +288,16 @@ function PremiumNinSlip({ data }: { data: NinData }) {
         </div>
 
         {/* === NIN Number === */}
-        <div style={{ textAlign: "center", marginTop: 10 }}>
-          <div style={{ fontSize: 10, fontWeight: 700, color: titleColor, marginBottom: 3, letterSpacing: 0.5 }}>
+        <div style={{ textAlign: "center", marginTop: 6 }}>
+          <div style={{ fontSize: 8, fontWeight: 700, color: titleColor, marginBottom: 2, letterSpacing: 0.4 }}>
             National Identification Number (NIN)
           </div>
           <div
             style={{
-              fontSize: 40,
+              fontSize: 32,
               fontWeight: 400,
               color: valueColor,
-              letterSpacing: 6,
+              letterSpacing: 5,
               fontFamily: "'Courier New', Courier, monospace",
               lineHeight: 1,
             }}
@@ -296,76 +307,83 @@ function PremiumNinSlip({ data }: { data: NinData }) {
         </div>
       </div>
 
-      {/* ===== BACK OF CARD (Upside-down for cut-fold-laminate) ===== */}
+      {/* ===== BACK OF CARD (CR80, upside-down for cut-fold-laminate) ===== */}
       <div
         style={{
+          width: cardWidth,
+          height: cardHeight,
           background: "#ffffff",
           border: "2px solid #cccccc",
           borderTop: "none",
           borderRadius: "0 0 6px 6px",
-          padding: "18px 24px",
+          padding: "14px 18px",
+          boxSizing: "border-box",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          overflow: "hidden",
         }}
       >
         {/* All back content is rotated 180° so it reads correctly when folded */}
-        <div style={{ transform: "rotate(180deg)" }}>
+        <div style={{ transform: "rotate(180deg)", width: "100%" }}>
           <div
             style={{
-              color: "#cc0000",
-              fontSize: 20,
+              color: valueColor,
+              fontSize: 16,
               fontWeight: 900,
               textAlign: "center",
-              letterSpacing: 4,
+              letterSpacing: 3,
               textTransform: "uppercase",
-              marginBottom: 8,
+              marginBottom: 6,
             }}
           >
-            DISCLAIMER
+            Disclaimer
           </div>
 
           <p
             style={{
               fontStyle: "italic",
               textAlign: "center",
-              fontSize: 11,
+              fontSize: 9.5,
               color: valueColor,
-              margin: "0 0 10px",
+              margin: "0 0 8px",
             }}
           >
             Trust, but verify
           </p>
 
-          <div style={{ fontSize: 9.5, color: valueColor, lineHeight: 1.6, textAlign: "center" }}>
-            <p style={{ margin: "0 0 6px" }}>
+          <div style={{ fontSize: 8.5, color: valueColor, lineHeight: 1.55, textAlign: "center" }}>
+            <p style={{ margin: "0 0 5px" }}>
               Kindly ensure each time this ID is presented, that you verify the credentials
-              using a Government-APPROVED verification resource.
+              using a government-approved verification resource.
             </p>
-            <p style={{ margin: "0 0 6px" }}>
-              The details on the front of this NIN Slip must EXACTLY match the
+            <p style={{ margin: "0 0 5px" }}>
+              The details on the front of this NIN slip must exactly match the
               verification result.
             </p>
 
             <p
               style={{
                 fontWeight: 900,
-                color: "#cc0000",
+                color: valueColor,
                 textTransform: "uppercase",
-                fontSize: 12,
+                fontSize: 10,
                 letterSpacing: 1,
-                margin: "10px 0 6px",
+                margin: "8px 0 5px",
               }}
             >
-              CAUTION!
+              Caution!
             </p>
 
-            <p style={{ margin: "0 0 6px" }}>
-              If this NIN was not issued to the person on the front of this document, please DO
-              NOT attempt to scan, photocopy or replicate the personal data contained herein.
+            <p style={{ margin: "0 0 5px" }}>
+              If this NIN was not issued to the person on the front of this document, please do
+              not attempt to scan, photocopy or replicate the personal data contained herein.
             </p>
-            <p style={{ margin: "0 0 6px" }}>
+            <p style={{ margin: "0 0 5px" }}>
               You are only permitted to scan the barcode for the purpose of identity verification.
             </p>
             <p style={{ margin: 0 }}>
-              The FEDERAL GOVERNMENT of NIGERIA assumes no responsibility if you accept any
+              The Federal Government of Nigeria assumes no responsibility if you accept any
               variance in the scan result or do not scan the 2D barcode overleaf.
             </p>
           </div>
