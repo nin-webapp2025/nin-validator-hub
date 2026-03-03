@@ -785,15 +785,15 @@ export function PrintNinSlip() {
     setNinData(null);
 
     try {
-      // Deduct credit
-      if (user?.id) {
-        const cr = await deductCredit(user.id);
-        if (!cr.success) {
-          toast({ title: "No Credits", description: "You have no API credits remaining. Contact an admin to top up.", variant: "destructive" });
-          setLoading(false);
-          return;
-        }
-      }
+      // Credit deduction disabled until payment system is implemented
+      // if (user?.id) {
+      //   const cr = await deductCredit(user.id);
+      //   if (!cr.success) {
+      //     toast({ title: "No Credits", description: "You have no API credits remaining. Contact an admin to top up.", variant: "destructive" });
+      //     setLoading(false);
+      //     return;
+      //   }
+      // }
 
       // For NIN input: use nin_advance (Prembly) which returns full data + photo
       // For phone input: first get NIN from nin_phone, then look up nin_advance
@@ -1148,7 +1148,7 @@ export function PrintNinSlip() {
             </Button>
 
             <p className="text-[11px] text-muted-foreground text-center">
-              Generating a slip costs 1 API credit. Your NIN will be verified before the slip is created.
+              Your NIN will be verified before the slip is created.
             </p>
           </form>
         </CardContent>

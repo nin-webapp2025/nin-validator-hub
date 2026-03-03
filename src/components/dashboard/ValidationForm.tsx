@@ -66,19 +66,19 @@ export function ValidationForm({ onSuccess }: ValidationFormProps) {
       // Track API request for rate limiting
       trackApiRequest();
 
-      // Check & deduct credit
-      if (user?.id) {
-        const creditResult = await deductCredit(user.id);
-        if (!creditResult.success) {
-          toast({
-            title: "No Credits",
-            description: "You have no API credits remaining. Contact an admin to top up.",
-            variant: "destructive",
-          });
-          setIsValidating(false);
-          return;
-        }
-      }
+      // Credit deduction disabled until payment system is implemented
+      // if (user?.id) {
+      //   const creditResult = await deductCredit(user.id);
+      //   if (!creditResult.success) {
+      //     toast({
+      //       title: "No Credits",
+      //       description: "You have no API credits remaining. Contact an admin to top up.",
+      //       variant: "destructive",
+      //     });
+      //     setIsValidating(false);
+      //     return;
+      //   }
+      // }
 
       const { data, error } = await supabase.functions.invoke("robosttech-api", {
         body: {
