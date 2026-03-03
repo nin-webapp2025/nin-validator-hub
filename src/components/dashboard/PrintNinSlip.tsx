@@ -912,11 +912,22 @@ export function PrintNinSlip() {
         format: "a4",
       });
 
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = pdf.internal.pageSize.getHeight();
+      const pdfWidth = pdf.internal.pageSize.getWidth();   // 210mm
+      const pdfHeight = pdf.internal.pageSize.getHeight();  // 297mm
 
-      // The hidden render div is already A4-sized, so place the image full-page
-      pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
+      if (slipType === "premium") {
+        // Place at exact CR80 ID card size: 85.6mm × 54mm per card face
+        const cr80Width = 85.6;
+        const imgAspect = canvas.height / canvas.width;
+        const imgWidth = cr80Width;
+        const imgHeight = cr80Width * imgAspect;
+        const x = (pdfWidth - imgWidth) / 2;
+        const y = (pdfHeight - imgHeight) / 2;
+        pdf.addImage(imgData, "PNG", x, y, imgWidth, imgHeight);
+      } else {
+        // Long slip: full A4 page
+        pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
+      }
 
       pdf.save(`NIN_Slip_${slipType === "premium" ? "Premium" : "Long"}_${ninData?.nin || "unknown"}.pdf`);
       toast({ title: "Downloaded", description: "NIN slip saved as PDF." });
@@ -975,19 +986,19 @@ export function PrintNinSlip() {
               </Button>
             </div>
 
-            {/* Hidden slip for html2canvas rendering — A4 paper (794×1123px at 96dpi) */}
+            {/* Hidden slip for html2canvas rendering */}
             <div style={{ position: "absolute", left: "-9999px", top: 0 }}>
               <div
                 ref={slipRef}
                 style={{
-                  width: 794,
-                  minHeight: 1123,
+                  width: slipType === "premium" ? 520 : 794,
+                  minHeight: slipType === "premium" ? undefined : 1123,
                   backgroundColor: "#ffffff",
                   display: "flex",
                   flexDirection: "column",
                   alignItems: slipType === "premium" ? "center" : "stretch",
-                  justifyContent: slipType === "premium" ? "center" : "flex-start",
-                  padding: slipType === "premium" ? "0 40px" : "40px 40px",
+                  justifyContent: slipType === "premium" ? "flex-start" : "flex-start",
+                  padding: slipType === "premium" ? 0 : "40px 40px",
                   boxSizing: "border-box",
                 }}
               >
