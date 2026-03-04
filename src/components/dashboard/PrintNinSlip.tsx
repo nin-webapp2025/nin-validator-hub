@@ -2,6 +2,7 @@ import { useState, useRef, useCallback } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { deductCredit } from "@/lib/credits";
+import { deductWallet } from "@/lib/wallet";
 import { createNotification } from "@/lib/notifications";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -757,6 +758,20 @@ export function PrintNinSlip() {
     setNinData(null);
 
     try {
+      // Wallet deduction for Print NIN Slip (₦800)
+      if (user?.id) {
+        const walletResult = await deductWallet(user.id, "print_nin_slip");
+        if (!walletResult.success) {
+          toast({
+            title: "Insufficient Balance",
+            description: walletResult.message || "Please fund your wallet to continue.",
+            variant: "destructive",
+          });
+          setLoading(false);
+          return;
+        }
+      }
+
       // Credit deduction disabled until payment system is implemented
       // if (user?.id) {
       //   const cr = await deductCredit(user.id);

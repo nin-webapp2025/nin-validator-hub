@@ -17,7 +17,9 @@ import NinSearch from "@/components/dashboard/NinSearch";
 import { Profile } from "@/components/dashboard/Profile";
 import { VipModificationForm } from "@/components/dashboard/VipModificationForm";
 import { PrintNinSlip } from "@/components/dashboard/PrintNinSlip";
-import { Crown } from "lucide-react";
+import { WalletTopUp } from "@/components/dashboard/WalletTopUp";
+import { TransactionHistory } from "@/components/dashboard/TransactionHistory";
+import { Crown, Wallet } from "lucide-react";
 
 /**
  * VIP Dashboard - Premium user experience with modification request capability
@@ -31,6 +33,7 @@ export default function VipDashboard() {
     <div className="min-h-screen bg-gradient-to-br from-purple-900 via-purple-800 to-black">
       <DashboardHeader 
         onNavigateToProfile={() => setActiveTab("profile")} 
+        onNavigateToWallet={() => setActiveTab("wallet")}
       />
       
       <main className="container mx-auto px-4 py-8">
@@ -84,6 +87,13 @@ export default function VipDashboard() {
               className="text-xs sm:text-sm py-2.5 data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-yellow-600 data-[state=active]:text-black"
             >
               Print NIN
+            </TabsTrigger>
+            <TabsTrigger 
+              value="wallet"
+              className="text-xs sm:text-sm py-2.5 flex items-center gap-1 data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-yellow-600 data-[state=active]:text-black"
+            >
+              <Wallet className="h-3.5 w-3.5" />
+              Wallet
             </TabsTrigger>
           </TabsList>
 
@@ -145,6 +155,15 @@ export default function VipDashboard() {
           <TabsContent value="print-nin" className="space-y-6">
             <div className="bg-purple-900/30 backdrop-blur-lg border border-amber-500/20 rounded-lg p-6">
               <PrintNinSlip />
+            </div>
+          </TabsContent>
+
+          <TabsContent value="wallet" className="space-y-6">
+            <div className="bg-purple-900/30 backdrop-blur-lg border border-amber-500/20 rounded-lg p-6">
+              <div className="grid gap-6 lg:grid-cols-2">
+                <WalletTopUp />
+                <TransactionHistory />
+              </div>
             </div>
           </TabsContent>
 

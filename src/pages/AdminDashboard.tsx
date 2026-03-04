@@ -13,7 +13,9 @@ import { AdminModificationRequests } from "@/components/dashboard/AdminModificat
 import { UserRoleManagement } from "@/components/dashboard/UserRoleManagement";
 import { AuditLog } from "@/components/dashboard/AuditLog";
 import { PrintNinSlip } from "@/components/dashboard/PrintNinSlip";
-import { Shield } from "lucide-react";
+import { WalletTopUp } from "@/components/dashboard/WalletTopUp";
+import { TransactionHistory } from "@/components/dashboard/TransactionHistory";
+import { Shield, Wallet } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -56,6 +58,7 @@ export default function AdminDashboard() {
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-purple-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
       <DashboardHeader 
         onNavigateToProfile={() => setActiveTab("profile")} 
+        onNavigateToWallet={() => setActiveTab("wallet")}
       />
       
       <main className="container mx-auto px-4 py-8">
@@ -87,6 +90,7 @@ export default function AdminDashboard() {
             <TabsTrigger value="clearance" className="text-xs sm:text-sm py-2.5">Clearance</TabsTrigger>
             <TabsTrigger value="bvn" className="text-xs sm:text-sm py-2.5">BVN</TabsTrigger>
             <TabsTrigger value="print-nin" className="text-xs sm:text-sm py-2.5">Print NIN</TabsTrigger>
+            <TabsTrigger value="wallet" className="text-xs sm:text-sm py-2.5 flex items-center gap-1"><Wallet className="h-3.5 w-3.5" />Wallet</TabsTrigger>
           </TabsList>
 
           <TabsContent value="modifications" className="space-y-6">
@@ -119,6 +123,13 @@ export default function AdminDashboard() {
 
           <TabsContent value="print-nin" className="space-y-6">
             <PrintNinSlip />
+          </TabsContent>
+
+          <TabsContent value="wallet" className="space-y-6">
+            <div className="grid gap-6 lg:grid-cols-2">
+              <WalletTopUp />
+              <TransactionHistory />
+            </div>
           </TabsContent>
 
           <TabsContent value="profile" className="space-y-6">

@@ -12,6 +12,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DataDisplayModal } from "@/components/ui/data-display-modal";
 import { trackApiRequest } from "./RateLimitIndicator";
+import { deductWallet } from "@/lib/wallet";
 
 interface BvnFormProps {
   onSuccess?: () => void;
@@ -51,6 +52,20 @@ export function BvnVerification({ onSuccess }: BvnFormProps) {
     setResult(null);
 
     try {
+      // Wallet deduction for BVN Verification (₦800)
+      if (user?.id) {
+        const walletResult = await deductWallet(user.id, "bvn_verification");
+        if (!walletResult.success) {
+          toast({
+            title: "Insufficient Balance",
+            description: walletResult.message || "Please fund your wallet to continue.",
+            variant: "destructive",
+          });
+          setLoading(false);
+          return;
+        }
+      }
+
       trackApiRequest();
 
       const action = verificationType === "basic" ? "bvn_basic" : "bvn_advance";

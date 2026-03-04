@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { trackApiRequest } from "@/components/dashboard/RateLimitIndicator";
 import { createNotification } from "@/lib/notifications";
 import { deductCredit } from "@/lib/credits";
+import { deductWallet } from "@/lib/wallet";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -65,6 +66,20 @@ export function ValidationForm({ onSuccess }: ValidationFormProps) {
     try {
       // Track API request for rate limiting
       trackApiRequest();
+
+      // Wallet deduction for NIN Validation (₦5,000)
+      if (user?.id) {
+        const walletResult = await deductWallet(user.id, "nin_validation");
+        if (!walletResult.success) {
+          toast({
+            title: "Insufficient Balance",
+            description: walletResult.message || "Please fund your wallet to continue.",
+            variant: "destructive",
+          });
+          setIsValidating(false);
+          return;
+        }
+      }
 
       // Credit deduction disabled until payment system is implemented
       // if (user?.id) {

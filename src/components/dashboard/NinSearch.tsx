@@ -10,6 +10,8 @@ import { z } from "zod";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DataDisplayModal } from "@/components/ui/data-display-modal";
 import { Badge } from "@/components/ui/badge";
+import { useAuth } from "@/hooks/useAuth";
+import { deductWallet } from "@/lib/wallet";
 
 const ninSchema = z.string().regex(/^\d{11}$/, "NIN must be exactly 11 digits");
 const phoneSchema = z.string().regex(/^0\d{10}$/, "Phone must be 11 digits starting with 0");
@@ -34,6 +36,7 @@ const cleanResponseData = (data: any) => {
 
 export default function NinSearch() {
   const [activeTab, setActiveTab] = useState("nin");
+  const { user } = useAuth();
   const [nin, setNin] = useState("");
   const [phone, setPhone] = useState("");
   const [demoNin, setDemoNin] = useState("");
@@ -63,6 +66,20 @@ export default function NinSearch() {
     setResult(null);
 
     try {
+      // Wallet deduction for NIN Verification (₦800)
+      if (user?.id) {
+        const walletResult = await deductWallet(user.id, "nin_verification");
+        if (!walletResult.success) {
+          toast({
+            title: "Insufficient Balance",
+            description: walletResult.message || "Please fund your wallet to continue.",
+            variant: "destructive",
+          });
+          setLoading(false);
+          return;
+        }
+      }
+
       const { data, error } = await supabase.functions.invoke("robosttech-api", {
         body: { action: "nin_advance", nin, number: nin },
       });
@@ -127,6 +144,20 @@ export default function NinSearch() {
     setResult(null);
 
     try {
+      // Wallet deduction for NIN Verification via phone (₦800)
+      if (user?.id) {
+        const walletResult = await deductWallet(user.id, "nin_verification");
+        if (!walletResult.success) {
+          toast({
+            title: "Insufficient Balance",
+            description: walletResult.message || "Please fund your wallet to continue.",
+            variant: "destructive",
+          });
+          setLoading(false);
+          return;
+        }
+      }
+
       const { data, error } = await supabase.functions.invoke("robosttech-api", {
         body: { action: "nin_phone", phone },
       });

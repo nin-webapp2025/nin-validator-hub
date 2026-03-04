@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, UserCheck, CheckCircle, XCircle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { deductWallet } from "@/lib/wallet";
 
 interface PersonalizationResult {
   message?: string;
@@ -43,6 +44,20 @@ export function Personalization({ onSuccess }: PersonalizationProps) {
     setResult(null);
 
     try {
+      // Wallet deduction for Personalization (₦1,500)
+      if (user?.id) {
+        const walletResult = await deductWallet(user.id, "personalization");
+        if (!walletResult.success) {
+          toast({
+            title: "Insufficient Balance",
+            description: walletResult.message || "Please fund your wallet to continue.",
+            variant: "destructive",
+          });
+          setIsSubmitting(false);
+          return;
+        }
+      }
+
       const { data, error } = await supabase.functions.invoke("robosttech-api", {
         body: {
           action: "personalization",

@@ -27,8 +27,10 @@ import { SessionTimeout } from "@/components/dashboard/SessionTimeout";
 import { BvnVerification } from "@/components/dashboard/BvnVerification";
 import { BvnHistory } from "@/components/dashboard/BvnHistory";
 import { PrintNinSlip } from "@/components/dashboard/PrintNinSlip";
+import { WalletTopUp } from "@/components/dashboard/WalletTopUp";
+import { TransactionHistory } from "@/components/dashboard/TransactionHistory";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Loader2, Search, Clock, UserCheck, User, ShieldCheck, FileSearch, Activity, CreditCard, Printer } from "lucide-react";
+import { Loader2, Search, Clock, UserCheck, User, ShieldCheck, FileSearch, Activity, CreditCard, Printer, Wallet } from "lucide-react";
 import { StatCardSkeleton } from "@/components/ui/skeleton-loader";
 import { useState } from "react";
 
@@ -139,6 +141,7 @@ export default function Dashboard() {
         <div className="min-h-screen bg-[#fafbfc] dark:bg-slate-950">
           <DashboardHeader 
             onNavigateToProfile={() => setActiveTab("profile")}
+            onNavigateToWallet={() => setActiveTab("wallet")}
           />
       
       {/* Compact Professional Header */}
@@ -241,6 +244,13 @@ export default function Dashboard() {
                 <Printer className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                 <span>Print NIN</span>
               </TabsTrigger>
+              <TabsTrigger 
+                value="wallet" 
+                className="flex items-center justify-center gap-1.5 px-2 py-2.5 sm:py-3 rounded-lg sm:rounded-xl font-semibold text-xs sm:text-sm text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 data-[state=active]:bg-green-600 data-[state=active]:text-white data-[state=active]:shadow-lg transition-all duration-200"
+              >
+                <Wallet className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                <span>Wallet</span>
+              </TabsTrigger>
 
             </TabsList>
           </div>
@@ -331,6 +341,18 @@ export default function Dashboard() {
                 transition={{ duration: 0.5 }}
               >
                 <PrintNinSlip />
+              </motion.div>
+            </TabsContent>
+
+            <TabsContent value="wallet" className="mt-0">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+                className="grid gap-6 lg:grid-cols-2"
+              >
+                <WalletTopUp />
+                <TransactionHistory />
               </motion.div>
             </TabsContent>
 

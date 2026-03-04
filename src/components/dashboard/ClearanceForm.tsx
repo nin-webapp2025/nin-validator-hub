@@ -7,10 +7,13 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2, ShieldCheck, Copy, CheckCircle } from "lucide-react";
 import { z } from "zod";
+import { useAuth } from "@/hooks/useAuth";
+import { deductWallet } from "@/lib/wallet";
 
 const trackingIdSchema = z.string().length(15, "Tracking ID must be exactly 15 characters");
 
 export default function ClearanceForm({ onSuccess }: { onSuccess?: () => void }) {
+  const { user } = useAuth();
   const [trackingId, setTrackingId] = useState("");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<any>(null);
@@ -36,6 +39,20 @@ export default function ClearanceForm({ onSuccess }: { onSuccess?: () => void })
     setResult(null);
 
     try {
+      // Wallet deduction for Clearance (₦3,000)
+      if (user?.id) {
+        const walletResult = await deductWallet(user.id, "clearance");
+        if (!walletResult.success) {
+          toast({
+            title: "Insufficient Balance",
+            description: walletResult.message || "Please fund your wallet to continue.",
+            variant: "destructive",
+          });
+          setLoading(false);
+          return;
+        }
+      }
+
       const { data, error } = await supabase.functions.invoke("robosttech-api", {
         body: { action: "clearance", trackingId },
       });

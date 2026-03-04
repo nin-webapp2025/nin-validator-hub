@@ -30,12 +30,14 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { WalletBalance } from "@/components/dashboard/WalletBalance";
 
 interface DashboardHeaderProps {
   onNavigateToProfile?: () => void;
+  onNavigateToWallet?: () => void;
 }
 
-export function DashboardHeader({ onNavigateToProfile }: DashboardHeaderProps) {
+export function DashboardHeader({ onNavigateToProfile, onNavigateToWallet }: DashboardHeaderProps) {
   const { user, signOut } = useAuth();
   const { theme, setTheme } = useTheme();
   const [showSignOutDialog, setShowSignOutDialog] = useState(false);
@@ -113,6 +115,8 @@ export function DashboardHeader({ onNavigateToProfile }: DashboardHeaderProps) {
         </div>
 
         <div className="flex items-center gap-2">
+          <WalletBalance onClick={onNavigateToWallet} />
+
           <Button
             variant="ghost"
             size="icon"

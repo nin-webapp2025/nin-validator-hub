@@ -11,7 +11,9 @@ import { BatchValidation } from "@/components/dashboard/BatchValidation";
 import { Profile } from "@/components/dashboard/Profile";
 import { StaffTasks } from "@/components/dashboard/StaffTasks";
 import { PrintNinSlip } from "@/components/dashboard/PrintNinSlip";
-import { Briefcase } from "lucide-react";
+import { WalletTopUp } from "@/components/dashboard/WalletTopUp";
+import { TransactionHistory } from "@/components/dashboard/TransactionHistory";
+import { Briefcase, Wallet } from "lucide-react";
 
 /**
  * Staff Dashboard - Full access to all NIN/BVN services
@@ -25,6 +27,7 @@ export default function StaffDashboard() {
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-green-50 to-blue-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
       <DashboardHeader 
         onNavigateToProfile={() => setActiveTab("profile")} 
+        onNavigateToWallet={() => setActiveTab("wallet")}
       />
       
       <main className="container mx-auto px-4 py-8">
@@ -43,6 +46,7 @@ export default function StaffDashboard() {
             <TabsTrigger value="bvn" className="text-xs sm:text-sm py-2.5">BVN Verification</TabsTrigger>
             <TabsTrigger value="batch" className="text-xs sm:text-sm py-2.5">Batch</TabsTrigger>
             <TabsTrigger value="print-nin" className="text-xs sm:text-sm py-2.5">Print NIN</TabsTrigger>
+            <TabsTrigger value="wallet" className="text-xs sm:text-sm py-2.5 flex items-center gap-1"><Wallet className="h-3.5 w-3.5" />Wallet</TabsTrigger>
           </TabsList>
 
           <TabsContent value="tasks" className="space-y-6">
@@ -75,6 +79,13 @@ export default function StaffDashboard() {
 
           <TabsContent value="print-nin" className="space-y-6">
             <PrintNinSlip />
+          </TabsContent>
+
+          <TabsContent value="wallet" className="space-y-6">
+            <div className="grid gap-6 lg:grid-cols-2">
+              <WalletTopUp />
+              <TransactionHistory />
+            </div>
           </TabsContent>
 
           <TabsContent value="profile" className="space-y-6">
