@@ -436,39 +436,23 @@ function LongNinSlip({ data }: { data: NinData }) {
             borderBottom: "2px solid #000",
           }}
         >
-          {/* Nigerian Coat of Arms (placeholder - styled representation) */}
+          {/* Nigerian Coat of Arms */}
           <div
             style={{
-              width: 52,
-              height: 52,
+              width: 56,
+              height: 56,
               flexShrink: 0,
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
             }}
           >
-            <svg width="48" height="48" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
-              {/* Simplified Nigerian Coat of Arms */}
-              <rect x="0" y="0" width="48" height="48" fill="none" />
-              {/* Eagle */}
-              <path d="M24 2 L28 8 L32 6 L30 12 L34 10 L31 15 L35 14 L30 18 L24 16 L18 18 L13 14 L17 15 L14 10 L18 12 L16 6 L20 8 Z" fill="#2d2d2d" />
-              {/* Shield */}
-              <rect x="16" y="18" width="16" height="14" rx="1" fill="#fff" stroke="#000" strokeWidth="0.8" />
-              <rect x="16" y="18" width="5.3" height="14" fill="#008751" />
-              <rect x="26.7" y="18" width="5.3" height="14" fill="#008751" />
-              {/* Y-shaped band (black) */}
-              <path d="M16 18 L24 26 L32 18" fill="none" stroke="#000" strokeWidth="1.5" />
-              <line x1="24" y1="26" x2="24" y2="32" stroke="#000" strokeWidth="1.5" />
-              {/* Horses */}
-              <text x="8" y="30" fontSize="10" fill="#8B4513">🐴</text>
-              <text x="34" y="30" fontSize="10" fill="#8B4513" transform="scale(-1,1) translate(-76,0)">🐴</text>
-              {/* Base motto */}
-              <rect x="10" y="34" width="28" height="5" rx="1" fill="#f0e68c" stroke="#8B4513" strokeWidth="0.3" />
-              <text x="24" y="38" fontSize="3.2" fill="#000" textAnchor="middle" fontWeight="bold">UNITY AND FAITH</text>
-              {/* Flowers */}
-              <circle cx="10" y="42" r="3" fill="#e74c3c" opacity="0.8" />
-              <circle cx="38" y="42" r="3" fill="#e74c3c" opacity="0.8" />
-            </svg>
+            <img
+              src="/images/coat-of-arms.png"
+              alt="Nigerian Coat of Arms"
+              crossOrigin="anonymous"
+              style={{ width: 56, height: 56, objectFit: "contain" }}
+            />
           </div>
 
           {/* Center title */}
@@ -484,34 +468,23 @@ function LongNinSlip({ data }: { data: NinData }) {
             </div>
           </div>
 
-          {/* NIMC Logo (styled text representation) */}
+          {/* NIMC Logo */}
           <div
             style={{
-              width: 52,
-              height: 52,
+              width: 56,
+              height: 56,
               flexShrink: 0,
               display: "flex",
-              flexDirection: "column",
               alignItems: "center",
               justifyContent: "center",
             }}
           >
-            <svg width="42" height="20" viewBox="0 0 42 20" xmlns="http://www.w3.org/2000/svg">
-              <circle cx="21" cy="6" r="5" fill="#008751" opacity="0.8" />
-              <path d="M16 6 Q21 0 26 6" fill="none" stroke="#008751" strokeWidth="1.5" />
-            </svg>
-            <div
-              style={{
-                fontSize: 16,
-                fontWeight: 800,
-                fontStyle: "italic",
-                color: "#008751",
-                lineHeight: 1,
-                letterSpacing: -0.5,
-              }}
-            >
-              Nimc
-            </div>
+            <img
+              src="/images/nimc-logo.png"
+              alt="NIMC Logo"
+              crossOrigin="anonymous"
+              style={{ width: 56, height: 56, objectFit: "contain" }}
+            />
           </div>
         </div>
 
