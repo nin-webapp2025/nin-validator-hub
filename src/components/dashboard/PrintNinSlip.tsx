@@ -499,14 +499,15 @@ function LongNinSlip({ data }: { data: NinData }) {
           cellSpacing={0}
         >
           <colgroup>
+            <col style={{ width: "13%" }} />
+            <col style={{ width: "16%" }} />
+            <col style={{ width: "13%" }} />
+            <col style={{ width: "14%" }} />
+            <col style={{ width: "26%" }} />
             <col style={{ width: "18%" }} />
-            <col style={{ width: "17%" }} />
-            <col style={{ width: "17%" }} />
-            <col style={{ width: "18%" }} />
-            <col style={{ width: "30%" }} />
           </colgroup>
           <tbody>
-            {/* Row 1: Tracking ID | Surname | Address + Photo */}
+            {/* Row 1: Tracking ID | Surname | Address | Photo */}
             <tr>
               <td style={{ ...cellStyle, fontWeight: 700 }}>
                 Tracking ID:
@@ -520,65 +521,63 @@ function LongNinSlip({ data }: { data: NinData }) {
               <td style={{ ...cellStyle }}>
                 {data.surname}
               </td>
+              {/* Address — spans rows 1-2 */}
               <td
                 rowSpan={2}
                 style={{
-                  borderBottom: "1px solid #000",
-                  padding: "4px 8px",
+                  ...cellStyle,
                   verticalAlign: "top",
-                  fontSize: 11,
                 }}
               >
-                <div style={{ display: "flex", gap: 8 }}>
-                  <div style={{ flex: 1 }}>
-                    <span style={labelStyle}>Address:</span>
-                    <div style={{ fontSize: 10.5, lineHeight: 1.35, marginTop: 2 }}>
-                      {data.address || "N/A"}
-                    </div>
-                  </div>
-                  {/* Photo (spans rows visually) */}
+                <span style={labelStyle}>Address:</span>
+                <div style={{ fontSize: 10.5, lineHeight: 1.35, marginTop: 2 }}>
+                  {data.address || "N/A"}
+                </div>
+              </td>
+              {/* Photo — spans all 4 rows */}
+              <td
+                rowSpan={4}
+                style={{
+                  borderBottom: "1px solid #000",
+                  padding: "4px 6px",
+                  verticalAlign: "middle",
+                  textAlign: "center",
+                }}
+              >
+                {photoSrc ? (
+                  <img
+                    src={photoSrc}
+                    alt="Photo"
+                    crossOrigin="anonymous"
+                    style={{
+                      width: 78,
+                      height: 92,
+                      objectFit: "cover",
+                      border: "1px solid #666",
+                    }}
+                  />
+                ) : (
                   <div
                     style={{
-                      flexShrink: 0,
+                      width: 78,
+                      height: 92,
+                      border: "1px solid #666",
+                      backgroundColor: "#f5f5f5",
                       display: "flex",
-                      alignItems: "flex-start",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      fontSize: 8,
+                      color: "#999",
+                      margin: "0 auto",
                     }}
                   >
-                    {photoSrc ? (
-                      <img
-                        src={photoSrc}
-                        alt="Photo"
-                        crossOrigin="anonymous"
-                        style={{
-                          width: 72,
-                          height: 88,
-                          objectFit: "cover",
-                          border: "1px solid #666",
-                        }}
-                      />
-                    ) : (
-                      <div
-                        style={{
-                          width: 72,
-                          height: 88,
-                          border: "1px solid #666",
-                          backgroundColor: "#f5f5f5",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          fontSize: 8,
-                          color: "#999",
-                        }}
-                      >
-                        No Photo
-                      </div>
-                    )}
+                    No Photo
                   </div>
-                </div>
+                )}
               </td>
             </tr>
 
-            {/* Row 2: NIN | First Name */}
+            {/* Row 2: NIN | First Name | (Address continues) | (Photo continues) */}
             <tr>
               <td style={{ ...cellStyle, fontWeight: 700 }}>
                 NIN:
@@ -594,7 +593,7 @@ function LongNinSlip({ data }: { data: NinData }) {
               </td>
             </tr>
 
-            {/* Row 3: (empty) | Middle Name */}
+            {/* Row 3: (empty) | Middle Name | (empty) | (Photo continues) */}
             <tr>
               <td style={{ ...cellStyle }}>&nbsp;</td>
               <td style={{ ...cellStyle }}>&nbsp;</td>
@@ -604,10 +603,10 @@ function LongNinSlip({ data }: { data: NinData }) {
               <td style={{ ...cellStyle }}>
                 {data.middleName || ""}
               </td>
-              <td style={{ ...cellStyle, borderRight: "none" }}>&nbsp;</td>
+              <td style={{ ...cellStyle }}>&nbsp;</td>
             </tr>
 
-            {/* Row 4: (empty) | Gender | State */}
+            {/* Row 4: (empty) | Gender | State | (Photo continues) */}
             <tr>
               <td style={{ ...cellStyle }}>&nbsp;</td>
               <td style={{ ...cellStyle }}>&nbsp;</td>
@@ -617,7 +616,7 @@ function LongNinSlip({ data }: { data: NinData }) {
               <td style={{ ...cellStyle }}>
                 {data.gender}
               </td>
-              <td style={{ ...cellStyle, borderRight: "none" }}>
+              <td style={{ ...cellStyle, verticalAlign: "bottom" }}>
                 {data.state || ""}
               </td>
             </tr>
