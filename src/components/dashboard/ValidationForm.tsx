@@ -146,14 +146,15 @@ export function ValidationForm({ onSuccess }: ValidationFormProps) {
         type: isSuccess ? "success" : "error",
       });
 
-      if (!isSuccess && typeof balanceMsg === "string") {
-        toast({
-          title: "Insufficient Balance",
-          description: `API billing error: ${balanceMsg}`,
-          variant: "destructive",
-        });
-        return;
-      }
+      // API balance checks disabled until payment system is implemented
+      // if (!isSuccess && typeof balanceMsg === "string") {
+      //   toast({
+      //     title: "Insufficient Balance",
+      //     description: `API billing error: ${balanceMsg}`,
+      //     variant: "destructive",
+      //   });
+      //   return;
+      // }
 
       const description =
         typeof payload?.message === "string"
@@ -175,10 +176,12 @@ export function ValidationForm({ onSuccess }: ValidationFormProps) {
           const errBody: any = await error.context.json();
           const balanceMsg = errBody?.message?.balance;
 
-          if (typeof balanceMsg === "string") {
-            errorTitle = "Insufficient Balance";
-            errorMessage = `API billing error: ${balanceMsg}`;
-          } else if (typeof errBody?.message === "string") {
+          // API balance checks disabled until payment system is implemented
+          // if (typeof balanceMsg === "string") {
+          //   errorTitle = "Insufficient Balance";
+          //   errorMessage = `API billing error: ${balanceMsg}`;
+          // } else
+          if (typeof errBody?.message === "string") {
             errorMessage = errBody.message;
           } else if (typeof errBody?.error === "string") {
             errorMessage = errBody.error;
@@ -193,12 +196,14 @@ export function ValidationForm({ onSuccess }: ValidationFormProps) {
       } else if (error instanceof Error) {
         // Fallback: parse message text
         const message = error.message;
-        if (message.includes("balance") || message.includes("fund")) {
-          errorTitle = "Insufficient Balance";
-          errorMessage = "Your API account has insufficient funds. Please top up your account to continue validating.";
-        } else {
-          errorMessage = message;
-        }
+        // API balance checks disabled until payment system is implemented
+        // if (message.includes("balance") || message.includes("fund")) {
+        //   errorTitle = "Insufficient Balance";
+        //   errorMessage = "Your API account has insufficient funds. Please top up your account to continue validating.";
+        // } else {
+        //   errorMessage = message;
+        // }
+        errorMessage = message;
       }
 
       toast({
