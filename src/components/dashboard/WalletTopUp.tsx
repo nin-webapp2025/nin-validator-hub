@@ -2,7 +2,7 @@
  * WalletTopUp — Paystack-powered wallet top-up form.
  * Uses react-paystack Inline popup. After payment, verifies via edge function.
  */
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { usePaystackPayment } from "react-paystack";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
@@ -20,6 +20,79 @@ const PAYSTACK_PUBLIC_KEY = import.meta.env.VITE_PAYSTACK_PUBLIC_KEY || "";
 // Quick-top-up amounts
 const QUICK_AMOUNTS = [1000, 2000, 5000, 10000, 20000, 50000];
 
+/**
+ * Inner component that re-mounts when payKey changes so usePaystackPayment
+ * always gets a fresh config (it reads config only on first render).
+ */
+function PaystackButton({
+  amount,
+  email,
+  publicKey,
+  userId,
+  onVerified,
+  onClose,
+  disabled,
+  processing,
+  label,
+}: {
+  amount: number;
+  email: string;
+  publicKey: string;
+  userId: string;
+  onVerified: (reference: string) => void;
+  onClose: () => void;
+  disabled: boolean;
+  processing: boolean;
+  label: string;
+}) {
+  const config = {
+    reference: `wtop_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+    email,
+    amount: Math.round(amount * 100), // Paystack expects kobo
+    publicKey,
+    currency: "NGN" as const,
+    metadata: {
+      custom_fields: [
+        { display_name: "User ID", variable_name: "user_id", value: userId },
+        { display_name: "Purpose", variable_name: "purpose", value: "wallet_top_up" },
+      ],
+    },
+  };
+
+  const initializePayment = usePaystackPayment(config);
+
+  const handleClick = () => {
+    initializePayment({
+      onSuccess: (ref: any) => {
+        const reference = ref?.reference || ref?.trxref || config.reference;
+        onVerified(reference);
+      },
+      onClose,
+    });
+  };
+
+  return (
+    <Button
+      onClick={handleClick}
+      disabled={disabled || processing}
+      className="w-full gap-2 bg-green-600 hover:bg-green-700 text-white"
+      size="lg"
+    >
+      {processing ? (
+        <>
+          <Loader2 className="h-4 w-4 animate-spin" />
+          Verifying Payment...
+        </>
+      ) : (
+        <>
+          <CreditCard className="h-4 w-4" />
+          {label}
+        </>
+      )}
+    </Button>
+  );
+}
+
 export function WalletTopUp() {
   const { user } = useAuth();
   const { toast } = useToast();
@@ -27,6 +100,8 @@ export function WalletTopUp() {
   const [balance, setBalance] = useState<number>(0);
   const [amount, setAmount] = useState<string>("");
   const [processing, setProcessing] = useState(false);
+  // Increment payKey to force PaystackButton to remount with fresh config
+  const [payKey, setPayKey] = useState(0);
 
   // Fetch balance
   const fetchBalance = useCallback(async () => {
@@ -44,38 +119,38 @@ export function WalletTopUp() {
 
   const numAmount = parseFloat(amount) || 0;
 
-  // Paystack config
-  const config = {
-    reference: `wtop_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
-    email: user?.email || "",
-    amount: Math.round(numAmount * 100), // Paystack expects kobo
-    publicKey: PAYSTACK_PUBLIC_KEY,
-    currency: "NGN",
-    metadata: {
-      custom_fields: [
-        { display_name: "User ID", variable_name: "user_id", value: user?.id || "" },
-        { display_name: "Purpose", variable_name: "purpose", value: "wallet_top_up" },
-      ],
-    },
-  };
-
-  const initializePayment = usePaystackPayment(config);
-
-  const onPaystackSuccess = useCallback(
-    async (ref: any) => {
-      const reference = ref?.reference || ref?.trxref || config.reference;
+  /** Called after Paystack popup reports success */
+  const handleVerified = useCallback(
+    async (reference: string) => {
       setProcessing(true);
 
       try {
+        console.log("[WalletTopUp] Verifying reference:", reference);
+
         // Verify with our edge function
         const { data: verifyData, error } = await supabase.functions.invoke("paystack-verify", {
           body: { reference },
         });
 
-        if (error || !verifyData?.success) {
+        console.log("[WalletTopUp] Edge function response:", { verifyData, error });
+
+        // supabase.functions.invoke may return a FunctionsHttpError in `error`
+        // or the edge function may return { success: false } in `data`
+        if (error) {
+          console.error("[WalletTopUp] Edge function error:", error);
           toast({
             title: "Verification Failed",
-            description: verifyData?.error || "Could not verify payment. Contact support with reference: " + reference,
+            description: "Could not verify payment. Contact support with reference: " + reference,
+            variant: "destructive",
+          });
+          return;
+        }
+
+        if (!verifyData?.success) {
+          console.error("[WalletTopUp] Paystack verify unsuccessful:", verifyData);
+          toast({
+            title: "Verification Failed",
+            description: verifyData?.error || verifyData?.message || "Payment verification failed. Reference: " + reference,
             variant: "destructive",
           });
           return;
@@ -89,6 +164,7 @@ export function WalletTopUp() {
             description: `${formatNaira(verifyData.amount)} has been added to your wallet. New balance: ${formatNaira(result.balance)}`,
           });
           setAmount("");
+          setPayKey((k) => k + 1); // remount PaystackButton for fresh reference
         } else {
           toast({
             title: "Credit Error",
@@ -97,20 +173,20 @@ export function WalletTopUp() {
           });
         }
       } catch (err: any) {
-        console.error("Payment verification error:", err);
+        console.error("[WalletTopUp] Payment verification error:", err);
         toast({
           title: "Error",
-          description: "An error occurred during payment verification. Reference: " + reference,
+          description: "An unexpected error occurred during verification. Reference: " + reference,
           variant: "destructive",
         });
       } finally {
         setProcessing(false);
       }
     },
-    [user, toast, config.reference]
+    [user, toast]
   );
 
-  const onPaystackClose = useCallback(() => {
+  const handleClose = useCallback(() => {
     toast({
       title: "Payment Cancelled",
       description: "You closed the payment window. No charges were made.",
@@ -126,7 +202,6 @@ export function WalletTopUp() {
       toast({ title: "Configuration Error", description: "Paystack is not configured. Contact support.", variant: "destructive" });
       return;
     }
-    initializePayment({ onSuccess: onPaystackSuccess, onClose: onPaystackClose });
   };
 
   return (
@@ -198,25 +273,31 @@ export function WalletTopUp() {
             <p className="text-xs text-muted-foreground">Minimum top-up: ₦100</p>
           </div>
 
-          {/* Pay button */}
-          <Button
-            onClick={handlePay}
-            disabled={numAmount < 100 || processing}
-            className="w-full gap-2 bg-green-600 hover:bg-green-700 text-white"
-            size="lg"
-          >
-            {processing ? (
-              <>
-                <Loader2 className="h-4 w-4 animate-spin" />
-                Verifying Payment...
-              </>
-            ) : (
-              <>
-                <CreditCard className="h-4 w-4" />
-                Pay {numAmount >= 100 ? formatNaira(numAmount) : ""}
-              </>
-            )}
-          </Button>
+          {/* Pay button — uses key={payKey} so it remounts with fresh Paystack config */}
+          {numAmount >= 100 && PAYSTACK_PUBLIC_KEY ? (
+            <PaystackButton
+              key={payKey}
+              amount={numAmount}
+              email={user?.email || ""}
+              publicKey={PAYSTACK_PUBLIC_KEY}
+              userId={user?.id || ""}
+              onVerified={handleVerified}
+              onClose={handleClose}
+              disabled={numAmount < 100}
+              processing={processing}
+              label={`Pay ${formatNaira(numAmount)}`}
+            />
+          ) : (
+            <Button
+              onClick={handlePay}
+              disabled={numAmount < 100 || processing}
+              className="w-full gap-2 bg-green-600 hover:bg-green-700 text-white"
+              size="lg"
+            >
+              <CreditCard className="h-4 w-4" />
+              Pay
+            </Button>
+          )}
 
           <div className="flex items-start gap-2 p-3 rounded-lg bg-blue-50 dark:bg-blue-950/30 text-xs text-blue-700 dark:text-blue-300">
             <Info className="h-4 w-4 shrink-0 mt-0.5" />

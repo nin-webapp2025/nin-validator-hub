@@ -29,19 +29,32 @@ serve(async (req) => {
     }
 
     // Verify the transaction with Paystack API
-    const verifyRes = await fetch(
-      `https://api.paystack.co/transaction/verify/${encodeURIComponent(reference)}`,
-      {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${secretKey}`,
-          "Content-Type": "application/json",
-        },
-      }
-    );
+    const verifyUrl = `https://api.paystack.co/transaction/verify/${encodeURIComponent(reference)}`;
+    console.log("Verifying Paystack transaction:", verifyUrl);
+
+    const verifyRes = await fetch(verifyUrl, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${secretKey}`,
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!verifyRes.ok) {
+      const errorText = await verifyRes.text();
+      console.error("Paystack API HTTP error:", verifyRes.status, errorText);
+      return new Response(
+        JSON.stringify({
+          success: false,
+          error: `Paystack API returned HTTP ${verifyRes.status}`,
+          details: errorText.substring(0, 300),
+        }),
+        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
 
     const verifyData = await verifyRes.json();
-    console.log("Paystack verify response:", JSON.stringify(verifyData).substring(0, 500));
+    console.log("Paystack verify response status:", verifyData.status, "data.status:", verifyData.data?.status);
 
     if (!verifyData.status || verifyData.data?.status !== "success") {
       return new Response(
