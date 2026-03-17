@@ -8,7 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Loader2, ShieldCheck, Copy, CheckCircle } from "lucide-react";
 import { z } from "zod";
 import { useAuth } from "@/hooks/useAuth";
-import { deductWallet } from "@/lib/wallet";
+import { deductWallet, refundWallet } from "@/lib/wallet";
 
 const trackingIdSchema = z.string().length(15, "Tracking ID must be exactly 15 characters");
 
@@ -39,18 +39,23 @@ export default function ClearanceForm({ onSuccess }: { onSuccess?: () => void })
     setResult(null);
 
     try {
+      // Require authenticated user
+      if (!user?.id) {
+        toast({ title: "Authentication Required", description: "Please sign in to continue.", variant: "destructive" });
+        setLoading(false);
+        return;
+      }
+
       // Wallet deduction for Clearance (₦3,000)
-      if (user?.id) {
-        const walletResult = await deductWallet(user.id, "clearance");
-        if (!walletResult.success) {
-          toast({
-            title: "Insufficient Balance",
-            description: walletResult.message || "Please fund your wallet to continue.",
-            variant: "destructive",
-          });
-          setLoading(false);
-          return;
-        }
+      const walletResult = await deductWallet(user.id, "clearance");
+      if (!walletResult.success) {
+        toast({
+          title: "Insufficient Balance",
+          description: walletResult.message || "Please fund your wallet to continue.",
+          variant: "destructive",
+        });
+        setLoading(false);
+        return;
       }
 
       const { data, error } = await supabase.functions.invoke("robosttech-api", {
@@ -89,6 +94,10 @@ export default function ClearanceForm({ onSuccess }: { onSuccess?: () => void })
       }
     } catch (error: any) {
       console.error("Clearance error:", error);
+      // Refund wallet since API call failed
+      if (user?.id) {
+        await refundWallet(user.id, "clearance").catch(console.error);
+      }
       toast({
         title: "Error",
         description: error.message || "An unexpected error occurred.",

@@ -11,7 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DataDisplayModal } from "@/components/ui/data-display-modal";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/hooks/useAuth";
-import { deductWallet } from "@/lib/wallet";
+import { deductWallet, refundWallet } from "@/lib/wallet";
 
 const ninSchema = z.string().regex(/^\d{11}$/, "NIN must be exactly 11 digits");
 const phoneSchema = z.string().regex(/^0\d{10}$/, "Phone must be 11 digits starting with 0");
@@ -66,18 +66,23 @@ export default function NinSearch() {
     setResult(null);
 
     try {
+      // Require authenticated user
+      if (!user?.id) {
+        toast({ title: "Authentication Required", description: "Please sign in to continue.", variant: "destructive" });
+        setLoading(false);
+        return;
+      }
+
       // Wallet deduction for NIN Verification (₦800)
-      if (user?.id) {
-        const walletResult = await deductWallet(user.id, "nin_verification");
-        if (!walletResult.success) {
-          toast({
-            title: "Insufficient Balance",
-            description: walletResult.message || "Please fund your wallet to continue.",
-            variant: "destructive",
-          });
-          setLoading(false);
-          return;
-        }
+      const walletResult = await deductWallet(user.id, "nin_verification");
+      if (!walletResult.success) {
+        toast({
+          title: "Insufficient Balance",
+          description: walletResult.message || "Please fund your wallet to continue.",
+          variant: "destructive",
+        });
+        setLoading(false);
+        return;
       }
 
       const { data, error } = await supabase.functions.invoke("robosttech-api", {
@@ -114,6 +119,10 @@ export default function NinSearch() {
       }
     } catch (error: any) {
       console.error("NIN search error:", error);
+      // Refund wallet since API call failed
+      if (user?.id) {
+        await refundWallet(user.id, "nin_verification").catch(console.error);
+      }
       toast({
         title: "Error",
         description: error.message || "An unexpected error occurred.",
@@ -144,18 +153,23 @@ export default function NinSearch() {
     setResult(null);
 
     try {
+      // Require authenticated user
+      if (!user?.id) {
+        toast({ title: "Authentication Required", description: "Please sign in to continue.", variant: "destructive" });
+        setLoading(false);
+        return;
+      }
+
       // Wallet deduction for NIN Verification via phone (₦800)
-      if (user?.id) {
-        const walletResult = await deductWallet(user.id, "nin_verification");
-        if (!walletResult.success) {
-          toast({
-            title: "Insufficient Balance",
-            description: walletResult.message || "Please fund your wallet to continue.",
-            variant: "destructive",
-          });
-          setLoading(false);
-          return;
-        }
+      const walletResult2 = await deductWallet(user.id, "nin_verification");
+      if (!walletResult2.success) {
+        toast({
+          title: "Insufficient Balance",
+          description: walletResult2.message || "Please fund your wallet to continue.",
+          variant: "destructive",
+        });
+        setLoading(false);
+        return;
       }
 
       const { data, error } = await supabase.functions.invoke("robosttech-api", {
@@ -184,6 +198,10 @@ export default function NinSearch() {
       }
     } catch (error: any) {
       console.error("Phone lookup error:", error);
+      // Refund wallet since API call failed
+      if (user?.id) {
+        await refundWallet(user.id, "nin_verification").catch(console.error);
+      }
       toast({
         title: "Error",
         description: error.message || "An unexpected error occurred.",

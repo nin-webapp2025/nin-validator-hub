@@ -61,11 +61,12 @@ export async function deductWallet(
 
   // Deduct
   const newBalance = currentBalance - price;
+  const newTotalSpent = (await getTotalSpent(userId)) + price;
   const { error } = await (supabase as any)
     .from("wallet_balances")
     .update({
       balance: newBalance,
-      total_spent: currentBalance - newBalance + (await getTotalSpent(userId)),
+      total_spent: newTotalSpent,
       updated_at: new Date().toISOString(),
     })
     .eq("user_id", userId);
@@ -140,6 +141,40 @@ export async function creditWallet(
   window.dispatchEvent(new Event("wallet-updated"));
 
   return { success: true, balance: newBalance };
+}
+
+// ─── Refund wallet (when downstream API fails after deduction) ──
+export async function refundWallet(
+  userId: string,
+  operation: string
+): Promise<void> {
+  const price = OPERATION_PRICES[operation];
+  if (!price) return;
+
+  const currentBalance = await getWalletBalance(userId);
+  const newBalance = currentBalance + price;
+  const currentTotalSpent = await getTotalSpent(userId);
+
+  await (supabase as any)
+    .from("wallet_balances")
+    .update({
+      balance: newBalance,
+      total_spent: Math.max(0, currentTotalSpent - price),
+      updated_at: new Date().toISOString(),
+    })
+    .eq("user_id", userId);
+
+  // Record refund transaction
+  await (supabase as any).from("wallet_transactions").insert({
+    user_id: userId,
+    type: "top_up",
+    amount: price,
+    description: `Refund — ${OPERATION_LABELS[operation] || operation} failed`,
+    operation,
+    status: "success",
+  });
+
+  window.dispatchEvent(new Event("wallet-updated"));
 }
 
 // ─── Helpers ─────────────────────────────────────────────────

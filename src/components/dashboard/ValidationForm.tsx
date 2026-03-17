@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { trackApiRequest } from "@/components/dashboard/RateLimitIndicator";
 import { createNotification } from "@/lib/notifications";
 import { deductCredit } from "@/lib/credits";
-import { deductWallet } from "@/lib/wallet";
+import { deductWallet, refundWallet } from "@/lib/wallet";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -67,18 +67,23 @@ export function ValidationForm({ onSuccess }: ValidationFormProps) {
       // Track API request for rate limiting
       trackApiRequest();
 
+      // Require authenticated user
+      if (!user?.id) {
+        toast({ title: "Authentication Required", description: "Please sign in to continue.", variant: "destructive" });
+        setIsValidating(false);
+        return;
+      }
+
       // Wallet deduction for NIN Validation (₦5,000)
-      if (user?.id) {
-        const walletResult = await deductWallet(user.id, "nin_validation");
-        if (!walletResult.success) {
-          toast({
-            title: "Insufficient Balance",
-            description: walletResult.message || "Please fund your wallet to continue.",
-            variant: "destructive",
-          });
-          setIsValidating(false);
-          return;
-        }
+      const walletResult = await deductWallet(user.id, "nin_validation");
+      if (!walletResult.success) {
+        toast({
+          title: "Insufficient Balance",
+          description: walletResult.message || "Please fund your wallet to continue.",
+          variant: "destructive",
+        });
+        setIsValidating(false);
+        return;
       }
 
       // Credit deduction disabled until payment system is implemented
@@ -219,6 +224,11 @@ export function ValidationForm({ onSuccess }: ValidationFormProps) {
         //   errorMessage = message;
         // }
         errorMessage = message;
+      }
+
+      // Refund wallet since API call failed
+      if (user?.id) {
+        await refundWallet(user.id, "nin_validation").catch(console.error);
       }
 
       toast({

@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, UserCheck, CheckCircle, XCircle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { deductWallet } from "@/lib/wallet";
+import { deductWallet, refundWallet } from "@/lib/wallet";
 
 interface PersonalizationResult {
   message?: string;
@@ -44,18 +44,23 @@ export function Personalization({ onSuccess }: PersonalizationProps) {
     setResult(null);
 
     try {
+      // Require authenticated user
+      if (!user?.id) {
+        toast({ title: "Authentication Required", description: "Please sign in to continue.", variant: "destructive" });
+        setIsSubmitting(false);
+        return;
+      }
+
       // Wallet deduction for Personalization (₦1,500)
-      if (user?.id) {
-        const walletResult = await deductWallet(user.id, "personalization");
-        if (!walletResult.success) {
-          toast({
-            title: "Insufficient Balance",
-            description: walletResult.message || "Please fund your wallet to continue.",
-            variant: "destructive",
-          });
-          setIsSubmitting(false);
-          return;
-        }
+      const walletResult = await deductWallet(user.id, "personalization");
+      if (!walletResult.success) {
+        toast({
+          title: "Insufficient Balance",
+          description: walletResult.message || "Please fund your wallet to continue.",
+          variant: "destructive",
+        });
+        setIsSubmitting(false);
+        return;
       }
 
       const { data, error } = await supabase.functions.invoke("robosttech-api", {
@@ -88,6 +93,10 @@ export function Personalization({ onSuccess }: PersonalizationProps) {
         variant: data?.success ? "default" : "destructive",
       });
     } catch (error: unknown) {
+      // Refund wallet since API call failed
+      if (user?.id) {
+        await refundWallet(user.id, "personalization").catch(console.error);
+      }
       toast({
         title: "Error",
         description: error instanceof Error ? error.message : "Failed to submit personalization",

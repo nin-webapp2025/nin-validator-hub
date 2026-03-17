@@ -12,7 +12,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DataDisplayModal } from "@/components/ui/data-display-modal";
 import { trackApiRequest } from "./RateLimitIndicator";
-import { deductWallet } from "@/lib/wallet";
+import { deductWallet, refundWallet } from "@/lib/wallet";
 
 interface BvnFormProps {
   onSuccess?: () => void;
@@ -52,18 +52,23 @@ export function BvnVerification({ onSuccess }: BvnFormProps) {
     setResult(null);
 
     try {
+      // Require authenticated user
+      if (!user?.id) {
+        toast({ title: "Authentication Required", description: "Please sign in to continue.", variant: "destructive" });
+        setLoading(false);
+        return;
+      }
+
       // Wallet deduction for BVN Verification (₦800)
-      if (user?.id) {
-        const walletResult = await deductWallet(user.id, "bvn_verification");
-        if (!walletResult.success) {
-          toast({
-            title: "Insufficient Balance",
-            description: walletResult.message || "Please fund your wallet to continue.",
-            variant: "destructive",
-          });
-          setLoading(false);
-          return;
-        }
+      const walletResult = await deductWallet(user.id, "bvn_verification");
+      if (!walletResult.success) {
+        toast({
+          title: "Insufficient Balance",
+          description: walletResult.message || "Please fund your wallet to continue.",
+          variant: "destructive",
+        });
+        setLoading(false);
+        return;
       }
 
       trackApiRequest();
@@ -114,6 +119,11 @@ export function BvnVerification({ onSuccess }: BvnFormProps) {
       }
     } catch (error: any) {
       console.error("BVN verification error:", error);
+
+      // Refund wallet since API call failed
+      if (user?.id) {
+        await refundWallet(user.id, "bvn_verification").catch(console.error);
+      }
       
       // Save error to database
       try {

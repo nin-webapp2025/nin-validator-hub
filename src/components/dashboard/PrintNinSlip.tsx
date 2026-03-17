@@ -2,7 +2,7 @@ import { useState, useRef, useCallback } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { deductCredit } from "@/lib/credits";
-import { deductWallet } from "@/lib/wallet";
+import { deductWallet, refundWallet } from "@/lib/wallet";
 import { createNotification } from "@/lib/notifications";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -758,18 +758,23 @@ export function PrintNinSlip() {
     setNinData(null);
 
     try {
+      // Require authenticated user
+      if (!user?.id) {
+        toast({ title: "Authentication Required", description: "Please sign in to continue.", variant: "destructive" });
+        setLoading(false);
+        return;
+      }
+
       // Wallet deduction for Print NIN Slip (₦800)
-      if (user?.id) {
-        const walletResult = await deductWallet(user.id, "print_nin_slip");
-        if (!walletResult.success) {
-          toast({
-            title: "Insufficient Balance",
-            description: walletResult.message || "Please fund your wallet to continue.",
-            variant: "destructive",
-          });
-          setLoading(false);
-          return;
-        }
+      const walletResult = await deductWallet(user.id, "print_nin_slip");
+      if (!walletResult.success) {
+        toast({
+          title: "Insufficient Balance",
+          description: walletResult.message || "Please fund your wallet to continue.",
+          variant: "destructive",
+        });
+        setLoading(false);
+        return;
       }
 
       // Credit deduction disabled until payment system is implemented
@@ -852,6 +857,10 @@ export function PrintNinSlip() {
       toast({ title: "Slip Ready", description: "Your NIN slip has been generated. Download it below." });
     } catch (err: any) {
       console.error("Print NIN error:", err);
+      // Refund wallet since API call failed
+      if (user?.id) {
+        await refundWallet(user.id, "print_nin_slip").catch(console.error);
+      }
       toast({ title: "Error", description: err?.message || "An unexpected error occurred.", variant: "destructive" });
     } finally {
       setLoading(false);
