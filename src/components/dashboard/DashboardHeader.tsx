@@ -31,6 +31,7 @@ import {
 } from "@/components/ui/popover";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { WalletBalance } from "@/components/dashboard/WalletBalance";
+import { DevRoleSwitcher } from "@/components/dashboard/DevRoleSwitcher";
 
 interface DashboardHeaderProps {
   onNavigateToProfile?: () => void;
@@ -112,6 +113,7 @@ export function DashboardHeader({ onNavigateToProfile, onNavigateToWallet }: Das
             <Command className="h-3 w-3" />
             <span>K</span>
           </Badge>
+          <DevRoleSwitcher />
         </div>
 
         <div className="flex items-center gap-2">

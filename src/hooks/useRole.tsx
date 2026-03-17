@@ -4,6 +4,29 @@ import { useAuth } from './useAuth';
 
 export type UserRole = 'admin' | 'user' | 'staff' | 'vip';
 
+const DEV_ROLE_KEY = 'sparkid_dev_role';
+
+/** Read the dev-mode override (if any). Returns null when not overridden. */
+export function getDevRoleOverride(): UserRole | null {
+  if (import.meta.env.PROD) return null; // disabled in production builds
+  const stored = localStorage.getItem(DEV_ROLE_KEY);
+  if (stored && ['admin', 'user', 'staff', 'vip'].includes(stored)) {
+    return stored as UserRole;
+  }
+  return null;
+}
+
+/** Set or clear the dev-mode role override. */
+export function setDevRoleOverride(role: UserRole | null) {
+  if (role) {
+    localStorage.setItem(DEV_ROLE_KEY, role);
+  } else {
+    localStorage.removeItem(DEV_ROLE_KEY);
+  }
+  // Dispatch storage event so other tabs / hooks react
+  window.dispatchEvent(new Event('dev-role-changed'));
+}
+
 interface UseRoleReturn {
   role: UserRole | null;
   isLoading: boolean;
@@ -28,6 +51,14 @@ export function useRole(): UseRoleReturn {
   const fetchRole = async () => {
     if (!user) {
       setRole(null);
+      setIsLoading(false);
+      return;
+    }
+
+    // Dev-mode override takes priority
+    const devOverride = getDevRoleOverride();
+    if (devOverride) {
+      setRole(devOverride);
       setIsLoading(false);
       return;
     }
@@ -60,6 +91,13 @@ export function useRole(): UseRoleReturn {
 
   useEffect(() => {
     fetchRole();
+  }, [user?.id]);
+
+  // Re-fetch when dev override changes
+  useEffect(() => {
+    const handler = () => fetchRole();
+    window.addEventListener('dev-role-changed', handler);
+    return () => window.removeEventListener('dev-role-changed', handler);
   }, [user?.id]);
 
   return {
