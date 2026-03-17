@@ -7,7 +7,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { Key, Plus, Trash2, Copy, Loader2, Eye, EyeOff } from "lucide-react";
+import { Key, Plus, Trash2, Copy, Loader2, Eye, EyeOff, Power, BookOpen, ExternalLink } from "lucide-react";
+import { Link } from "react-router-dom";
+import { Switch } from "@/components/ui/switch";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -25,6 +27,8 @@ interface ApiKey {
   name: string;
   key_prefix: string;
   permissions: string[];
+  is_active: boolean;
+  total_requests: number;
   last_used_at: string | null;
   created_at: string;
 }
@@ -60,7 +64,7 @@ export function ApiKeyManagement() {
     if (!user) return;
     const { data } = await (supabase as any)
       .from("api_keys")
-      .select("id, name, key_prefix, permissions, last_used_at, created_at")
+      .select("id, name, key_prefix, permissions, is_active, total_requests, last_used_at, created_at")
       .eq("user_id", user.id)
       .order("created_at", { ascending: false });
     if (data) setKeys(data);
@@ -120,7 +124,10 @@ export function ApiKeyManagement() {
           API Keys
         </CardTitle>
         <CardDescription>
-          Generate API keys for programmatic access to verification endpoints.
+          Generate API keys for programmatic access to verification endpoints.{" "}
+          <Link to="/docs/api" className="inline-flex items-center gap-1 text-blue-600 hover:underline">
+            View API Docs <ExternalLink className="h-3 w-3" />
+          </Link>
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -183,21 +190,45 @@ export function ApiKeyManagement() {
                 className="flex items-center justify-between p-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900"
               >
                 <div className="min-w-0 flex-1">
-                  <p className="text-sm font-medium text-slate-900 dark:text-slate-100">{key.name}</p>
+                  <div className="flex items-center gap-2">
+                    <p className="text-sm font-medium text-slate-900 dark:text-slate-100">{key.name}</p>
+                    {!key.is_active && (
+                      <Badge variant="secondary" className="text-[10px] px-1.5 py-0 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400">
+                        Inactive
+                      </Badge>
+                    )}
+                  </div>
                   <p className="text-xs font-mono text-slate-500 dark:text-slate-400">
                     {key.key_prefix}••••••••
                   </p>
-                  <div className="flex items-center gap-2 mt-1">
+                  <div className="flex items-center gap-2 mt-1 flex-wrap">
                     {key.permissions.map((p) => (
                       <Badge key={p} variant="outline" className="text-[10px] px-1.5 py-0">
                         {p}
                       </Badge>
                     ))}
                     <span className="text-[10px] text-slate-400">
+                      {key.total_requests ?? 0} requests
+                    </span>
+                    <span className="text-[10px] text-slate-400">
                       Created {new Date(key.created_at).toLocaleDateString()}
                     </span>
+                    {key.last_used_at && (
+                      <span className="text-[10px] text-slate-400">
+                        Last used {new Date(key.last_used_at).toLocaleDateString()}
+                      </span>
+                    )}
                   </div>
                 </div>
+                <Switch
+                  checked={key.is_active}
+                  onCheckedChange={async (checked) => {
+                    await (supabase as any).from("api_keys").update({ is_active: checked }).eq("id", key.id);
+                    setKeys((prev) => prev.map((k) => (k.id === key.id ? { ...k, is_active: checked } : k)));
+                    toast({ title: checked ? "Key Activated" : "Key Deactivated" });
+                  }}
+                  className="shrink-0"
+                />
                 <AlertDialog>
                   <AlertDialogTrigger asChild>
                     <Button variant="ghost" size="icon" className="h-8 w-8 text-red-500 hover:text-red-600">

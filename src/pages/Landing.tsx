@@ -487,9 +487,9 @@ export default function Landing() {
                 © {new Date().getFullYear()} SparkID. All rights reserved.
               </p>
               <div className="flex items-center gap-6">
-                <a href="#services" className="text-sm text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
-                  Documentation
-                </a>
+                <Link to="/docs/api" className="text-sm text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                  API Documentation
+                </Link>
                 <a href="#services" className="text-sm text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
                   Help Center
                 </a>
