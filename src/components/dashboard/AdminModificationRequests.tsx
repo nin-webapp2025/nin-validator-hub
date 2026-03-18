@@ -52,7 +52,7 @@ export function AdminModificationRequests() {
 
   const fetchRequests = async () => {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from("nin_modification_requests")
         .select("*")
         .order("created_at", { ascending: false });
@@ -74,7 +74,7 @@ export function AdminModificationRequests() {
   const fetchStaffUsers = async () => {
     try {
       // Join user_roles with profiles to get staff emails (no admin API needed)
-      const { data: staffRoles, error: rolesError } = await supabase
+      const { data: staffRoles, error: rolesError } = await (supabase as any)
         .from("user_roles")
         .select("user_id")
         .eq("role", "staff");
@@ -84,7 +84,7 @@ export function AdminModificationRequests() {
       if (staffRoles && staffRoles.length > 0) {
         const staffIds = staffRoles.map(r => r.user_id);
         
-        const { data: profiles, error: profilesError } = await supabase
+        const { data: profiles, error: profilesError } = await (supabase as any)
           .from("profiles")
           .select("id, email")
           .in("id", staffIds);
@@ -156,7 +156,7 @@ export function AdminModificationRequests() {
         updateData.rejection_reason = rejectionReason;
       }
 
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from("nin_modification_requests")
         .update(updateData)
         .eq("id", selectedRequest.id);

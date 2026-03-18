@@ -42,14 +42,14 @@ export function UserRoleManagement() {
       setIsLoading(true);
 
       // Get all profiles (admins can see all via RLS policy)
-      const { data: profiles, error: profilesError } = await supabase
+      const { data: profiles, error: profilesError } = await (supabase as any)
         .from("profiles")
         .select("id, email, created_at");
 
       if (profilesError) throw profilesError;
 
       // Get all user roles (admins can see all via RLS policy)
-      const { data: userRoles, error: rolesError } = await supabase
+      const { data: userRoles, error: rolesError } = await (supabase as any)
         .from("user_roles")
         .select("user_id, role");
 
@@ -90,7 +90,7 @@ export function UserRoleManagement() {
 
     try {
       // Update or insert role
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from("user_roles")
         .upsert({ 
           user_id: userId, 
@@ -102,12 +102,12 @@ export function UserRoleManagement() {
 
       if (error) {
         // If upsert failed, try delete old + insert new
-        await supabase
+        await (supabase as any)
           .from("user_roles")
           .delete()
           .eq("user_id", userId);
 
-        const { error: insertError } = await supabase
+        const { error: insertError } = await (supabase as any)
           .from("user_roles")
           .insert({ user_id: userId, role: newRole });
 

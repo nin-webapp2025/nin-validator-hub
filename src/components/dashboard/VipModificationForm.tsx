@@ -65,7 +65,7 @@ export function VipModificationForm() {
     setIsSubmitting(true);
 
     try {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from("nin_modification_requests")
         .insert({
           user_id: user.id,

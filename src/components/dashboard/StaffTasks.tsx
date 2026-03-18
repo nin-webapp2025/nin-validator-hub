@@ -52,7 +52,7 @@ export function StaffTasks() {
     if (!user) return;
 
     try {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from("nin_modification_requests")
         .select("*")
         .eq("assigned_to", user.id)
@@ -99,7 +99,7 @@ export function StaffTasks() {
         updateData.completed_at = new Date().toISOString();
       }
 
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from("nin_modification_requests")
         .update(updateData)
         .eq("id", selectedTask.id);
