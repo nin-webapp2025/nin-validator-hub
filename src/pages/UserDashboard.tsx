@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
 import { Footer } from "@/components/dashboard/Footer";
@@ -19,7 +20,7 @@ import { OnboardingWizard } from "@/components/dashboard/OnboardingWizard";
 import { PrintNinSlip } from "@/components/dashboard/PrintNinSlip";
 import { WalletTopUp } from "@/components/dashboard/WalletTopUp";
 import { TransactionHistory } from "@/components/dashboard/TransactionHistory";
-import { User, Wallet } from "lucide-react";
+import { User, Wallet, BookOpen } from "lucide-react";
 
 /**
  * User Dashboard - Full access to all NIN/BVN verification services
@@ -27,6 +28,7 @@ import { User, Wallet } from "lucide-react";
  */
 export default function UserDashboard() {
   const [activeTab, setActiveTab] = useState("validate");
+  const navigate = useNavigate();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-purple-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 overflow-x-hidden">
@@ -52,6 +54,7 @@ export default function UserDashboard() {
               <TabsTrigger value="print-nin" className="text-xs sm:text-sm py-2 sm:py-2.5 whitespace-nowrap">Print NIN</TabsTrigger>
               <TabsTrigger value="personalization" className="text-xs sm:text-sm py-2 sm:py-2.5 whitespace-nowrap">Personalize</TabsTrigger>
               <TabsTrigger value="wallet" className="text-xs sm:text-sm py-2 sm:py-2.5 whitespace-nowrap flex items-center gap-1"><Wallet className="h-3.5 w-3.5" />Wallet</TabsTrigger>
+              <TabsTrigger value="api-docs" onClick={() => navigate("/docs/api")} className="text-xs sm:text-sm py-2 sm:py-2.5 whitespace-nowrap flex items-center gap-1"><BookOpen className="h-3.5 w-3.5" />API Docs</TabsTrigger>
             </TabsList>
           </div>
 
