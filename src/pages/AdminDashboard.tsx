@@ -55,13 +55,13 @@ export default function AdminDashboard() {
   });
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-purple-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-purple-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 overflow-x-hidden">
       <DashboardHeader 
         onNavigateToProfile={() => setActiveTab("profile")} 
         onNavigateToWallet={() => setActiveTab("wallet")}
       />
       
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto px-3 sm:px-4 py-6 sm:py-8">
         <div className="mb-6 flex items-center gap-2">
           <Shield className="h-6 w-6 text-blue-600 dark:text-blue-400" />
           <h1 className="text-2xl font-bold text-gray-900 dark:text-slate-100">Admin Dashboard</h1>
@@ -81,7 +81,7 @@ export default function AdminDashboard() {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0 no-scrollbar">
+          <div className="overflow-x-auto -mx-3 px-3 sm:mx-0 sm:px-0 no-scrollbar">
             <TabsList className="inline-flex w-max sm:w-full sm:grid sm:grid-cols-5 lg:flex lg:flex-row gap-1 p-1.5 h-auto">
               <TabsTrigger value="modifications" className="text-xs sm:text-sm py-2 sm:py-2.5 whitespace-nowrap">Modifications</TabsTrigger>
               <TabsTrigger value="users" className="text-xs sm:text-sm py-2 sm:py-2.5 whitespace-nowrap">User Roles</TabsTrigger>

@@ -37,11 +37,11 @@ export function WalletBalance({ onClick }: WalletBalanceProps) {
   return (
     <button
       onClick={onClick}
-      className="flex items-center gap-1.5 rounded-lg px-2 py-1.5 text-xs font-semibold transition-colors hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 min-w-[4.5rem] justify-center shrink-0"
+      className="flex items-center gap-1 rounded-lg px-2 py-1.5 text-xs font-semibold transition-colors hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 max-w-[7rem] shrink-0"
       title="Wallet Balance — Click to top up"
     >
       <Wallet className="h-3.5 w-3.5 text-green-600 dark:text-green-400 shrink-0" />
-      <span className="whitespace-nowrap tabular-nums">{formatNaira(balance)}</span>
+      <span className="truncate tabular-nums">{formatNaira(balance)}</span>
     </button>
   );
 }

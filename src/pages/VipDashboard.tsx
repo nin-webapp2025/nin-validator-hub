@@ -30,13 +30,13 @@ export default function VipDashboard() {
   const [activeTab, setActiveTab] = useState("modification");
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-purple-800 to-black">
+    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-purple-800 to-black overflow-x-hidden">
       <DashboardHeader 
         onNavigateToProfile={() => setActiveTab("profile")} 
         onNavigateToWallet={() => setActiveTab("wallet")}
       />
       
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto px-3 sm:px-4 py-6 sm:py-8">
         <div className="mb-6 flex items-center gap-3">
           <Crown className="h-7 w-7 text-amber-400" />
           <h1 className="text-3xl font-bold bg-gradient-to-r from-amber-300 via-yellow-200 to-amber-400 bg-clip-text text-transparent">
@@ -45,7 +45,7 @@ export default function VipDashboard() {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0 no-scrollbar">
+          <div className="overflow-x-auto -mx-3 px-3 sm:mx-0 sm:px-0 no-scrollbar">
             <TabsList className="inline-flex w-max sm:w-full sm:grid sm:grid-cols-4 lg:flex lg:flex-row gap-1 p-1.5 h-auto bg-purple-900/50 backdrop-blur-lg border border-amber-500/20">
               <TabsTrigger 
                 value="modification" 

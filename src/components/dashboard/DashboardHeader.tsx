@@ -98,8 +98,8 @@ export function DashboardHeader({ onNavigateToProfile, onNavigateToWallet }: Das
   };
 
   return (
-    <header className="sticky top-0 z-50 border-b border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm">
-      <div className="container mx-auto flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
+    <header className="sticky top-0 z-50 border-b border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm overflow-x-hidden">
+      <div className="container mx-auto flex h-14 sm:h-16 items-center justify-between px-3 sm:px-4 lg:px-8">
         <div className="flex items-center gap-2 sm:gap-3 min-w-0">
           <img 
             src="/logo.svg" 
