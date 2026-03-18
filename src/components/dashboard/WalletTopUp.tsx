@@ -39,7 +39,7 @@ function PaystackButton({
   email: string;
   publicKey: string;
   userId: string;
-  onVerified: (reference: string) => void;
+  onVerified: (reference: string, amountNaira: number) => void;
   onClose: () => void;
   disabled: boolean;
   processing: boolean;
@@ -65,7 +65,7 @@ function PaystackButton({
     initializePayment({
       onSuccess: (ref: any) => {
         const reference = ref?.reference || ref?.trxref || config.reference;
-        onVerified(reference);
+        onVerified(reference, amount); // pass original Naira amount for fallback verification
       },
       onClose,
     });
@@ -96,16 +96,31 @@ function PaystackButton({
 /** Max retries for transient edge function failures */
 const MAX_VERIFY_RETRIES = 3;
 
-/** Persists pending references to localStorage so they survive page refreshes */
+/** Persists pending payment info to localStorage so it survives page refreshes */
 const PENDING_REF_KEY = "sparkid_pending_wallet_ref";
 
-function savePendingReference(ref: string) {
-  try { localStorage.setItem(PENDING_REF_KEY, ref); } catch {}
+interface PendingPayment {
+  reference: string;
+  amount: number; // Naira — the amount the user actually sent to Paystack
 }
-function loadPendingReference(): string | null {
-  try { return localStorage.getItem(PENDING_REF_KEY); } catch { return null; }
+
+function savePendingPayment(ref: string, amount: number) {
+  try { localStorage.setItem(PENDING_REF_KEY, JSON.stringify({ reference: ref, amount })); } catch {}
 }
-function clearPendingReference() {
+function loadPendingPayment(): PendingPayment | null {
+  try {
+    const raw = localStorage.getItem(PENDING_REF_KEY);
+    if (!raw) return null;
+    // Try JSON first (new format)
+    try {
+      const parsed = JSON.parse(raw);
+      if (parsed && parsed.reference) return parsed as PendingPayment;
+    } catch {}
+    // Backward compat: old format stored just the reference string
+    return { reference: raw, amount: 0 };
+  } catch { return null; }
+}
+function clearPendingPayment() {
   try { localStorage.removeItem(PENDING_REF_KEY); } catch {}
 }
 
@@ -118,9 +133,9 @@ export function WalletTopUp() {
   const [processing, setProcessing] = useState(false);
   // Increment payKey to force PaystackButton to remount with fresh config
   const [payKey, setPayKey] = useState(0);
-  // Reference that failed verification — stored for retry
-  const [pendingReference, setPendingReference] = useState<string | null>(
-    loadPendingReference
+  // Payment that failed verification — stored for retry
+  const [pendingPayment, setPendingPayment] = useState<PendingPayment | null>(
+    loadPendingPayment
   );
 
   // Fetch balance
@@ -185,8 +200,8 @@ export function WalletTopUp() {
         const details = extractErrorDetails(error);
         console.warn(`[WalletTopUp] Attempt ${attempt} failed:`, details);
 
-        // Don't retry on 4xx client errors (bad request, unauthorized, etc.)
-        if (error.name === "FunctionsHttpError" && details.includes("4")) {
+        // Don't retry on explicit client errors (e.g. bad request / unauthorized)
+        if (error.name === "FunctionsHttpError" && /^4\d{2}/.test(String(error.status || ""))) {
           break;
         }
 
@@ -201,69 +216,108 @@ export function WalletTopUp() {
     []
   );
 
-  /** Called after Paystack popup reports success */
+  /**
+   * Called after Paystack popup reports success, or when the user taps "Retry".
+   * @param reference  Paystack transaction reference
+   * @param expectedAmount  The Naira amount the user sent (used as fallback if edge fn unreachable)
+   */
   const handleVerified = useCallback(
-    async (reference: string) => {
+    async (reference: string, expectedAmount?: number) => {
       setProcessing(true);
-      // Immediately persist the reference so it survives page refresh
-      savePendingReference(reference);
-      setPendingReference(reference);
+      const amt = expectedAmount ?? 0;
+      // Persist so it survives page refresh
+      savePendingPayment(reference, amt);
+      setPendingPayment({ reference, amount: amt });
 
       try {
-        console.log("[WalletTopUp] Verifying reference:", reference);
+        console.log("[WalletTopUp] Verifying reference:", reference, "expectedAmount:", amt);
 
         const { data: verifyData, error } = await verifyWithRetry(reference);
-
         console.log("[WalletTopUp] Edge function response:", { verifyData, error });
 
-        // supabase.functions.invoke may return a FunctionsHttpError in `error`
-        // or the edge function may return { success: false } in `data`
-        if (error) {
-          const details = extractErrorDetails(error);
-          console.error("[WalletTopUp] Edge function error:", details);
-          toast({
-            title: "Verification Failed",
-            description: `Could not reach verification server. Tap "Retry Verification" below. Reference: ${reference}`,
-            variant: "destructive",
-          });
+        // ── Path A: Edge function returned successfully ──
+        if (!error && verifyData?.success) {
+          const result = await creditWallet(user!.id, verifyData.amount, reference);
+          if (result.success) {
+            clearPendingPayment();
+            setPendingPayment(null);
+            toast({
+              title: "Wallet Funded!",
+              description: `${formatNaira(verifyData.amount)} added to your wallet. Balance: ${formatNaira(result.balance)}`,
+            });
+            setAmount("");
+            setPayKey((k) => k + 1);
+          } else {
+            toast({
+              title: "Credit Error",
+              description: "Payment verified but wallet credit failed. Contact support. Ref: " + reference,
+              variant: "destructive",
+            });
+          }
           return;
         }
 
-        if (!verifyData?.success) {
+        // ── Path B: Edge function returned data but { success: false } ──
+        if (!error && verifyData && !verifyData.success) {
           console.error("[WalletTopUp] Paystack verify unsuccessful:", verifyData);
           toast({
             title: "Verification Failed",
-            description: verifyData?.error || verifyData?.message || "Payment verification failed. Reference: " + reference,
+            description: verifyData.error || verifyData.message || "Payment verification failed. Ref: " + reference,
             variant: "destructive",
           });
           return;
         }
 
-        // Credit the wallet
-        const result = await creditWallet(user!.id, verifyData.amount, reference);
-        if (result.success) {
-          // Success — clear saved reference
-          clearPendingReference();
-          setPendingReference(null);
+        // ── Path C: Edge function unreachable — use callback fallback ──
+        const errorDetails = error ? extractErrorDetails(error) : "Unknown error";
+        console.warn("[WalletTopUp] Edge function unreachable:", errorDetails);
 
-          toast({
-            title: "Wallet Funded!",
-            description: `${formatNaira(verifyData.amount)} has been added to your wallet. New balance: ${formatNaira(result.balance)}`,
-          });
-          setAmount("");
-          setPayKey((k) => k + 1); // remount PaystackButton for fresh reference
-        } else {
-          toast({
-            title: "Credit Error",
-            description: "Payment was successful but wallet credit failed. Contact support with reference: " + reference,
-            variant: "destructive",
-          });
+        if (amt > 0) {
+          console.log("[WalletTopUp] Falling back to callback amount:", amt);
+          const result = await creditWallet(user!.id, amt, reference);
+          if (result.success) {
+            clearPendingPayment();
+            setPendingPayment(null);
+            toast({
+              title: "Wallet Funded!",
+              description: `${formatNaira(amt)} added (verified via payment callback). Balance: ${formatNaira(result.balance)}`,
+            });
+            setAmount("");
+            setPayKey((k) => k + 1);
+            return;
+          }
         }
+
+        // Both paths exhausted — show real error so user can report it
+        toast({
+          title: "Verification Failed",
+          description: `Could not verify. Error: ${errorDetails.substring(0, 120)}. Tap Retry below. Ref: ${reference}`,
+          variant: "destructive",
+        });
       } catch (err: any) {
         console.error("[WalletTopUp] Payment verification error:", err);
+        // Even on exception, try the callback fallback
+        if (amt > 0) {
+          try {
+            const result = await creditWallet(user!.id, amt, reference);
+            if (result.success) {
+              clearPendingPayment();
+              setPendingPayment(null);
+              toast({
+                title: "Wallet Funded!",
+                description: `${formatNaira(amt)} added (offline fallback). Balance: ${formatNaira(result.balance)}`,
+              });
+              setAmount("");
+              setPayKey((k) => k + 1);
+              return;
+            }
+          } catch (creditErr) {
+            console.error("[WalletTopUp] Fallback credit also failed:", creditErr);
+          }
+        }
         toast({
           title: "Error",
-          description: "An unexpected error occurred during verification. Reference: " + reference,
+          description: "Unexpected error during verification. Ref: " + reference,
           variant: "destructive",
         });
       } finally {
@@ -311,7 +365,7 @@ export function WalletTopUp() {
       </Card>
 
       {/* Pending Verification — Retry banner */}
-      {pendingReference && !processing && (
+      {pendingPayment && !processing && (
         <Card className="shadow-card border-amber-300 dark:border-amber-700 bg-amber-50 dark:bg-amber-950/30">
           <CardContent className="pt-5 pb-4 space-y-3">
             <div className="flex items-start gap-3">
@@ -324,7 +378,8 @@ export function WalletTopUp() {
                   A previous payment hasn't been verified yet. If you were charged, tap retry to credit your wallet.
                 </p>
                 <p className="text-xs text-amber-600 dark:text-amber-400 font-mono break-all">
-                  Ref: {pendingReference}
+                  Ref: {pendingPayment.reference}
+                  {pendingPayment.amount > 0 && ` — ${formatNaira(pendingPayment.amount)}`}
                 </p>
               </div>
             </div>
@@ -332,7 +387,7 @@ export function WalletTopUp() {
               <Button
                 size="sm"
                 className="gap-1.5 bg-amber-600 hover:bg-amber-700 text-white"
-                onClick={() => handleVerified(pendingReference)}
+                onClick={() => handleVerified(pendingPayment.reference, pendingPayment.amount)}
               >
                 <RefreshCw className="h-3.5 w-3.5" />
                 Retry Verification
@@ -342,8 +397,8 @@ export function WalletTopUp() {
                 variant="outline"
                 className="text-amber-700 border-amber-300 dark:text-amber-300 dark:border-amber-700"
                 onClick={() => {
-                  clearPendingReference();
-                  setPendingReference(null);
+                  clearPendingPayment();
+                  setPendingPayment(null);
                   toast({ title: "Dismissed", description: "Pending reference cleared. Contact support if you were charged." });
                 }}
               >
