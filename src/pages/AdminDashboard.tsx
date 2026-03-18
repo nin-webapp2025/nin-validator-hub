@@ -15,7 +15,8 @@ import { AuditLog } from "@/components/dashboard/AuditLog";
 import { PrintNinSlip } from "@/components/dashboard/PrintNinSlip";
 import { WalletTopUp } from "@/components/dashboard/WalletTopUp";
 import { TransactionHistory } from "@/components/dashboard/TransactionHistory";
-import { Shield, Wallet } from "lucide-react";
+import { ApiDocsAccessManagement } from "@/components/dashboard/ApiDocsAccessManagement";
+import { Shield, Wallet, BookOpen } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -92,6 +93,7 @@ export default function AdminDashboard() {
               <TabsTrigger value="bvn" className="text-xs sm:text-sm py-2 sm:py-2.5 whitespace-nowrap">BVN</TabsTrigger>
               <TabsTrigger value="print-nin" className="text-xs sm:text-sm py-2 sm:py-2.5 whitespace-nowrap">Print NIN</TabsTrigger>
               <TabsTrigger value="wallet" className="text-xs sm:text-sm py-2 sm:py-2.5 whitespace-nowrap flex items-center gap-1"><Wallet className="h-3.5 w-3.5" />Wallet</TabsTrigger>
+              <TabsTrigger value="api-docs" className="text-xs sm:text-sm py-2 sm:py-2.5 whitespace-nowrap flex items-center gap-1"><BookOpen className="h-3.5 w-3.5" />API Docs</TabsTrigger>
             </TabsList>
           </div>
 
@@ -132,6 +134,10 @@ export default function AdminDashboard() {
               <WalletTopUp />
               <TransactionHistory />
             </div>
+          </TabsContent>
+
+          <TabsContent value="api-docs" className="space-y-6">
+            <ApiDocsAccessManagement />
           </TabsContent>
 
           <TabsContent value="profile" className="space-y-6">
