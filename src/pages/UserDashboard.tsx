@@ -43,15 +43,17 @@ export default function UserDashboard() {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid grid-cols-3 md:grid-cols-4 lg:flex lg:flex-row w-full gap-1 p-1.5 h-auto">
-            <TabsTrigger value="validate" className="text-xs sm:text-sm py-2.5">NIN Validation</TabsTrigger>
-            <TabsTrigger value="bvn" className="text-xs sm:text-sm py-2.5">BVN Verification</TabsTrigger>
-            <TabsTrigger value="clearance" className="text-xs sm:text-sm py-2.5">Clearance</TabsTrigger>
-            <TabsTrigger value="search" className="text-xs sm:text-sm py-2.5">NIN Verification</TabsTrigger>
-            <TabsTrigger value="print-nin" className="text-xs sm:text-sm py-2.5">Print NIN</TabsTrigger>
-            <TabsTrigger value="personalization" className="text-xs sm:text-sm py-2.5">Personalization</TabsTrigger>
-            <TabsTrigger value="wallet" className="text-xs sm:text-sm py-2.5 flex items-center gap-1"><Wallet className="h-3.5 w-3.5" />Wallet</TabsTrigger>
-          </TabsList>
+          <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0 no-scrollbar">
+            <TabsList className="inline-flex w-max sm:w-full sm:grid sm:grid-cols-4 lg:flex lg:flex-row gap-1 p-1.5 h-auto">
+              <TabsTrigger value="validate" className="text-xs sm:text-sm py-2 sm:py-2.5 whitespace-nowrap">NIN Validation</TabsTrigger>
+              <TabsTrigger value="bvn" className="text-xs sm:text-sm py-2 sm:py-2.5 whitespace-nowrap">BVN Verify</TabsTrigger>
+              <TabsTrigger value="clearance" className="text-xs sm:text-sm py-2 sm:py-2.5 whitespace-nowrap">Clearance</TabsTrigger>
+              <TabsTrigger value="search" className="text-xs sm:text-sm py-2 sm:py-2.5 whitespace-nowrap">NIN Verify</TabsTrigger>
+              <TabsTrigger value="print-nin" className="text-xs sm:text-sm py-2 sm:py-2.5 whitespace-nowrap">Print NIN</TabsTrigger>
+              <TabsTrigger value="personalization" className="text-xs sm:text-sm py-2 sm:py-2.5 whitespace-nowrap">Personalize</TabsTrigger>
+              <TabsTrigger value="wallet" className="text-xs sm:text-sm py-2 sm:py-2.5 whitespace-nowrap flex items-center gap-1"><Wallet className="h-3.5 w-3.5" />Wallet</TabsTrigger>
+            </TabsList>
+          </div>
 
           <TabsContent value="validate" className="space-y-6">
             <div className="grid gap-6 lg:grid-cols-2">
@@ -91,7 +93,7 @@ export default function UserDashboard() {
           </TabsContent>
 
           <TabsContent value="wallet" className="space-y-6">
-            <div className="grid gap-6 lg:grid-cols-2">
+            <div className="grid gap-6 md:grid-cols-2">
               <WalletTopUp />
               <TransactionHistory />
             </div>

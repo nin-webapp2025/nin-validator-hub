@@ -100,23 +100,25 @@ export function DashboardHeader({ onNavigateToProfile, onNavigateToWallet }: Das
   return (
     <header className="sticky top-0 z-50 border-b border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm">
       <div className="container mx-auto flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3 min-w-0">
           <img 
             src="/logo.svg" 
             alt="SparkID" 
-            className="h-10 w-auto dark:brightness-110"
+            className="h-8 sm:h-10 w-auto dark:brightness-110 shrink-0"
           />
           <Badge 
             variant="outline" 
-            className="hidden md:flex items-center gap-1.5 px-2 py-1 text-xs font-medium text-slate-600 dark:text-slate-400 border-slate-300 dark:border-slate-700"
+            className="hidden lg:flex items-center gap-1.5 px-2 py-1 text-xs font-medium text-slate-600 dark:text-slate-400 border-slate-300 dark:border-slate-700"
           >
             <Command className="h-3 w-3" />
             <span>K</span>
           </Badge>
-          <DevRoleSwitcher />
+          <div className="hidden sm:block">
+            <DevRoleSwitcher />
+          </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1 sm:gap-2">
           <WalletBalance onClick={onNavigateToWallet} />
 
           <Button

@@ -45,57 +45,59 @@ export default function VipDashboard() {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid grid-cols-3 md:grid-cols-4 lg:flex lg:flex-row w-full gap-1 p-1.5 h-auto bg-purple-900/50 backdrop-blur-lg border border-amber-500/20">
-            <TabsTrigger 
-              value="modification" 
-              className="text-xs sm:text-sm py-2.5 data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-yellow-600 data-[state=active]:text-black"
-            >
-              Modify NIN
-            </TabsTrigger>
-            <TabsTrigger 
-              value="validate" 
-              className="text-xs sm:text-sm py-2.5 data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-yellow-600 data-[state=active]:text-black"
-            >
-              NIN Validation
-            </TabsTrigger>
-            <TabsTrigger 
-              value="bvn" 
-              className="text-xs sm:text-sm py-2.5 data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-yellow-600 data-[state=active]:text-black"
-            >
-              BVN Verification
-            </TabsTrigger>
-            <TabsTrigger 
-              value="clearance" 
-              className="text-xs sm:text-sm py-2.5 data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-yellow-600 data-[state=active]:text-black"
-            >
-              Clearance
-            </TabsTrigger>
-            <TabsTrigger 
-              value="search"
-              className="text-xs sm:text-sm py-2.5 data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-yellow-600 data-[state=active]:text-black"
-            >
-              NIN Verification
-            </TabsTrigger>
-            <TabsTrigger 
-              value="personalization"
-              className="text-xs sm:text-sm py-2.5 data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-yellow-600 data-[state=active]:text-black"
-            >
-              Personalization
-            </TabsTrigger>
-            <TabsTrigger 
-              value="print-nin"
-              className="text-xs sm:text-sm py-2.5 data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-yellow-600 data-[state=active]:text-black"
-            >
-              Print NIN
-            </TabsTrigger>
-            <TabsTrigger 
-              value="wallet"
-              className="text-xs sm:text-sm py-2.5 flex items-center gap-1 data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-yellow-600 data-[state=active]:text-black"
-            >
-              <Wallet className="h-3.5 w-3.5" />
-              Wallet
-            </TabsTrigger>
-          </TabsList>
+          <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0 no-scrollbar">
+            <TabsList className="inline-flex w-max sm:w-full sm:grid sm:grid-cols-4 lg:flex lg:flex-row gap-1 p-1.5 h-auto bg-purple-900/50 backdrop-blur-lg border border-amber-500/20">
+              <TabsTrigger 
+                value="modification" 
+                className="text-xs sm:text-sm py-2 sm:py-2.5 whitespace-nowrap data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-yellow-600 data-[state=active]:text-black"
+              >
+                Modify NIN
+              </TabsTrigger>
+              <TabsTrigger 
+                value="validate" 
+                className="text-xs sm:text-sm py-2 sm:py-2.5 whitespace-nowrap data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-yellow-600 data-[state=active]:text-black"
+              >
+                NIN Validation
+              </TabsTrigger>
+              <TabsTrigger 
+                value="bvn" 
+                className="text-xs sm:text-sm py-2 sm:py-2.5 whitespace-nowrap data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-yellow-600 data-[state=active]:text-black"
+              >
+                BVN Verify
+              </TabsTrigger>
+              <TabsTrigger 
+                value="clearance" 
+                className="text-xs sm:text-sm py-2 sm:py-2.5 whitespace-nowrap data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-yellow-600 data-[state=active]:text-black"
+              >
+                Clearance
+              </TabsTrigger>
+              <TabsTrigger 
+                value="search"
+                className="text-xs sm:text-sm py-2 sm:py-2.5 whitespace-nowrap data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-yellow-600 data-[state=active]:text-black"
+              >
+                NIN Verify
+              </TabsTrigger>
+              <TabsTrigger 
+                value="personalization"
+                className="text-xs sm:text-sm py-2 sm:py-2.5 whitespace-nowrap data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-yellow-600 data-[state=active]:text-black"
+              >
+                Personalize
+              </TabsTrigger>
+              <TabsTrigger 
+                value="print-nin"
+                className="text-xs sm:text-sm py-2 sm:py-2.5 whitespace-nowrap data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-yellow-600 data-[state=active]:text-black"
+              >
+                Print NIN
+              </TabsTrigger>
+              <TabsTrigger 
+                value="wallet"
+                className="text-xs sm:text-sm py-2 sm:py-2.5 whitespace-nowrap flex items-center gap-1 data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-yellow-600 data-[state=active]:text-black"
+              >
+                <Wallet className="h-3.5 w-3.5" />
+                Wallet
+              </TabsTrigger>
+            </TabsList>
+          </div>
 
           <TabsContent value="modification" className="space-y-6">
             <VipModificationForm />

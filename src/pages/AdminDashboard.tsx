@@ -81,17 +81,19 @@ export default function AdminDashboard() {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid grid-cols-3 md:grid-cols-5 lg:flex lg:flex-row w-full gap-1 p-1.5 h-auto">
-            <TabsTrigger value="modifications" className="text-xs sm:text-sm py-2.5">Modifications</TabsTrigger>
-            <TabsTrigger value="users" className="text-xs sm:text-sm py-2.5">User Roles</TabsTrigger>
-            <TabsTrigger value="audit" className="text-xs sm:text-sm py-2.5">Audit Log</TabsTrigger>
-            <TabsTrigger value="validation" className="text-xs sm:text-sm py-2.5">Validation</TabsTrigger>
-            <TabsTrigger value="personalization" className="text-xs sm:text-sm py-2.5">Personalization</TabsTrigger>
-            <TabsTrigger value="clearance" className="text-xs sm:text-sm py-2.5">Clearance</TabsTrigger>
-            <TabsTrigger value="bvn" className="text-xs sm:text-sm py-2.5">BVN</TabsTrigger>
-            <TabsTrigger value="print-nin" className="text-xs sm:text-sm py-2.5">Print NIN</TabsTrigger>
-            <TabsTrigger value="wallet" className="text-xs sm:text-sm py-2.5 flex items-center gap-1"><Wallet className="h-3.5 w-3.5" />Wallet</TabsTrigger>
-          </TabsList>
+          <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0 no-scrollbar">
+            <TabsList className="inline-flex w-max sm:w-full sm:grid sm:grid-cols-5 lg:flex lg:flex-row gap-1 p-1.5 h-auto">
+              <TabsTrigger value="modifications" className="text-xs sm:text-sm py-2 sm:py-2.5 whitespace-nowrap">Modifications</TabsTrigger>
+              <TabsTrigger value="users" className="text-xs sm:text-sm py-2 sm:py-2.5 whitespace-nowrap">User Roles</TabsTrigger>
+              <TabsTrigger value="audit" className="text-xs sm:text-sm py-2 sm:py-2.5 whitespace-nowrap">Audit Log</TabsTrigger>
+              <TabsTrigger value="validation" className="text-xs sm:text-sm py-2 sm:py-2.5 whitespace-nowrap">Validation</TabsTrigger>
+              <TabsTrigger value="personalization" className="text-xs sm:text-sm py-2 sm:py-2.5 whitespace-nowrap">Personalize</TabsTrigger>
+              <TabsTrigger value="clearance" className="text-xs sm:text-sm py-2 sm:py-2.5 whitespace-nowrap">Clearance</TabsTrigger>
+              <TabsTrigger value="bvn" className="text-xs sm:text-sm py-2 sm:py-2.5 whitespace-nowrap">BVN</TabsTrigger>
+              <TabsTrigger value="print-nin" className="text-xs sm:text-sm py-2 sm:py-2.5 whitespace-nowrap">Print NIN</TabsTrigger>
+              <TabsTrigger value="wallet" className="text-xs sm:text-sm py-2 sm:py-2.5 whitespace-nowrap flex items-center gap-1"><Wallet className="h-3.5 w-3.5" />Wallet</TabsTrigger>
+            </TabsList>
+          </div>
 
           <TabsContent value="modifications" className="space-y-6">
             <AdminModificationRequests />

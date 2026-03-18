@@ -350,15 +350,15 @@ export function WalletTopUp() {
       {/* Balance Card */}
       <Card className="shadow-card bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-950/30 dark:to-emerald-950/30 border-green-200 dark:border-green-800">
         <CardContent className="pt-6">
-          <div className="flex items-center justify-between">
-            <div>
+          <div className="flex items-center justify-between gap-3">
+            <div className="min-w-0">
               <p className="text-sm font-medium text-green-700 dark:text-green-400">Wallet Balance</p>
-              <p className="text-3xl font-bold text-green-900 dark:text-green-100 mt-1">
+              <p className="text-2xl sm:text-3xl font-bold text-green-900 dark:text-green-100 mt-1 tabular-nums truncate">
                 {formatNaira(balance)}
               </p>
             </div>
-            <div className="h-14 w-14 rounded-full bg-green-100 dark:bg-green-900/50 flex items-center justify-center">
-              <Wallet className="h-7 w-7 text-green-600 dark:text-green-400" />
+            <div className="h-12 w-12 sm:h-14 sm:w-14 rounded-full bg-green-100 dark:bg-green-900/50 flex items-center justify-center shrink-0">
+              <Wallet className="h-6 w-6 sm:h-7 sm:w-7 text-green-600 dark:text-green-400" />
             </div>
           </div>
         </CardContent>
