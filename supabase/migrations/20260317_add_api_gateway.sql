@@ -23,12 +23,14 @@ CREATE TABLE IF NOT EXISTS api_gateway_logs (
 ALTER TABLE api_gateway_logs ENABLE ROW LEVEL SECURITY;
 
 -- Users can view their own gateway logs
+DROP POLICY IF EXISTS "Users can view own gateway logs" ON api_gateway_logs;
 CREATE POLICY "Users can view own gateway logs"
   ON api_gateway_logs FOR SELECT
   TO authenticated
   USING (auth.uid() = user_id);
 
 -- Admins can view all gateway logs
+DROP POLICY IF EXISTS "Admins can view all gateway logs" ON api_gateway_logs;
 CREATE POLICY "Admins can view all gateway logs"
   ON api_gateway_logs FOR SELECT
   TO authenticated
