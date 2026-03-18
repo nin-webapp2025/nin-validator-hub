@@ -131,6 +131,12 @@ export default function Landing() {
               >
                 About
               </a>
+              <Link 
+                to="/docs/api" 
+                className="text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+              >
+                API Docs
+              </Link>
             </div>
 
             <div className="flex items-center gap-2 sm:gap-3">
@@ -188,6 +194,12 @@ export default function Landing() {
                         <Users className="h-5 w-5 text-blue-600" />
                         About
                       </a>
+                    </SheetClose>
+                    <SheetClose asChild>
+                      <Link to="/docs/api" className="flex items-center gap-3 px-4 py-3 rounded-xl text-base font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+                        <BookOpen className="h-5 w-5 text-blue-600" />
+                        API Docs
+                      </Link>
                     </SheetClose>
                   </nav>
                   <div className="flex flex-col gap-3 px-4">
