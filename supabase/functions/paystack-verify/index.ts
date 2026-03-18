@@ -4,9 +4,11 @@ const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers":
     "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 
 serve(async (req) => {
+  // Handle CORS preflight
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
@@ -14,17 +16,28 @@ serve(async (req) => {
   try {
     const secretKey = Deno.env.get("PAYSTACK_SECRET_KEY");
     if (!secretKey) {
+      console.error("PAYSTACK_SECRET_KEY is not set in environment");
       return new Response(
-        JSON.stringify({ success: false, error: "Paystack secret key not configured." }),
+        JSON.stringify({ success: false, error: "Paystack secret key not configured. Please set PAYSTACK_SECRET_KEY in Supabase Edge Function secrets." }),
         { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    const { reference } = await req.json();
+    let body: any;
+    try {
+      body = await req.json();
+    } catch {
+      return new Response(
+        JSON.stringify({ success: false, error: "Invalid request body. Expected JSON with { reference }." }),
+        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const { reference } = body;
     if (!reference) {
       return new Response(
         JSON.stringify({ success: false, error: "No payment reference provided." }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
