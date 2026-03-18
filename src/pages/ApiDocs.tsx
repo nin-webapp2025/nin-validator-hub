@@ -1,9 +1,6 @@
-import { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { Link } from "react-router-dom";
 import { useTheme } from "@/components/theme-provider";
-import { useAuth } from "@/hooks/useAuth";
-import { useRole } from "@/hooks/useRole";
-import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -25,8 +22,6 @@ import {
   Code2,
   Terminal,
   Globe,
-  Loader2,
-  Lock,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -347,59 +342,6 @@ print(response.json())`;
 /* ─── Main page ───────────────────────────────────────────── */
 export default function ApiDocs() {
   const { theme, setTheme } = useTheme();
-  const { user } = useAuth();
-  const { role, isLoading: roleLoading } = useRole();
-  const navigate = useNavigate();
-  const [hasAccess, setHasAccess] = useState<boolean | null>(null);
-
-  useEffect(() => {
-    if (roleLoading || !user) return;
-
-    // Admins always have access
-    if (role === "admin") {
-      setHasAccess(true);
-      return;
-    }
-
-    // Check api_docs_access table for non-admin users
-    (supabase as any)
-      .from("api_docs_access")
-      .select("id")
-      .eq("user_id", user.id)
-      .maybeSingle()
-      .then(({ data }: { data: any }) => {
-        setHasAccess(!!data);
-      });
-  }, [user, role, roleLoading]);
-
-  // Loading state
-  if (roleLoading || hasAccess === null) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-white to-blue-50/30 dark:from-slate-950 dark:via-slate-900 dark:to-blue-950/20">
-        <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
-      </div>
-    );
-  }
-
-  // Access denied
-  if (!hasAccess) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-white to-blue-50/30 dark:from-slate-950 dark:via-slate-900 dark:to-blue-950/20 px-4">
-        <Card className="max-w-md w-full text-center">
-          <CardContent className="pt-8 pb-6 space-y-4">
-            <Lock className="h-12 w-12 text-slate-400 mx-auto" />
-            <h2 className="text-xl font-bold text-slate-900 dark:text-white">Access Restricted</h2>
-            <p className="text-sm text-slate-500 dark:text-slate-400">
-              You don't have access to the API documentation. Please contact an administrator to request access.
-            </p>
-            <Button onClick={() => navigate("/dashboard")} className="mt-2">
-              Back to Dashboard
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50/30 dark:from-slate-950 dark:via-slate-900 dark:to-blue-950/20">
