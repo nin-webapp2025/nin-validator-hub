@@ -474,6 +474,7 @@ export default function ApiDocs() {
         headers: {
           "Content-Type": "application/json",
           "x-api-key": playKey.trim(),
+          "Authorization": `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
         },
         body: JSON.stringify(parsedBody),
       });

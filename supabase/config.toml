@@ -2,3 +2,6 @@ project_id = "eyntzaodrljvnzetvfdb"
 
 [functions.robosttech-api]
 verify_jwt = false
+
+[functions.api-gateway]
+verify_jwt = false
