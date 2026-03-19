@@ -31,6 +31,10 @@ const ACTION_PRICES: Record<string, number> = {
   print_nin_slip_long: 400,
 };
 
+/* ─── Allowed actions ──────────────────────────────────────── */
+type Action = keyof typeof ACTION_PRICES;
+const VALID_ACTIONS = new Set(Object.keys(ACTION_PRICES));
+
 /* ─── Mock responses for test keys (sk_test_ prefix) ──────── */
 const MOCK_RESPONSES: Record<string, unknown> = {
   validate: {
@@ -252,7 +256,7 @@ serve(async (req) => {
     const keyHash = await sha256(apiKey);
     const { data: keyRow, error: keyErr } = await sb
       .from("api_keys")
-      .select("id, user_id, is_active, is_test, rate_limit, total_requests")
+      .select("id, user_id, is_active, rate_limit, total_requests")
       .eq("key_hash", keyHash)
       .single();
 
@@ -342,7 +346,8 @@ serve(async (req) => {
     }
 
     /* 5b. Test mode short-circuit ------------------------------------ */
-    if (keyRow.is_test) {
+    const isTestMode = apiKey.startsWith("sk_test_");
+    if (isTestMode) {
       const elapsedMs = Date.now() - startMs;
       // Log the test request (no wallet deduction)
       await sb.from("api_gateway_logs").insert({

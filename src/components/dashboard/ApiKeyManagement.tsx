@@ -28,7 +28,6 @@ interface ApiKey {
   key_prefix: string;
   permissions: string[];
   is_active: boolean;
-  is_test: boolean;
   total_requests: number;
   last_used_at: string | null;
   created_at: string;
@@ -67,7 +66,7 @@ export function ApiKeyManagement() {
     if (!user) return;
     const { data } = await (supabase as any)
       .from("api_keys")
-      .select("id, name, key_prefix, permissions, is_active, is_test, total_requests, last_used_at, created_at")
+      .select("id, name, key_prefix, permissions, is_active, total_requests, last_used_at, created_at")
       .eq("user_id", user.id)
       .order("created_at", { ascending: false });
     if (data) setKeys(data);
@@ -93,7 +92,6 @@ export function ApiKeyManagement() {
       key_hash: hash,
       key_prefix: prefix,
       permissions: ["read"],
-      is_test: createTestMode,
     });
 
     setCreating(false);
@@ -213,7 +211,7 @@ export function ApiKeyManagement() {
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2">
                     <p className="text-sm font-medium text-slate-900 dark:text-slate-100">{key.name}</p>
-                    {key.is_test && (
+                    {key.key_prefix.startsWith("sk_test_") && (
                       <Badge variant="secondary" className="text-[10px] px-1.5 py-0 bg-violet-100 dark:bg-violet-900/30 text-violet-700 dark:text-violet-400">
                         TEST
                       </Badge>
