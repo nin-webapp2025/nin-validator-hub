@@ -31,9 +31,189 @@ const ACTION_PRICES: Record<string, number> = {
   print_nin_slip_long: 400,
 };
 
-/* ─── Allowed actions ──────────────────────────────────────── */
-type Action = keyof typeof ACTION_PRICES;
-const VALID_ACTIONS = new Set(Object.keys(ACTION_PRICES));
+/* ─── Mock responses for test keys (sk_test_ prefix) ──────── */
+const MOCK_RESPONSES: Record<string, unknown> = {
+  validate: {
+    message: "Validation Submission Successfull",
+    approved: true,
+    category: "new",
+    success: true,
+    nin: "00000000000",
+    tracking_id: "TST_MOCK_0001",
+    _test_mode: true,
+  },
+  validation_status: {
+    message: "Uploaded",
+    status: "sent",
+    success: false,
+    "in-progress": true,
+    nin: "00000000000",
+    _test_mode: true,
+  },
+  clearance: {
+    message: "Clearance Submission Successfull",
+    approved: true,
+    success: true,
+    nin: "00000000000",
+    tracking_id: "TST_MOCK_CLR001",
+    _test_mode: true,
+  },
+  clearance_status: {
+    message: "Clearance Status Successfull",
+    status: "completed",
+    success: true,
+    _test_mode: true,
+  },
+  personalization: {
+    message: "Personalization Submission Successfull",
+    approved: true,
+    category: "to_get_slip",
+    success: true,
+    tracking_id: "TST_MOCK_0001",
+    _test_mode: true,
+  },
+  personalization_status: {
+    message: "Personalization Successfull",
+    personalized: true,
+    success: true,
+    status: "completed",
+    _test_mode: true,
+  },
+  nin_search: {
+    message: "NIN Search Successfull",
+    success: true,
+    data: {
+      nin: "00000000000",
+      firstName: "TEST",
+      lastName: "USER",
+      middleName: "MODE",
+      dateOfBirth: "01-01-1990",
+      gender: "Male",
+      phone: "08000000000",
+    },
+    _test_mode: true,
+  },
+  nin_phone: {
+    message: "NIN Phone Lookup Successfull",
+    success: true,
+    nin: "00000000000",
+    _test_mode: true,
+  },
+  nin_demo: {
+    message: "NIN Demo Successfull",
+    success: true,
+    data: {
+      nin: "00000000000",
+      firstname: "TEST",
+      surname: "USER",
+      gender: "Male",
+      birthdate: "01-01-1990",
+    },
+    _test_mode: true,
+  },
+  nin_basic: {
+    status: true,
+    success: true,
+    verification: {
+      status: "VERIFIED",
+      type: "NIN_BASIC",
+    },
+    data: {
+      nin: "00000000000",
+      firstname: "TEST",
+      surname: "USER",
+      middlename: "MODE",
+      birthdate: "01-01-1990",
+      gender: "Male",
+      telephoneno: "08000000000",
+      photo: "",
+    },
+    _test_mode: true,
+  },
+  nin_advance: {
+    status: true,
+    success: true,
+    verification: {
+      status: "VERIFIED",
+      type: "NIN_ADVANCE",
+    },
+    data: {
+      nin: "00000000000",
+      firstname: "TEST",
+      surname: "USER",
+      middlename: "MODE",
+      birthdate: "01-01-1990",
+      gender: "Male",
+      telephoneno: "08000000000",
+      photo: "",
+    },
+    _test_mode: true,
+  },
+  bvn_basic: {
+    status: true,
+    success: true,
+    verification: {
+      status: "VERIFIED",
+      type: "BVN_BASIC",
+    },
+    data: {
+      bvn: "00000000000",
+      first_name: "TEST",
+      last_name: "USER",
+      dob: "01-Jan-90",
+      phone: "08000000000",
+    },
+    _test_mode: true,
+  },
+  bvn_advance: {
+    status: true,
+    success: true,
+    verification: {
+      status: "VERIFIED",
+      type: "BVN_ADVANCE",
+    },
+    data: {
+      bvn: "00000000000",
+      first_name: "TEST",
+      last_name: "USER",
+      dob: "01-Jan-90",
+      phone: "08000000000",
+    },
+    _test_mode: true,
+  },
+  print_nin_slip_premium: {
+    status: true,
+    success: true,
+    verification: { status: "VERIFIED", type: "NIN_ADVANCE" },
+    data: {
+      nin: "00000000000",
+      firstname: "TEST",
+      surname: "USER",
+      middlename: "MODE",
+      birthdate: "01-01-1990",
+      gender: "Male",
+      telephoneno: "08000000000",
+      photo: "",
+    },
+    _test_mode: true,
+  },
+  print_nin_slip_long: {
+    status: true,
+    success: true,
+    verification: { status: "VERIFIED", type: "NIN_ADVANCE" },
+    data: {
+      nin: "00000000000",
+      firstname: "TEST",
+      surname: "USER",
+      middlename: "MODE",
+      birthdate: "01-01-1990",
+      gender: "Male",
+      telephoneno: "08000000000",
+      photo: "",
+    },
+    _test_mode: true,
+  },
+};
 
 /* ─── Helper: JSON response ────────────────────────────────── */
 function json(body: unknown, status = 200) {
@@ -72,7 +252,7 @@ serve(async (req) => {
     const keyHash = await sha256(apiKey);
     const { data: keyRow, error: keyErr } = await sb
       .from("api_keys")
-      .select("id, user_id, is_active, rate_limit, total_requests")
+      .select("id, user_id, is_active, is_test, rate_limit, total_requests")
       .eq("key_hash", keyHash)
       .single();
 
@@ -159,6 +339,26 @@ serve(async (req) => {
 
     if (validationError) {
       return json({ error: validationError }, 400);
+    }
+
+    /* 5b. Test mode short-circuit ------------------------------------ */
+    if (keyRow.is_test) {
+      const elapsedMs = Date.now() - startMs;
+      // Log the test request (no wallet deduction)
+      await sb.from("api_gateway_logs").insert({
+        api_key_id: keyRow.id,
+        user_id: keyRow.user_id,
+        action,
+        status_code: 200,
+        response_time_ms: elapsedMs,
+        ip_address: req.headers.get("x-forwarded-for") || req.headers.get("cf-connecting-ip") || null,
+      });
+      await sb
+        .from("api_keys")
+        .update({ total_requests: (keyRow.total_requests ?? 0) + 1, last_used_at: new Date().toISOString() })
+        .eq("id", keyRow.id);
+      const mock = MOCK_RESPONSES[action] ?? { success: true, _test_mode: true };
+      return json(mock, 200);
     }
 
     /* 6. Wallet deduction --------------------------------------------- */

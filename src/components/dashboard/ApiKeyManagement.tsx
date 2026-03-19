@@ -28,14 +28,16 @@ interface ApiKey {
   key_prefix: string;
   permissions: string[];
   is_active: boolean;
+  is_test: boolean;
   total_requests: number;
   last_used_at: string | null;
   created_at: string;
 }
 
-function generateApiKey(): string {
+function generateApiKey(test = false): string {
   const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-  let key = "sk_live_";
+  const prefix = test ? "sk_test_" : "sk_live_";
+  let key = prefix;
   for (let i = 0; i < 40; i++) {
     key += chars.charAt(Math.floor(Math.random() * chars.length));
   }
@@ -59,12 +61,13 @@ export function ApiKeyManagement() {
   const [creating, setCreating] = useState(false);
   const [newlyCreatedKey, setNewlyCreatedKey] = useState<string | null>(null);
   const [showKey, setShowKey] = useState(false);
+  const [createTestMode, setCreateTestMode] = useState(false);
 
   const fetchKeys = async () => {
     if (!user) return;
     const { data } = await (supabase as any)
       .from("api_keys")
-      .select("id, name, key_prefix, permissions, is_active, total_requests, last_used_at, created_at")
+      .select("id, name, key_prefix, permissions, is_active, is_test, total_requests, last_used_at, created_at")
       .eq("user_id", user.id)
       .order("created_at", { ascending: false });
     if (data) setKeys(data);
@@ -80,9 +83,9 @@ export function ApiKeyManagement() {
     if (!user || !newKeyName.trim()) return;
     setCreating(true);
 
-    const rawKey = generateApiKey();
+    const rawKey = generateApiKey(createTestMode);
     const hash = await hashKey(rawKey);
-    const prefix = rawKey.slice(0, 12);
+    const prefix = rawKey.slice(0, createTestMode ? 9 : 8);
 
     const { error } = await (supabase as any).from("api_keys").insert({
       user_id: user.id,
@@ -90,6 +93,7 @@ export function ApiKeyManagement() {
       key_hash: hash,
       key_prefix: prefix,
       permissions: ["read"],
+      is_test: createTestMode,
     });
 
     setCreating(false);
@@ -101,7 +105,7 @@ export function ApiKeyManagement() {
     setNewlyCreatedKey(rawKey);
     setNewKeyName("");
     fetchKeys();
-    toast({ title: "API Key Created", description: "Copy the key now — it won't be shown again." });
+    toast({ title: createTestMode ? "Test Key Created" : "API Key Created", description: "Copy the key now — it won't be shown again." });
   };
 
   const handleDelete = async (id: string) => {
@@ -132,21 +136,38 @@ export function ApiKeyManagement() {
       </CardHeader>
       <CardContent className="space-y-4">
         {/* Create new key */}
-        <div className="flex gap-2">
-          <Input
-            placeholder="Key name (e.g. Production)"
-            value={newKeyName}
-            onChange={(e) => setNewKeyName(e.target.value)}
-            className="dark:bg-slate-900 dark:border-slate-700"
-          />
-          <Button
-            onClick={handleCreate}
-            disabled={!newKeyName.trim() || creating}
-            className="gap-1 shrink-0"
-          >
-            {creating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
-            Create
-          </Button>
+        <div className="space-y-3">
+          <div className="flex gap-2">
+            <Input
+              placeholder="Key name (e.g. Production)"
+              value={newKeyName}
+              onChange={(e) => setNewKeyName(e.target.value)}
+              className="dark:bg-slate-900 dark:border-slate-700"
+            />
+            <Button
+              onClick={handleCreate}
+              disabled={!newKeyName.trim() || creating}
+              className="gap-1 shrink-0"
+            >
+              {creating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
+              Create
+            </Button>
+          </div>
+          <div className="flex items-center gap-3 p-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900">
+            <Switch
+              id="test-mode-toggle"
+              checked={createTestMode}
+              onCheckedChange={setCreateTestMode}
+            />
+            <div>
+              <label htmlFor="test-mode-toggle" className="text-sm font-medium cursor-pointer select-none">
+                Test mode key
+              </label>
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                Test keys (sk_test_) return mock responses and never deduct from your wallet.
+              </p>
+            </div>
+          </div>
         </div>
 
         {/* Display newly created key */}
@@ -192,6 +213,11 @@ export function ApiKeyManagement() {
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2">
                     <p className="text-sm font-medium text-slate-900 dark:text-slate-100">{key.name}</p>
+                    {key.is_test && (
+                      <Badge variant="secondary" className="text-[10px] px-1.5 py-0 bg-violet-100 dark:bg-violet-900/30 text-violet-700 dark:text-violet-400">
+                        TEST
+                      </Badge>
+                    )}
                     {!key.is_active && (
                       <Badge variant="secondary" className="text-[10px] px-1.5 py-0 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400">
                         Inactive

@@ -526,6 +526,53 @@ curl -X POST https://eyntzaodrljvnzetvfdb.supabase.co/functions/v1/api-gateway \
           </div>
         </section>
 
+        {/* ── Test Mode ─────────────────────────────────────── */}
+        <section className="space-y-4">
+          <h2 className="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+            <Zap className="h-5 w-5 text-violet-500" /> Test Mode
+          </h2>
+          <p className="text-slate-600 dark:text-slate-400">
+            Test keys start with{" "}
+            <code className="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-sm font-mono">sk_test_</code>{" "}
+            and return realistic mock responses — <strong>no wallet deduction, no upstream API calls.</strong>{" "}
+            Use them to build and test your integration before switching to a live key.
+          </p>
+          <div className="grid sm:grid-cols-2 gap-4">
+            <div className="p-4 rounded-lg border border-violet-200 dark:border-violet-800 bg-violet-50 dark:bg-violet-950/20">
+              <p className="text-sm font-semibold text-violet-800 dark:text-violet-300 mb-1">sk_test_ key behaviour</p>
+              <ul className="text-sm text-violet-700 dark:text-violet-400 space-y-1 list-disc list-inside">
+                <li>Returns hardcoded mock data instantly</li>
+                <li>No wallet balance required</li>
+                <li>Requests are logged to your usage stats</li>
+                <li>All actions supported</li>
+              </ul>
+            </div>
+            <div className="p-4 rounded-lg border border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-950/20">
+              <p className="text-sm font-semibold text-blue-800 dark:text-blue-300 mb-1">sk_live_ key behaviour</p>
+              <ul className="text-sm text-blue-700 dark:text-blue-400 space-y-1 list-disc list-inside">
+                <li>Calls real NIMC / Prembly APIs</li>
+                <li>Deducts wallet per operation</li>
+                <li>Returns real identity data</li>
+                <li>Use in production only</li>
+              </ul>
+            </div>
+          </div>
+          <p className="text-sm text-slate-500 dark:text-slate-400">
+            Create a test key from the <strong>API Keys</strong> tab in your dashboard by enabling the{" "}
+            <em>Test mode key</em> toggle before clicking Create.
+          </p>
+          <CodeBlock
+            code={`# Test key — free, returns mock data
+curl -X POST https://eyntzaodrljvnzetvfdb.supabase.co/functions/v1/api-gateway \\
+  -H "Content-Type: application/json" \\
+  -H "x-api-key: sk_test_YOUR_TEST_KEY_HERE" \\
+  -d '{"action": "validate", "nin": "12345678901"}'
+
+# Response includes "_test_mode": true to confirm test environment
+# { "success": true, "approved": true, "nin": "00000000000", "_test_mode": true }`}
+          />
+        </section>
+
         {/* ── Base URL ──────────────────────────────────────── */}
         <section className="space-y-4">
           <h2 className="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
