@@ -1,12 +1,21 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useTheme } from "@/components/theme-provider";
 import { useAuth } from "@/hooks/useAuth";
 import { useRole } from "@/hooks/useRole";
+import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   BookOpen,
   Key,
@@ -24,6 +33,9 @@ import {
   Code2,
   Terminal,
   Globe,
+  Play,
+  Loader2,
+  FlaskConical,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -405,6 +417,77 @@ export default function ApiDocs() {
     navigate(base, { state: { tab: "api-keys" } });
   };
 
+  /* ─── Playground state ────────────────────────────────── */
+  const BASE_URL = "https://eyntzaodrljvnzetvfdb.supabase.co/functions/v1/api-gateway";
+
+  const [playAction, setPlayAction] = useState(ENDPOINTS[0].id);
+  const [playBody, setPlayBody] = useState(
+    JSON.stringify(ENDPOINTS[0].body, null, 2)
+  );
+  const [playKey, setPlayKey] = useState("");
+  const [playSending, setPlaySending] = useState(false);
+  const [playResponse, setPlayResponse] = useState<{
+    status: number;
+    ms: number;
+    body: unknown;
+  } | null>(null);
+  const [playError, setPlayError] = useState<string | null>(null);
+
+  // Auto-fill first test key found for this user
+  useEffect(() => {
+    if (!user) return;
+    (supabase as any)
+      .from("api_keys")
+      .select("key_prefix")
+      .eq("user_id", user.id)
+      .eq("is_active", true)
+      .order("created_at", { ascending: false })
+      .then(({ data }: { data: { key_prefix: string }[] | null }) => {
+        if (!data) return;
+        const testKey = data.find((k) => k.key_prefix.startsWith("sk_t"));
+        if (testKey) setPlayKey(testKey.key_prefix + "… (paste full key)");
+      });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]);
+
+  const handlePlaySend = async () => {
+    setPlayError(null);
+    setPlayResponse(null);
+
+    if (!playKey.trim()) {
+      setPlayError("Paste your API key (sk_test_… or sk_live_…) above.");
+      return;
+    }
+    let parsedBody: unknown;
+    try {
+      parsedBody = JSON.parse(playBody);
+    } catch {
+      setPlayError("Request body is not valid JSON.");
+      return;
+    }
+
+    setPlaySending(true);
+    const t0 = Date.now();
+    try {
+      const res = await fetch(BASE_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": playKey.trim(),
+        },
+        body: JSON.stringify(parsedBody),
+      });
+      const ms = Date.now() - t0;
+      let body: unknown;
+      try { body = await res.json(); } catch { body = { raw: await res.text() }; }
+      setPlayResponse({ status: res.status, ms, body });
+    } catch (err: unknown) {
+      setPlayError(err instanceof Error ? err.message : "Network error");
+    } finally {
+      setPlaySending(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50/30 dark:from-slate-950 dark:via-slate-900 dark:to-blue-950/20">
       {/* ── Top nav ─────────────────────────────────────────── */}
@@ -726,6 +809,164 @@ curl -X POST https://eyntzaodrljvnzetvfdb.supabase.co/functions/v1/api-gateway \
                 ))}
               </tbody>
             </table>
+          </div>
+        </section>
+
+        {/* ── Playground ────────────────────────────────────── */}
+        <section id="playground" className="space-y-4">
+          <h2 className="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+            <FlaskConical className="h-5 w-5 text-violet-500" /> API Playground
+          </h2>
+          <p className="text-slate-600 dark:text-slate-400 text-sm">
+            Send live requests directly from this page. Use a{" "}
+            <code className="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-sm font-mono">sk_test_</code>{" "}
+            key to test for free with mock responses, or a{" "}
+            <code className="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-sm font-mono">sk_live_</code>{" "}
+            key to hit real APIs.
+          </p>
+
+          <div className="grid lg:grid-cols-2 gap-4">
+            {/* ── Left: request builder ── */}
+            <div className="space-y-3">
+              {/* Action selector */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
+                  Action
+                </label>
+                <Select
+                  value={playAction}
+                  onValueChange={(val) => {
+                    setPlayAction(val);
+                    const ep = ENDPOINTS.find((e) => e.id === val);
+                    if (ep) setPlayBody(JSON.stringify(ep.body, null, 2));
+                    setPlayResponse(null);
+                    setPlayError(null);
+                  }}
+                >
+                  <SelectTrigger className="dark:bg-slate-900 dark:border-slate-700">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {ENDPOINTS.map((ep) => (
+                      <SelectItem key={ep.id} value={ep.id}>
+                        <span className="font-mono text-xs mr-2 text-slate-500">{ep.id}</span>
+                        {ep.name}
+                        {ep.price === 0 && (
+                          <span className="ml-2 text-[10px] text-green-600 dark:text-green-400">free</span>
+                        )}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* API Key input */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
+                  API Key
+                </label>
+                <input
+                  type="password"
+                  value={playKey}
+                  onChange={(e) => setPlayKey(e.target.value)}
+                  placeholder="sk_test_… or sk_live_…"
+                  className="w-full h-9 rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                />
+                <p className="text-[11px] text-slate-400">
+                  Use a <span className="font-mono">sk_test_</span> key for free mock responses. Keys are never stored or logged here.
+                </p>
+              </div>
+
+              {/* Request body */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
+                  Request Body (JSON)
+                </label>
+                <Textarea
+                  value={playBody}
+                  onChange={(e) => setPlayBody(e.target.value)}
+                  rows={8}
+                  spellCheck={false}
+                  className="font-mono text-xs dark:bg-slate-900 dark:border-slate-700 resize-none"
+                />
+              </div>
+
+              <Button
+                onClick={handlePlaySend}
+                disabled={playSending}
+                className="w-full gap-2"
+              >
+                {playSending ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Play className="h-4 w-4" />
+                )}
+                {playSending ? "Sending…" : "Send Request"}
+              </Button>
+
+              {playError && (
+                <div className="p-3 rounded-lg border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-950/20 text-sm text-red-700 dark:text-red-400">
+                  {playError}
+                </div>
+              )}
+            </div>
+
+            {/* ── Right: response panel ── */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
+                  Response
+                </label>
+                {playResponse && (
+                  <div className="flex items-center gap-2">
+                    <Badge
+                      variant="outline"
+                      className={cn(
+                        "font-mono text-xs",
+                        playResponse.status < 300
+                          ? "text-green-600 border-green-300 dark:text-green-400 dark:border-green-700"
+                          : playResponse.status < 500
+                            ? "text-amber-600 border-amber-300 dark:text-amber-400 dark:border-amber-700"
+                            : "text-red-600 border-red-300 dark:text-red-400 dark:border-red-700"
+                      )}
+                    >
+                      {playResponse.status}
+                    </Badge>
+                    <span className="text-xs text-slate-400 flex items-center gap-1">
+                      <Clock className="h-3 w-3" />
+                      {playResponse.ms}ms
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              <div className="relative min-h-[280px] rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-950 dark:bg-slate-900">
+                {!playResponse && !playSending && (
+                  <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-slate-500">
+                    <FlaskConical className="h-8 w-8 opacity-30" />
+                    <p className="text-sm">Response will appear here</p>
+                  </div>
+                )}
+                {playSending && (
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <Loader2 className="h-6 w-6 animate-spin text-slate-400" />
+                  </div>
+                )}
+                {playResponse && (
+                  <pre className="p-4 overflow-auto text-xs font-mono text-slate-100 leading-relaxed h-full max-h-[480px]">
+                    {JSON.stringify(playResponse.body, null, 2)}
+                  </pre>
+                )}
+              </div>
+
+              {playResponse?.body && typeof playResponse.body === "object" &&
+                "_test_mode" in (playResponse.body as object) && (
+                <div className="flex items-center gap-2 text-xs text-violet-600 dark:text-violet-400">
+                  <FlaskConical className="h-3.5 w-3.5" />
+                  Test mode — mock response, no charge
+                </div>
+              )}
+            </div>
           </div>
         </section>
 
