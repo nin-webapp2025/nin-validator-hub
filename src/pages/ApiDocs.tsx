@@ -1,6 +1,8 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useTheme } from "@/components/theme-provider";
+import { useAuth } from "@/hooks/useAuth";
+import { useRole } from "@/hooks/useRole";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -32,7 +34,7 @@ const ENDPOINTS = [
     name: "NIN Validation",
     method: "POST",
     description: "Submit a NIN for full NIMC validation. Returns approval status and tracking info.",
-    price: 5000,
+    price: 2000,
     body: { action: "validate", nin: "12345678901" },
     response: {
       message: "Validation Submission Successfull",
@@ -61,7 +63,7 @@ const ENDPOINTS = [
     name: "Clearance",
     method: "POST",
     description: "Submit a NIN for clearance processing.",
-    price: 3000,
+    price: 1500,
     body: { action: "clearance", tracking_id: "CKW49TGENXXXXXX" },
     response: {
       message: "Clearance Submission Successfull",
@@ -88,7 +90,7 @@ const ENDPOINTS = [
     name: "Personalization",
     method: "POST",
     description: "Submit a tracking ID for personalization. Returns NIN holder details.",
-    price: 1500,
+    price: 200,
     body: { action: "personalization", tracking_id: "CKW49TGENXXXXXX" },
     response: {
       message: "Personalization Submission Successfull",
@@ -117,7 +119,7 @@ const ENDPOINTS = [
     name: "NIN Search",
     method: "POST",
     description: "Search for identity information using a NIN.",
-    price: 800,
+    price: 200,
     body: { action: "nin_search", nin: "12345678901" },
     response: {
       message: "NIN Search Successfull",
@@ -130,7 +132,7 @@ const ENDPOINTS = [
     name: "NIN Phone Lookup",
     method: "POST",
     description: "Look up a NIN using a registered phone number.",
-    price: 800,
+    price: 200,
     body: { action: "nin_phone", phone: "08012345678" },
     response: {
       message: "NIN Phone Lookup Successfull",
@@ -143,7 +145,7 @@ const ENDPOINTS = [
     name: "NIN Advanced Lookup",
     method: "POST",
     description: "Advanced NIN verification with full biographical data (Prembly).",
-    price: 800,
+    price: 200,
     body: { action: "nin_advance", number: "12345678901" },
     response: {
       success: true,
@@ -164,7 +166,7 @@ const ENDPOINTS = [
     name: "BVN Verification",
     method: "POST",
     description: "Verify a Bank Verification Number with full details (Prembly).",
-    price: 800,
+    price: 250,
     body: { action: "bvn_advance", number: "22222222222" },
     response: {
       success: true,
@@ -174,6 +176,44 @@ const ENDPOINTS = [
         last_name: "DOE",
         dob: "01-Jan-90",
         phone: "08012345678",
+      },
+    },
+  },
+  {
+    id: "print_nin_slip_premium",
+    name: "Print Premium NIN Slip",
+    method: "POST",
+    description: "Fetch full NIN data required to render a Premium (CR80 card-style) digital NIN slip. Returns biographical data and base64 photo.",
+    price: 600,
+    body: { action: "print_nin_slip_premium", nin: "12345678901" },
+    response: {
+      success: true,
+      data: {
+        nin: "12345678901",
+        firstname: "JOHN",
+        surname: "DOE",
+        birthdate: "01-01-1990",
+        gender: "Male",
+        photo: "/9j/4AAQ...(base64)",
+      },
+    },
+  },
+  {
+    id: "print_nin_slip_long",
+    name: "Print Long NIN Slip (NINS)",
+    method: "POST",
+    description: "Fetch full NIN data required to render the official Long Format NIMC NIN Slip (NINS table layout). Returns biographical data and base64 photo.",
+    price: 400,
+    body: { action: "print_nin_slip_long", nin: "12345678901" },
+    response: {
+      success: true,
+      data: {
+        nin: "12345678901",
+        firstname: "JOHN",
+        surname: "DOE",
+        birthdate: "01-01-1990",
+        gender: "Male",
+        photo: "/9j/4AAQ...(base64)",
       },
     },
   },
@@ -342,16 +382,37 @@ print(response.json())`;
 /* ─── Main page ───────────────────────────────────────────── */
 export default function ApiDocs() {
   const { theme, setTheme } = useTheme();
+  const { user } = useAuth();
+  const { role } = useRole();
+  const navigate = useNavigate();
+
+  // Map role → dashboard path with api-keys tab hash
+  const apiKeysPath = (() => {
+    if (!user) return "/auth";
+    const base = role === "admin" ? "/dashboard/admin"
+      : role === "staff" ? "/dashboard/staff"
+      : role === "vip" ? "/dashboard/vip"
+      : "/dashboard/user";
+    return `${base}?tab=api-keys`;
+  })();
+
+  const handleGetApiKey = () => {
+    if (!user) { navigate("/auth"); return; }
+    const base = role === "admin" ? "/dashboard/admin"
+      : role === "staff" ? "/dashboard/staff"
+      : role === "vip" ? "/dashboard/vip"
+      : "/dashboard/user";
+    navigate(base, { state: { tab: "api-keys" } });
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50/30 dark:from-slate-950 dark:via-slate-900 dark:to-blue-950/20">
       {/* ── Top nav ─────────────────────────────────────────── */}
       <header className="sticky top-0 z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur border-b border-slate-200 dark:border-slate-800">
         <div className="max-w-5xl mx-auto flex items-center justify-between px-4 sm:px-6 h-14">
-          <Link to="/" className="flex items-center gap-2">
-            <img src="/logo.svg" alt="SparkID" className="h-7" />
-            <span className="font-bold text-lg text-slate-900 dark:text-white">API Docs</span>
-          </Link>
+            <Link to="/">
+              <img src="/logo.svg" alt="SparkID" className="h-7" />
+            </Link>
           <div className="flex items-center gap-2">
             <Button
               variant="ghost"
@@ -361,11 +422,9 @@ export default function ApiDocs() {
             >
               {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
             </Button>
-            <Link to="/auth">
-              <Button size="sm" className="gap-1">
+            <Button size="sm" onClick={handleGetApiKey} className="gap-1">
                 Get API Key <ArrowRight className="h-3.5 w-3.5" />
               </Button>
-            </Link>
           </div>
         </div>
       </header>
@@ -384,11 +443,9 @@ export default function ApiDocs() {
             run clearance checks, and more — all with a single API key.
           </p>
           <div className="flex items-center justify-center gap-3 pt-2">
-            <Link to="/auth">
-              <Button className="gap-1.5">
+            <Button className="gap-1.5" onClick={handleGetApiKey}>
                 <Key className="h-4 w-4" /> Get Your API Key
               </Button>
-            </Link>
             <a href="#endpoints">
               <Button variant="outline" className="gap-1.5">
                 <BookOpen className="h-4 w-4" /> View Endpoints

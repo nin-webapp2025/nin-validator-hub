@@ -765,8 +765,9 @@ export function PrintNinSlip() {
         return;
       }
 
-      // Wallet deduction for Print NIN Slip (₦800)
-      const walletResult = await deductWallet(user.id, "print_nin_slip");
+      // Wallet deduction: ₦600 for premium slip, ₦400 for long slip
+      const slipOperation = slipType === "premium" ? "print_nin_slip_premium" : "print_nin_slip_long";
+      const walletResult = await deductWallet(user.id, slipOperation);
       if (!walletResult.success) {
         toast({
           title: "Insufficient Balance",
@@ -859,7 +860,8 @@ export function PrintNinSlip() {
       console.error("Print NIN error:", err);
       // Refund wallet since API call failed
       if (user?.id) {
-        await refundWallet(user.id, "print_nin_slip").catch(console.error);
+        const slipOp = slipType === "premium" ? "print_nin_slip_premium" : "print_nin_slip_long";
+        await refundWallet(user.id, slipOp).catch(console.error);
       }
       toast({ title: "Error", description: err?.message || "An unexpected error occurred.", variant: "destructive" });
     } finally {

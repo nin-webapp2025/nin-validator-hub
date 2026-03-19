@@ -12,21 +12,23 @@ const corsHeaders = {
 const ROBOSTTECH_API_URL = "https://robosttech.com/api";
 const PREMBLY_API_URL = "https://api.prembly.com/verification";
 
-/* ─── Pricing per action (Naira) — mirrors frontend wallet.ts  */
+/* ─── Pricing per action (Naira) ──────────────────────────── */
 const ACTION_PRICES: Record<string, number> = {
-  validate: 5000,
-  validation_status: 0, // status checks are free
-  personalization: 1500,
+  validate: 2000,
+  validation_status: 0,            // status checks are free
+  personalization: 200,
   personalization_status: 0,
-  clearance: 3000,
+  clearance: 1500,
   clearance_status: 0,
-  nin_search: 800,
-  nin_phone: 800,
-  nin_demo: 800,
-  nin_basic: 800,
-  nin_advance: 800,
-  bvn_basic: 800,
-  bvn_advance: 800,
+  nin_search: 200,
+  nin_phone: 200,
+  nin_demo: 200,
+  nin_basic: 200,
+  nin_advance: 200,
+  bvn_basic: 250,
+  bvn_advance: 250,
+  print_nin_slip_premium: 600,
+  print_nin_slip_long: 400,
 };
 
 /* ─── Allowed actions ──────────────────────────────────────── */
@@ -95,14 +97,68 @@ serve(async (req) => {
     }
 
     /* 5. Parse body --------------------------------------------------- */
-    const body = await req.json();
-    const action = body.action as string;
+    let body: Record<string, unknown>;
+    try {
+      body = await req.json();
+    } catch {
+      return json({ error: "Invalid JSON body" }, 400);
+    }
+    const action = (body.action as string) ?? "";
 
     if (!action || !VALID_ACTIONS.has(action)) {
       return json(
         { error: "Invalid action", valid_actions: [...VALID_ACTIONS] },
         400
       );
+    }
+
+    /* 5a. Per-action input validation --------------------------------- */
+    const NIN_RE = /^\d{11}$/;
+    const BVN_RE = /^\d{11}$/;
+    const PHONE_RE = /^0[7-9][01]\d{8}$/; // Nigerian mobile
+
+    const validationError = (() => {
+      switch (action) {
+        case "validate":
+        case "validation_status":
+        case "nin_search":
+        case "nin_demo":
+          if (!body.nin || !NIN_RE.test(String(body.nin)))
+            return "Field 'nin' must be an 11-digit number.";
+          break;
+        case "nin_basic":
+        case "nin_advance":
+        case "print_nin_slip_premium":
+        case "print_nin_slip_long":
+          if (!body.nin && !body.number)
+            return "Field 'nin' or 'number' (11-digit) is required.";
+          if ((body.nin && !NIN_RE.test(String(body.nin))) || (body.number && !NIN_RE.test(String(body.number))))
+            return "Field 'nin'/'number' must be an 11-digit number.";
+          break;
+        case "nin_phone":
+          if (!body.phone || !PHONE_RE.test(String(body.phone)))
+            return "Field 'phone' must be a valid Nigerian mobile number (e.g. 08012345678).";
+          break;
+        case "bvn_basic":
+        case "bvn_advance":
+          if (!body.bvn && !body.number)
+            return "Field 'bvn' or 'number' (11-digit) is required.";
+          if ((body.bvn && !BVN_RE.test(String(body.bvn))) || (body.number && !BVN_RE.test(String(body.number))))
+            return "Field 'bvn'/'number' must be an 11-digit number.";
+          break;
+        case "personalization":
+        case "personalization_status":
+        case "clearance":
+        case "clearance_status":
+          if (!body.tracking_id && !body.trackingId)
+            return "Field 'tracking_id' is required.";
+          break;
+      }
+      return null;
+    })();
+
+    if (validationError) {
+      return json({ error: validationError }, 400);
     }
 
     /* 6. Wallet deduction --------------------------------------------- */
@@ -147,7 +203,7 @@ serve(async (req) => {
     }
 
     /* 7. Determine upstream endpoint ---------------------------------- */
-    const isPrembly = ["nin_basic", "nin_advance", "bvn_basic", "bvn_advance"].includes(action);
+    const isPrembly = ["nin_basic", "nin_advance", "bvn_basic", "bvn_advance", "print_nin_slip_premium", "print_nin_slip_long"].includes(action);
     const upstreamKey = isPrembly
       ? Deno.env.get("PREMBLY_API_KEY")
       : Deno.env.get("ROBOSTTECH_API_KEY");
@@ -229,6 +285,14 @@ serve(async (req) => {
       case "bvn_advance":
         endpoint = "/bvn";
         requestBody = { number: body.bvn || body.number };
+        headers["X-Api-Key"] = upstreamKey;
+        headers["accept"] = "application/json";
+        break;
+      case "print_nin_slip_premium":
+      case "print_nin_slip_long":
+        // Uses nin_advance under the hood — returns full biographical data + photo for slip rendering
+        endpoint = "/nin_advance";
+        requestBody = { number: body.nin || body.number };
         headers["X-Api-Key"] = upstreamKey;
         headers["accept"] = "application/json";
         break;

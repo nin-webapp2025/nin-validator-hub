@@ -16,6 +16,7 @@ import { PrintNinSlip } from "@/components/dashboard/PrintNinSlip";
 import { WalletTopUp } from "@/components/dashboard/WalletTopUp";
 import { TransactionHistory } from "@/components/dashboard/TransactionHistory";
 import { ApiDocsAccessManagement } from "@/components/dashboard/ApiDocsAccessManagement";
+import { ApiKeyManagement } from "@/components/dashboard/ApiKeyManagement";
 import { Shield, Wallet, BookOpen } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useQuery } from "@tanstack/react-query";
@@ -138,6 +139,7 @@ export default function AdminDashboard() {
 
           <TabsContent value="api-docs" className="space-y-6">
             <ApiDocsAccessManagement />
+            <ApiKeyManagement />
           </TabsContent>
 
           <TabsContent value="profile" className="space-y-6">
