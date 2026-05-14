@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
-import { Footer } from "@/components/dashboard/Footer";
+import { AppFooter } from "@/components/dashboard/AppFooter";
 import { ValidationForm } from "@/components/dashboard/ValidationForm";
 import NinSearch from "@/components/dashboard/NinSearch";
 import { Personalization } from "@/components/dashboard/Personalization";
@@ -107,7 +107,7 @@ export default function StaffDashboard() {
         </Tabs>
       </main>
 
-      <Footer />
+      <AppFooter />
     </div>
   );
 }

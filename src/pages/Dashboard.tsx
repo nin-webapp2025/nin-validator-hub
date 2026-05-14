@@ -7,7 +7,7 @@ import { motion } from "framer-motion";
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
 import { CommandMenu } from "@/components/CommandMenu";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
-import { Footer } from "@/components/dashboard/Footer";
+import { AppFooter } from "@/components/dashboard/AppFooter";
 import { StatsCards } from "@/components/dashboard/StatsCards";
 import { ValidationForm } from "@/components/dashboard/ValidationForm";
 import { ValidationHistory } from "@/components/dashboard/ValidationHistory";
@@ -369,7 +369,7 @@ export default function Dashboard() {
           </Tabs>
         </main>
         
-        <Footer />
+        <AppFooter />
       </div>
       </ErrorBoundary>
     </>

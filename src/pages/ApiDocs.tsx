@@ -38,6 +38,7 @@ import {
   FlaskConical,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { AppFooter } from "@/components/dashboard/AppFooter";
 import { API_ACTION_PRICES } from "../../shared/pricing";
 
 /* ─── Pricing & endpoint data ─────────────────────────────── */
@@ -1056,25 +1057,7 @@ curl -X POST https://eyntzaodrljvnzetvfdb.supabase.co/functions/v1/api-gateway \
         </section>
       </main>
 
-      {/* ── Footer ──────────────────────────────────────────── */}
-      <footer className="border-t border-slate-200 dark:border-slate-800 py-8">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-sm text-slate-500 dark:text-slate-400">
-            &copy; {new Date().getFullYear()} SparkID. All rights reserved.
-          </p>
-          <div className="flex gap-4 text-sm text-slate-500 dark:text-slate-400">
-            <Link to="/privacy" className="hover:text-blue-600 transition-colors">
-              Privacy
-            </Link>
-            <Link to="/terms" className="hover:text-blue-600 transition-colors">
-              Terms
-            </Link>
-            <a href="mailto:support@sparkid.ng" className="hover:text-blue-600 transition-colors">
-              Support
-            </a>
-          </div>
-        </div>
-      </footer>
+      <AppFooter />
     </div>
   );
 }

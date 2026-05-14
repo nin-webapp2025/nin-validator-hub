@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
-import { Footer } from "@/components/dashboard/Footer";
+import { AppFooter } from "@/components/dashboard/AppFooter";
 import { StatsCards } from "@/components/dashboard/StatsCards";
 import { ApiUsage } from "@/components/dashboard/ApiUsage";
 import { ValidationHistory } from "@/components/dashboard/ValidationHistory";
@@ -148,7 +148,7 @@ export default function AdminDashboard() {
         </Tabs>
       </main>
 
-      <Footer />
+      <AppFooter />
     </div>
   );
 }

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
-import { Footer } from "@/components/dashboard/Footer";
+import { AppFooter } from "@/components/dashboard/AppFooter";
 import { ValidationForm } from "@/components/dashboard/ValidationForm";
 import { ValidationHistory } from "@/components/dashboard/ValidationHistory";
 import { ValidationStatus } from "@/components/dashboard/ValidationStatus";
@@ -177,7 +177,7 @@ export default function VipDashboard() {
         </Tabs>
       </main>
 
-      <Footer />
+      <AppFooter />
     </div>
   );
 }
