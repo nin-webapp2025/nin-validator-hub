@@ -3,27 +3,15 @@
  * All amounts are in Naira (₦).
  */
 import { supabase } from "@/integrations/supabase/client";
+import {
+  DASHBOARD_OPERATION_LABELS,
+  DASHBOARD_OPERATION_PRICES,
+} from "../../shared/pricing";
 
 // ─── Pricing per operation (Naira) ───────────────────────────
-export const OPERATION_PRICES: Record<string, number> = {
-  nin_validation: 5000,
-  bvn_verification: 800,
-  nin_verification: 800,
-  print_nin_slip_premium: 600,
-  print_nin_slip_long: 400,
-  clearance: 3000,
-  personalization: 1500,
-};
+export const OPERATION_PRICES = DASHBOARD_OPERATION_PRICES;
 
-export const OPERATION_LABELS: Record<string, string> = {
-  nin_validation: "NIN Validation",
-  bvn_verification: "BVN Verification",
-  nin_verification: "NIN Verification",
-  print_nin_slip_premium: "Print Premium NIN Slip",
-  print_nin_slip_long: "Print Long NIN Slip (NINS)",
-  clearance: "Clearance",
-  personalization: "Personalization",
-};
+export const OPERATION_LABELS = DASHBOARD_OPERATION_LABELS;
 
 // ─── Get wallet balance ──────────────────────────────────────
 export async function getWalletBalance(userId: string): Promise<number> {

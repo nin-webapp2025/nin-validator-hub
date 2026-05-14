@@ -16,6 +16,11 @@ interface RequestBody {
   phone?: string;
   number?: string;
   bvn?: string;
+  firstname?: string;
+  lastname?: string;
+  middlename?: string;
+  gender?: string;
+  dateOfBirth?: string;
 }
 
 serve(async (req) => {
@@ -109,7 +114,13 @@ serve(async (req) => {
         break;
       case "nin_demo":
         endpoint = "/nin_demo";
-        requestBody = { nin: body.nin };
+        requestBody = {
+          firstname: body.firstname,
+          lastname: body.lastname,
+          middlename: body.middlename ?? "",
+          gender: body.gender,
+          dateOfBirth: body.dateOfBirth,
+        };
         headers["api-key"] = apiKey!;
         break;
       case "nin_basic":

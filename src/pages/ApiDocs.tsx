@@ -38,6 +38,7 @@ import {
   FlaskConical,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { API_ACTION_PRICES } from "../../shared/pricing";
 
 /* ─── Pricing & endpoint data ─────────────────────────────── */
 const ENDPOINTS = [
@@ -46,7 +47,7 @@ const ENDPOINTS = [
     name: "NIN Validation",
     method: "POST",
     description: "Submit a NIN for full NIMC validation. Returns approval status and tracking info.",
-    price: 2000,
+    price: API_ACTION_PRICES.validate,
     body: { action: "validate", nin: "12345678901" },
     response: {
       message: "Validation Submission Successfull",
@@ -61,7 +62,7 @@ const ENDPOINTS = [
     name: "Validation Status",
     method: "POST",
     description: "Check the status of a previously submitted NIN validation.",
-    price: 0,
+    price: API_ACTION_PRICES.validation_status,
     body: { action: "validation_status", nin: "12345678901" },
     response: {
       message: "Uploaded",
@@ -75,7 +76,7 @@ const ENDPOINTS = [
     name: "Clearance",
     method: "POST",
     description: "Submit a NIN for clearance processing.",
-    price: 1500,
+    price: API_ACTION_PRICES.clearance,
     body: { action: "clearance", tracking_id: "CKW49TGENXXXXXX" },
     response: {
       message: "Clearance Submission Successfull",
@@ -89,7 +90,7 @@ const ENDPOINTS = [
     name: "Clearance Status",
     method: "POST",
     description: "Check the status of a previously submitted clearance request.",
-    price: 0,
+    price: API_ACTION_PRICES.clearance_status,
     body: { action: "clearance_status", tracking_id: "CKW49TGENXXXXXX" },
     response: {
       message: "Clearance Status Successfull",
@@ -102,7 +103,7 @@ const ENDPOINTS = [
     name: "Personalization",
     method: "POST",
     description: "Submit a tracking ID for personalization. Returns NIN holder details.",
-    price: 200,
+    price: API_ACTION_PRICES.personalization,
     body: { action: "personalization", tracking_id: "CKW49TGENXXXXXX" },
     response: {
       message: "Personalization Submission Successfull",
@@ -117,7 +118,7 @@ const ENDPOINTS = [
     name: "Personalization Status",
     method: "POST",
     description: "Check the status of a personalization request.",
-    price: 0,
+    price: API_ACTION_PRICES.personalization_status,
     body: { action: "personalization_status", tracking_id: "CKW49TGENXXXXXX" },
     response: {
       message: "Personalization Successfull",
@@ -131,7 +132,7 @@ const ENDPOINTS = [
     name: "NIN Search",
     method: "POST",
     description: "Search for identity information using a NIN.",
-    price: 200,
+    price: API_ACTION_PRICES.nin_search,
     body: { action: "nin_search", nin: "12345678901" },
     response: {
       message: "NIN Search Successfull",
@@ -144,7 +145,7 @@ const ENDPOINTS = [
     name: "NIN Phone Lookup",
     method: "POST",
     description: "Look up a NIN using a registered phone number.",
-    price: 200,
+    price: API_ACTION_PRICES.nin_phone,
     body: { action: "nin_phone", phone: "08012345678" },
     response: {
       message: "NIN Phone Lookup Successfull",
@@ -157,7 +158,7 @@ const ENDPOINTS = [
     name: "NIN Advanced Lookup",
     method: "POST",
     description: "Advanced NIN verification with full biographical data (Prembly).",
-    price: 200,
+    price: API_ACTION_PRICES.nin_advance,
     body: { action: "nin_advance", number: "12345678901" },
     response: {
       success: true,
@@ -178,7 +179,7 @@ const ENDPOINTS = [
     name: "BVN Verification",
     method: "POST",
     description: "Verify a Bank Verification Number with full details (Prembly).",
-    price: 250,
+    price: API_ACTION_PRICES.bvn_advance,
     body: { action: "bvn_advance", number: "22222222222" },
     response: {
       success: true,
@@ -196,7 +197,7 @@ const ENDPOINTS = [
     name: "Print Premium NIN Slip",
     method: "POST",
     description: "Fetch full NIN data required to render a Premium (CR80 card-style) digital NIN slip. Returns biographical data and base64 photo.",
-    price: 600,
+    price: API_ACTION_PRICES.print_nin_slip_premium,
     body: { action: "print_nin_slip_premium", nin: "12345678901" },
     response: {
       success: true,
@@ -215,7 +216,7 @@ const ENDPOINTS = [
     name: "Print Long NIN Slip (NINS)",
     method: "POST",
     description: "Fetch full NIN data required to render the official Long Format NIMC NIN Slip (NINS table layout). Returns biographical data and base64 photo.",
-    price: 400,
+    price: API_ACTION_PRICES.print_nin_slip_long,
     body: { action: "print_nin_slip_long", nin: "12345678901" },
     response: {
       success: true,
@@ -395,8 +396,10 @@ print(response.json())`;
 export default function ApiDocs() {
   const { theme, setTheme } = useTheme();
   const { user } = useAuth();
-  const { role } = useRole();
+  const { role, isLoading: roleLoading } = useRole();
   const navigate = useNavigate();
+  const [accessLoading, setAccessLoading] = useState(true);
+  const [hasAccess, setHasAccess] = useState(false);
 
   // Map role → dashboard path with api-keys tab hash
   const apiKeysPath = (() => {
@@ -416,6 +419,45 @@ export default function ApiDocs() {
       : "/dashboard/user";
     navigate(base, { state: { tab: "api-keys" } });
   };
+
+  useEffect(() => {
+    if (!user || roleLoading) return;
+
+    let cancelled = false;
+
+    const checkAccess = async () => {
+      if (role === "admin") {
+        if (!cancelled) {
+          setHasAccess(true);
+          setAccessLoading(false);
+        }
+        return;
+      }
+
+      const { data, error } = await (supabase as any)
+        .from("api_docs_access")
+        .select("id")
+        .eq("user_id", user.id)
+        .maybeSingle();
+
+      if (cancelled) return;
+
+      const allowed = !error && !!data;
+      setHasAccess(allowed);
+      setAccessLoading(false);
+
+      if (!allowed) {
+        navigate("/dashboard", { replace: true });
+      }
+    };
+
+    setAccessLoading(true);
+    checkAccess();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [user, role, roleLoading, navigate]);
 
   /* ─── Playground state ────────────────────────────────── */
   const BASE_URL = "https://eyntzaodrljvnzetvfdb.supabase.co/functions/v1/api-gateway";
@@ -488,6 +530,21 @@ export default function ApiDocs() {
       setPlaySending(false);
     }
   };
+
+  if (roleLoading || accessLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-white to-blue-50/30 dark:from-slate-950 dark:via-slate-900 dark:to-blue-950/20">
+        <div className="flex items-center gap-3 text-slate-600 dark:text-slate-300">
+          <Loader2 className="h-5 w-5 animate-spin" />
+          <span>Verifying API docs access...</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (!hasAccess) {
+    return null;
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50/30 dark:from-slate-950 dark:via-slate-900 dark:to-blue-950/20">

@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { API_ACTION_PRICES } from "../../../shared/pricing.ts";
 
 /* ─── CORS ─────────────────────────────────────────────────── */
 const corsHeaders = {
@@ -13,23 +14,7 @@ const ROBOSTTECH_API_URL = "https://robosttech.com/api";
 const PREMBLY_API_URL = "https://api.prembly.com/verification";
 
 /* ─── Pricing per action (Naira) ──────────────────────────── */
-const ACTION_PRICES: Record<string, number> = {
-  validate: 2000,
-  validation_status: 0,            // status checks are free
-  personalization: 200,
-  personalization_status: 0,
-  clearance: 1500,
-  clearance_status: 0,
-  nin_search: 200,
-  nin_phone: 200,
-  nin_demo: 200,
-  nin_basic: 200,
-  nin_advance: 200,
-  bvn_basic: 250,
-  bvn_advance: 250,
-  print_nin_slip_premium: 600,
-  print_nin_slip_long: 400,
-};
+const ACTION_PRICES = API_ACTION_PRICES;
 
 /* ─── Allowed actions ──────────────────────────────────────── */
 type Action = keyof typeof ACTION_PRICES;
@@ -306,10 +291,23 @@ serve(async (req) => {
         case "validate":
         case "validation_status":
         case "nin_search":
-        case "nin_demo":
           if (!body.nin || !NIN_RE.test(String(body.nin)))
             return "Field 'nin' must be an 11-digit number.";
           break;
+        case "nin_demo": {
+          const firstname = String(body.firstname ?? "").trim();
+          const lastname = String(body.lastname ?? "").trim();
+          const gender = String(body.gender ?? "").trim().toLowerCase();
+          const dateOfBirth = String(body.dateOfBirth ?? "").trim();
+
+          if (!firstname) return "Field 'firstname' is required.";
+          if (!lastname) return "Field 'lastname' is required.";
+          if (!["male", "female"].includes(gender))
+            return "Field 'gender' must be either 'male' or 'female'.";
+          if (!/^\d{4}-\d{2}-\d{2}$/.test(dateOfBirth))
+            return "Field 'dateOfBirth' must be in YYYY-MM-DD format.";
+          break;
+        }
         case "nin_basic":
         case "nin_advance":
         case "print_nin_slip_premium":
@@ -466,7 +464,13 @@ serve(async (req) => {
         break;
       case "nin_demo":
         endpoint = "/nin_demo";
-        requestBody = { nin: body.nin };
+        requestBody = {
+          firstname: String(body.firstname ?? "").trim().toUpperCase(),
+          lastname: String(body.lastname ?? "").trim().toUpperCase(),
+          middlename: String(body.middlename ?? "").trim().toUpperCase(),
+          gender: String(body.gender ?? "").trim().toLowerCase(),
+          dateOfBirth: String(body.dateOfBirth ?? "").trim(),
+        };
         headers["api-key"] = upstreamKey;
         break;
       case "nin_basic":

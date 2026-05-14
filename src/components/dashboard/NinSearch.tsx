@@ -12,9 +12,19 @@ import { DataDisplayModal } from "@/components/ui/data-display-modal";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/hooks/useAuth";
 import { deductWallet, refundWallet } from "@/lib/wallet";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const ninSchema = z.string().regex(/^\d{11}$/, "NIN must be exactly 11 digits");
 const phoneSchema = z.string().regex(/^0\d{10}$/, "Phone must be 11 digits starting with 0");
+const demoSearchSchema = z.object({
+  firstname: z.string().trim().min(1, "First name is required"),
+  lastname: z.string().trim().min(1, "Last name is required"),
+  middlename: z.string().trim().optional(),
+  gender: z.enum(["male", "female"], {
+    errorMap: () => ({ message: "Gender must be either male or female" }),
+  }),
+  dateOfBirth: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Date of birth must be in YYYY-MM-DD format"),
+});
 
 // Helper function to clean response data by removing photo and signature fields
 const cleanResponseData = (data: any) => {
@@ -39,7 +49,11 @@ export default function NinSearch() {
   const { user } = useAuth();
   const [nin, setNin] = useState("");
   const [phone, setPhone] = useState("");
-  const [demoNin, setDemoNin] = useState("");
+  const [demoFirstname, setDemoFirstname] = useState("");
+  const [demoLastname, setDemoLastname] = useState("");
+  const [demoMiddlename, setDemoMiddlename] = useState("");
+  const [demoGender, setDemoGender] = useState("");
+  const [demoDateOfBirth, setDemoDateOfBirth] = useState("");
   const [basicNin, setBasicNin] = useState("");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<any>(null);
@@ -215,12 +229,19 @@ export default function NinSearch() {
   const handleDemoSearch = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    let payload: z.infer<typeof demoSearchSchema>;
     try {
-      ninSchema.parse(demoNin);
+      payload = demoSearchSchema.parse({
+        firstname: demoFirstname,
+        lastname: demoLastname,
+        middlename: demoMiddlename,
+        gender: demoGender,
+        dateOfBirth: demoDateOfBirth,
+      });
     } catch (error) {
       if (error instanceof z.ZodError) {
         toast({
-          title: "Invalid NIN",
+          title: "Invalid Demographic Data",
           description: error.errors[0].message,
           variant: "destructive",
         });
@@ -233,7 +254,14 @@ export default function NinSearch() {
 
     try {
       const { data, error } = await supabase.functions.invoke("robosttech-api", {
-        body: { action: "nin_demo", nin: demoNin },
+        body: {
+          action: "nin_demo",
+          firstname: payload.firstname.toUpperCase(),
+          lastname: payload.lastname.toUpperCase(),
+          middlename: payload.middlename?.toUpperCase() ?? "",
+          gender: payload.gender,
+          dateOfBirth: payload.dateOfBirth,
+        },
       });
 
       if (error) throw error;
@@ -562,24 +590,66 @@ export default function NinSearch() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <FileText className="h-5 w-5" />
-                Demo Search
+                Search by Demographic Data
               </CardTitle>
               <CardDescription>
-                Test the NIN search functionality with demo data
+                Search for a NIN record using name, gender, and date of birth
               </CardDescription>
             </CardHeader>
             <CardContent>
               <form onSubmit={handleDemoSearch} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="demo-nin">National Identification Number</Label>
-                  <Input
-                    id="demo-nin"
-                    placeholder="Enter 11-digit NIN for demo"
-                    value={demoNin}
-                    onChange={(e) => setDemoNin(e.target.value)}
-                    maxLength={11}
-                    required
-                  />
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  <div className="space-y-2">
+                    <Label htmlFor="demo-firstname">First Name</Label>
+                    <Input
+                      id="demo-firstname"
+                      placeholder="Enter first name"
+                      value={demoFirstname}
+                      onChange={(e) => setDemoFirstname(e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="demo-lastname">Last Name</Label>
+                    <Input
+                      id="demo-lastname"
+                      placeholder="Enter last name"
+                      value={demoLastname}
+                      onChange={(e) => setDemoLastname(e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="demo-middlename">Middle Name</Label>
+                    <Input
+                      id="demo-middlename"
+                      placeholder="Optional middle name"
+                      value={demoMiddlename}
+                      onChange={(e) => setDemoMiddlename(e.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="demo-gender">Gender</Label>
+                    <Select value={demoGender} onValueChange={setDemoGender}>
+                      <SelectTrigger id="demo-gender">
+                        <SelectValue placeholder="Select gender" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="female">Female</SelectItem>
+                        <SelectItem value="male">Male</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2 sm:col-span-2">
+                    <Label htmlFor="demo-date-of-birth">Date of Birth</Label>
+                    <Input
+                      id="demo-date-of-birth"
+                      type="date"
+                      value={demoDateOfBirth}
+                      onChange={(e) => setDemoDateOfBirth(e.target.value)}
+                      required
+                    />
+                  </div>
                 </div>
                 <Button type="submit" disabled={loading} className="w-full">
                   {loading ? (
@@ -588,7 +658,7 @@ export default function NinSearch() {
                       Running Demo...
                     </>
                   ) : (
-                    "Run Demo"
+                    "Search Demographics"
                   )}
                 </Button>
               </form>

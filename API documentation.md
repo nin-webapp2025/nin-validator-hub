@@ -1,7 +1,7 @@
 # ROBOST TECH API Documentation
 
 GENERAL API KEY:
-f76412ad0863337b5a1fab0b4d3334784ce5c0919e5e6cf72392aa539bb01020
+Removed from repository. Use a secret from your environment or password manager.
 
 ---
 
