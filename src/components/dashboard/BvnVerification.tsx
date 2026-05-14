@@ -9,7 +9,6 @@ import { useToast } from "@/hooks/use-toast";
 import { Loader2, CreditCard, CheckCircle2, AlertCircle, Eye } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DataDisplayModal } from "@/components/ui/data-display-modal";
 import { trackApiRequest } from "./RateLimitIndicator";
 import { deductWallet, refundWallet } from "@/lib/wallet";
@@ -24,7 +23,6 @@ export function BvnVerification({ onSuccess }: BvnFormProps) {
   const [bvn, setBvn] = useState("");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<any>(null);
-  const [verificationType, setVerificationType] = useState<"basic" | "advance">("basic");
   const [modalOpen, setModalOpen] = useState(false);
 
   const handleVerify = async (e: React.FormEvent) => {
@@ -73,10 +71,9 @@ export function BvnVerification({ onSuccess }: BvnFormProps) {
 
       trackApiRequest();
 
-      const action = verificationType === "basic" ? "bvn_basic" : "bvn_advance";
       const { data, error } = await supabase.functions.invoke("robosttech-api", {
         body: { 
-          action,
+          action: "bvn_advance",
           bvn,
           number: bvn
         },
@@ -94,7 +91,7 @@ export function BvnVerification({ onSuccess }: BvnFormProps) {
         .insert({
           user_id: user.id,
           bvn: bvn,
-          verification_type: verificationType,
+          verification_type: "advance",
           status: data?.status || "completed",
           result: data,
         });
@@ -108,7 +105,7 @@ export function BvnVerification({ onSuccess }: BvnFormProps) {
       if (data?.status === "success" || data?.verification?.status === "success") {
         toast({
           title: "BVN Verified Successfully",
-          description: `${verificationType === "basic" ? "Basic" : "Advanced"} verification completed`,
+          description: "BVN verification completed",
         });
         onSuccess?.();
       } else {
@@ -132,7 +129,7 @@ export function BvnVerification({ onSuccess }: BvnFormProps) {
           .insert({
             user_id: user.id,
             bvn: bvn,
-            verification_type: verificationType,
+            verification_type: "advance",
             status: "failed",
             error_message: error.message,
           });
@@ -162,28 +159,11 @@ export function BvnVerification({ onSuccess }: BvnFormProps) {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <Tabs value={verificationType} onValueChange={(v) => setVerificationType(v as "basic" | "advance")}>
-          <TabsList className="grid w-full grid-cols-2 gap-1 mb-4 sm:mb-6">
-            <TabsTrigger value="basic" className="text-xs sm:text-sm">Basic</TabsTrigger>
-            <TabsTrigger value="advance" className="text-xs sm:text-sm">Advanced</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="basic" className="mt-0">
-            <Alert className="mb-4">
-              <AlertDescription>
-                Basic verification provides essential BVN details and validation status
-              </AlertDescription>
-            </Alert>
-          </TabsContent>
-
-          <TabsContent value="advance" className="mt-0">
-            <Alert className="mb-4">
-              <AlertDescription>
-                Advanced verification includes comprehensive personal information and biometric data
-              </AlertDescription>
-            </Alert>
-          </TabsContent>
-        </Tabs>
+        <Alert className="mb-4">
+          <AlertDescription>
+            BVN verification returns comprehensive personal information and biometric data
+          </AlertDescription>
+        </Alert>
 
         <form onSubmit={handleVerify} className="space-y-4">
           <div className="space-y-2">
@@ -216,7 +196,7 @@ export function BvnVerification({ onSuccess }: BvnFormProps) {
             ) : (
               <>
                 <CheckCircle2 className="mr-2 h-4 w-4" />
-                Verify BVN ({verificationType === "basic" ? "Basic" : "Advanced"})
+                Verify BVN
               </>
             )}
           </Button>
