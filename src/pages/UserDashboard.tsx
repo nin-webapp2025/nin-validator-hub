@@ -21,9 +21,10 @@ import { PrintNinSlip } from "@/components/dashboard/PrintNinSlip";
 import { WalletTopUp } from "@/components/dashboard/WalletTopUp";
 import { TransactionHistory } from "@/components/dashboard/TransactionHistory";
 import { ApiKeyManagement } from "@/components/dashboard/ApiKeyManagement";
+import { WalletBalance } from "@/components/dashboard/WalletBalance";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { User, Wallet, BookOpen, Key, Search, ShieldCheck, CreditCard, Printer, Sparkles, Settings2 } from "lucide-react";
+import { User, Wallet, BookOpen, Key, Search, ShieldCheck, CreditCard, Printer, Sparkles } from "lucide-react";
 
 const DASHBOARD_GROUPS = [
   {
@@ -84,18 +85,23 @@ export default function UserDashboard() {
       />
 
       <main className="container mx-auto px-3 sm:px-4 py-6 sm:py-8">
-        <div className="mb-6 flex items-center gap-2">
-          <User className="h-6 w-6 text-blue-600 dark:text-blue-400" />
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-slate-100">My Dashboard</h1>
-        </div>
-
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+          <WalletBalance
+            variant="hero"
+            onClick={() => setActiveTab("wallet")}
+            title="Wallet Balance"
+            subtitle="Fund your wallet once and use it across verification, NIN services, printing, and API operations."
+          />
+
           <div className="rounded-3xl border border-slate-200/80 bg-white/90 p-3 shadow-[0_12px_40px_rgba(15,23,42,0.06)] backdrop-blur dark:border-slate-800 dark:bg-slate-900/90 dark:shadow-[0_12px_40px_rgba(2,6,23,0.45)]">
             <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
               <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">
-                  Workspace
-                </p>
+                <div className="flex items-center gap-2">
+                  <User className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">
+                    Workspace
+                  </p>
+                </div>
                 <h2 className="mt-1 text-lg font-semibold text-slate-900 dark:text-slate-100">
                   {activeGroup.title}
                 </h2>
