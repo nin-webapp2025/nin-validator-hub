@@ -1,6 +1,7 @@
 import { useAuth } from "@/hooks/useAuth";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { getWalletBalance, formatNaira } from "@/lib/wallet";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -16,7 +17,8 @@ import {
   Shield,
   Award,
   Zap,
-  Pencil
+  Pencil,
+  Wallet
 } from "lucide-react";
 import { formatDistanceToNow, format } from "date-fns";
 import { Badge } from "@/components/ui/badge";
@@ -47,24 +49,49 @@ export function Profile({ onNavigateToSettings }: ProfileProps = {}) {
   });
 
   const { data: validationStats } = useQuery({
-    queryKey: ["validation-stats", user?.id],
+    queryKey: ["account-stats", user?.id],
     queryFn: async () => {
       if (!user) return null;
-      const { data, error } = await supabase
-        .from("validation_history")
-        .select("status, created_at")
-        .eq("user_id", user.id)
-        .order("created_at", { ascending: false });
-      
-      if (error) throw error;
-      
-      const total = data.length;
-      const successful = data.filter(v => v.status === "success").length;
-      const failed = data.filter(v => v.status === "failed").length;
-      const mostRecent = data.length > 0 ? data[0].created_at : null;
+      const [validationRes, personalizationRes, clearanceRes, bvnRes, walletBalance] = await Promise.all([
+        supabase.from("validation_history").select("status, created_at").eq("user_id", user.id),
+        supabase.from("personalization_history").select("status, created_at").eq("user_id", user.id),
+        supabase.from("clearance_history").select("status, created_at").eq("user_id", user.id),
+        supabase.from("bvn_history").select("status, created_at").eq("user_id", user.id),
+        getWalletBalance(user.id),
+      ]);
+
+      if (validationRes.error) throw validationRes.error;
+      if (personalizationRes.error) throw personalizationRes.error;
+      if (clearanceRes.error) throw clearanceRes.error;
+      if (bvnRes.error) throw bvnRes.error;
+
+      const allEvents = [
+        ...(validationRes.data ?? []).map((item) => ({ ...item, type: "validation" })),
+        ...(personalizationRes.data ?? []).map((item) => ({ ...item, type: "personalization" })),
+        ...(clearanceRes.data ?? []).map((item) => ({ ...item, type: "clearance" })),
+        ...(bvnRes.data ?? []).map((item) => ({ ...item, type: "bvn" })),
+      ].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+
+      const completedStatuses = new Set(["success", "completed", "verified", "approved", "sent"]);
+      const failedStatuses = new Set(["failed", "error", "rejected"]);
+      const successful = allEvents.filter((item) => completedStatuses.has(String(item.status).toLowerCase())).length;
+      const failed = allEvents.filter((item) => failedStatuses.has(String(item.status).toLowerCase())).length;
+      const total = allEvents.length;
+      const mostRecent = allEvents[0]?.created_at ?? null;
       const successRate = total > 0 ? Math.round((successful / total) * 100) : 0;
-      
-      return { total, successful, failed, mostRecent, successRate };
+
+      return {
+        total,
+        successful,
+        failed,
+        mostRecent,
+        successRate,
+        validationTotal: validationRes.data?.length ?? 0,
+        clearanceTotal: clearanceRes.data?.length ?? 0,
+        personalizationTotal: personalizationRes.data?.length ?? 0,
+        bvnTotal: bvnRes.data?.length ?? 0,
+        walletBalance,
+      };
     },
     enabled: !!user,
   });
@@ -108,8 +135,9 @@ export function Profile({ onNavigateToSettings }: ProfileProps = {}) {
   });
 
   const getInitials = () => {
-    if (profile?.display_name) {
-      return profile.display_name
+    const displayValue = profile?.display_name || profile?.full_name;
+    if (displayValue) {
+      return displayValue
         .split(" ")
         .map((n: string) => n[0])
         .join("")
@@ -142,15 +170,15 @@ export function Profile({ onNavigateToSettings }: ProfileProps = {}) {
           <div className="flex flex-col lg:flex-row items-start lg:items-center gap-4 sm:gap-6">
             {/* Avatar Section */}
             <div className="flex items-center gap-3 sm:gap-6 w-full sm:w-auto">
-              <Avatar className="h-20 w-20 sm:h-28 sm:w-28 border-4 border-white/20 shadow-2xl ring-2 sm:ring-4 ring-white/10">
-                <AvatarFallback className="text-2xl sm:text-3xl font-bold bg-white/10 backdrop-blur-sm text-white">
-                  {getInitials()}
-                </AvatarFallback>
-              </Avatar>
+                <Avatar className="h-20 w-20 sm:h-28 sm:w-28 border-4 border-white/20 shadow-2xl ring-2 sm:ring-4 ring-white/10">
+                  <AvatarFallback className="text-2xl sm:text-3xl font-bold bg-white/10 backdrop-blur-sm text-white">
+                    {getInitials()}
+                  </AvatarFallback>
+                </Avatar>
               
               <div className="text-white flex-1">
                 <h2 className="text-xl sm:text-2xl md:text-3xl font-bold mb-1 sm:mb-2 break-words">
-                  {profile?.display_name || user?.email?.split('@')[0] || "User"}
+                  {profile?.display_name || profile?.full_name || user?.email?.split('@')[0] || "User"}
                 </h2>
                 <div className="flex items-center gap-2 mb-2 sm:mb-3">
                   <Mail className="h-3 w-3 sm:h-4 sm:w-4 opacity-90 flex-shrink-0" />
@@ -222,7 +250,7 @@ export function Profile({ onNavigateToSettings }: ProfileProps = {}) {
           </CardHeader>
           <CardContent>
             <p className="text-3xl font-bold text-slate-900 dark:text-slate-100 mb-2">
-              {validationStats?.successful || 0}
+              {validationStats?.validationTotal || 0}
             </p>
             <div className="flex items-center gap-2">
               <Progress value={validationStats?.successRate || 0} className="h-2" />
@@ -247,10 +275,10 @@ export function Profile({ onNavigateToSettings }: ProfileProps = {}) {
           </CardHeader>
           <CardContent>
             <p className="text-3xl font-bold text-slate-900 dark:text-slate-100 mb-2">
-              {clearanceStats?.successful || 0}
+              {clearanceStats?.total || 0}
             </p>
             <p className="text-xs text-slate-600 dark:text-slate-400">
-              of {clearanceStats?.total || 0} total requests
+              {clearanceStats?.successful || 0} completed successfully
             </p>
           </CardContent>
         </Card>
@@ -269,34 +297,32 @@ export function Profile({ onNavigateToSettings }: ProfileProps = {}) {
           </CardHeader>
           <CardContent>
             <p className="text-3xl font-bold text-slate-900 dark:text-slate-100 mb-2">
-              {personalizationStats?.successful || 0}
+              {personalizationStats?.total || 0}
             </p>
             <p className="text-xs text-slate-600 dark:text-slate-400">
-              of {personalizationStats?.total || 0} total requests
+              {personalizationStats?.successful || 0} completed successfully
             </p>
           </CardContent>
         </Card>
 
-        {/* Last Activity */}
+        {/* Wallet Balance */}
         <Card className="border-slate-200 dark:border-slate-700 shadow-lg dark:bg-slate-800 hover:shadow-xl transition-shadow">
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <CardTitle className="text-sm font-semibold text-slate-600 dark:text-slate-400">
-                Last Activity
+                Wallet Balance
               </CardTitle>
-              <div className="h-10 w-10 rounded-xl bg-orange-50 dark:bg-orange-950/50 flex items-center justify-center">
-                <Clock className="h-5 w-5 text-orange-600 dark:text-orange-400" />
+              <div className="h-10 w-10 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 flex items-center justify-center">
+                <Wallet className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
               </div>
             </div>
           </CardHeader>
           <CardContent>
             <p className="text-lg font-bold text-slate-900 dark:text-slate-100 mb-1">
-              {validationStats?.mostRecent
-                ? formatDistanceToNow(new Date(validationStats.mostRecent), { addSuffix: true })
-                : "No activity yet"}
+              {formatNaira(validationStats?.walletBalance ?? 0)}
             </p>
             <p className="text-xs text-slate-600 dark:text-slate-400">
-              Last validation request
+              Available for top-ups, verifications, and API usage
             </p>
           </CardContent>
         </Card>
@@ -318,10 +344,19 @@ export function Profile({ onNavigateToSettings }: ProfileProps = {}) {
             <div className="space-y-4">
               <div>
                 <Label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                  Full Name
+                </Label>
+                <p className="text-base font-medium text-slate-900 dark:text-slate-100 mt-1">
+                  {profile?.full_name || profile?.display_name || "Not set"}
+                </p>
+              </div>
+
+              <div>
+                <Label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
                   Display Name
                 </Label>
                 <p className="text-base font-medium text-slate-900 dark:text-slate-100 mt-1">
-                  {profile?.display_name || "Not set"}
+                  {profile?.display_name || profile?.full_name || "Not set"}
                 </p>
               </div>
               
@@ -358,6 +393,18 @@ export function Profile({ onNavigateToSettings }: ProfileProps = {}) {
                   {membership.level}
                 </p>
               </div>
+
+              <div>
+                <Label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                  Latest Activity
+                </Label>
+                <p className="text-base font-medium text-slate-900 dark:text-slate-100 mt-1 flex items-center gap-2">
+                  <Clock className="h-4 w-4 text-slate-400" />
+                  {validationStats?.mostRecent
+                    ? formatDistanceToNow(new Date(validationStats.mostRecent), { addSuffix: true })
+                    : "No activity yet"}
+                </p>
+              </div>
             </div>
           </div>
 
@@ -374,7 +421,7 @@ export function Profile({ onNavigateToSettings }: ProfileProps = {}) {
                   {validationStats?.total || 0}
                 </p>
                 <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">
-                  Total Validations
+                  Total Requests
                 </p>
               </div>
               <div className="text-center p-4 rounded-xl bg-slate-50 dark:bg-slate-900/50">
@@ -395,10 +442,10 @@ export function Profile({ onNavigateToSettings }: ProfileProps = {}) {
               </div>
               <div className="text-center p-4 rounded-xl bg-slate-50 dark:bg-slate-900/50">
                 <p className="text-2xl font-bold text-purple-600 dark:text-purple-400">
-                  {validationStats?.successRate || 0}%
+                  {validationStats?.bvnTotal || 0}
                 </p>
                 <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">
-                  Success Rate
+                  BVN Checks
                 </p>
               </div>
             </div>

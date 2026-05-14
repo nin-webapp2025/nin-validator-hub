@@ -30,7 +30,6 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { WalletBalance } from "@/components/dashboard/WalletBalance";
 import { DevRoleSwitcher } from "@/components/dashboard/DevRoleSwitcher";
 
 interface DashboardHeaderProps {
@@ -119,8 +118,6 @@ export function DashboardHeader({ onNavigateToProfile, onNavigateToWallet }: Das
         </div>
 
         <div className="flex items-center gap-1 sm:gap-2">
-          <WalletBalance onClick={onNavigateToWallet} />
-
           <Button
             variant="ghost"
             size="icon"
