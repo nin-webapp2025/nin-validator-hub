@@ -10,13 +10,25 @@ import Landing from "./pages/Landing";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
 import AdminDashboard from "./pages/AdminDashboard";
-import UserDashboard from "./pages/UserDashboard";
 import StaffDashboard from "./pages/StaffDashboard";
 import VipDashboard from "./pages/VipDashboard";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
 import ApiDocs from "./pages/ApiDocs";
 import NotFound from "./pages/NotFound";
+import { UserAppShell } from "@/components/dashboard/UserAppShell";
+import UserOverviewPage from "./pages/user/UserOverviewPage";
+import UserNinValidationPage from "./pages/user/UserNinValidationPage";
+import UserNinSearchPage from "./pages/user/UserNinSearchPage";
+import UserBvnPage from "./pages/user/UserBvnPage";
+import UserClearancePage from "./pages/user/UserClearancePage";
+import UserPersonalizationPage from "./pages/user/UserPersonalizationPage";
+import UserPrintNinPage from "./pages/user/UserPrintNinPage";
+import UserAirtimePage from "./pages/user/UserAirtimePage";
+import UserDataPage from "./pages/user/UserDataPage";
+import UserWalletPage from "./pages/user/UserWalletPage";
+import UserApiKeysPage from "./pages/user/UserApiKeysPage";
+import UserProfilePage from "./pages/user/UserProfilePage";
 
 /**
  * Role-based dashboard router component
@@ -81,10 +93,23 @@ const App = () => (
               path="/dashboard/user" 
               element={
                 <ProtectedRoute allowedRoles={['user']}>
-                  <UserDashboard />
+                  <UserAppShell />
                 </ProtectedRoute>
-              } 
-            />
+              }
+            >
+              <Route index element={<UserOverviewPage />} />
+              <Route path="nin-validation" element={<UserNinValidationPage />} />
+              <Route path="nin-search" element={<UserNinSearchPage />} />
+              <Route path="bvn" element={<UserBvnPage />} />
+              <Route path="clearance" element={<UserClearancePage />} />
+              <Route path="personalization" element={<UserPersonalizationPage />} />
+              <Route path="print-nin" element={<UserPrintNinPage />} />
+              <Route path="airtime" element={<UserAirtimePage />} />
+              <Route path="data" element={<UserDataPage />} />
+              <Route path="wallet" element={<UserWalletPage />} />
+              <Route path="api-keys" element={<UserApiKeysPage />} />
+              <Route path="profile" element={<UserProfilePage />} />
+            </Route>
             <Route 
               path="/dashboard/staff" 
               element={

@@ -43,10 +43,10 @@ export function WalletBalance({
   if (balance === null) {
     if (variant === "hero") {
       return (
-        <div className="rounded-[28px] border border-slate-200/80 bg-white/95 p-5 shadow-[0_20px_60px_rgba(15,23,42,0.08)] backdrop-blur dark:border-slate-800 dark:bg-slate-900/95 dark:shadow-[0_20px_60px_rgba(2,6,23,0.45)] sm:p-6">
-          <div className="animate-pulse space-y-3">
+        <div className="rounded-[24px] border border-slate-200/80 bg-white/95 p-4 shadow-[0_16px_44px_rgba(15,23,42,0.08)] backdrop-blur dark:border-slate-800 dark:bg-slate-900/95 dark:shadow-[0_16px_44px_rgba(2,6,23,0.4)] sm:p-5">
+          <div className="animate-pulse space-y-2.5">
             <div className="h-3 w-28 rounded bg-slate-200 dark:bg-slate-700" />
-            <div className="h-10 w-48 rounded bg-slate-200 dark:bg-slate-700" />
+            <div className="h-8 w-40 rounded bg-slate-200 dark:bg-slate-700" />
             <div className="h-3 w-64 rounded bg-slate-200 dark:bg-slate-700" />
           </div>
         </div>
@@ -61,24 +61,24 @@ export function WalletBalance({
       <button
         type="button"
         onClick={onClick}
-        className="w-full rounded-[28px] border border-blue-200/70 bg-[linear-gradient(135deg,#0f172a_0%,#1d4ed8_48%,#2563eb_100%)] p-5 text-left text-white shadow-[0_24px_80px_rgba(37,99,235,0.24)] transition-transform hover:-translate-y-0.5 hover:shadow-[0_28px_90px_rgba(37,99,235,0.3)] dark:border-blue-500/20 sm:p-6"
+        className="w-full rounded-[24px] border border-blue-200/70 bg-[linear-gradient(135deg,#0f172a_0%,#1d4ed8_48%,#2563eb_100%)] p-4 text-left text-white shadow-[0_18px_56px_rgba(37,99,235,0.2)] transition-transform hover:-translate-y-0.5 hover:shadow-[0_22px_68px_rgba(37,99,235,0.26)] dark:border-blue-500/20 sm:p-5"
         title="Wallet Balance — Click to open wallet"
       >
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <div className="flex items-center gap-2 text-blue-100/90">
-              <Wallet className="h-4 w-4" />
+              <Wallet className="h-3.5 w-3.5" />
               <span className="text-xs font-semibold uppercase tracking-[0.22em]">{title}</span>
             </div>
-            <p className="mt-3 text-3xl font-black tracking-tight tabular-nums sm:text-5xl">
+            <p className="mt-2 text-2xl font-black tracking-tight tabular-nums sm:text-4xl">
               {formatNaira(balance)}
             </p>
-            <p className="mt-2 max-w-xl text-sm text-blue-50/85 sm:text-base">
+            <p className="mt-1.5 max-w-xl text-xs text-blue-50/85 sm:text-sm">
               {subtitle}
             </p>
           </div>
 
-          <div className="inline-flex items-center gap-2 self-start rounded-2xl border border-white/15 bg-white/10 px-3 py-2 text-sm font-semibold text-white/95 backdrop-blur sm:self-auto">
+          <div className="inline-flex items-center gap-2 self-start rounded-xl border border-white/15 bg-white/10 px-3 py-1.5 text-xs font-semibold text-white/95 backdrop-blur sm:self-auto sm:text-sm">
             <span>Open wallet</span>
             <span aria-hidden="true">→</span>
           </div>

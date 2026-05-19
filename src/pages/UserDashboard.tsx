@@ -22,9 +22,11 @@ import { WalletTopUp } from "@/components/dashboard/WalletTopUp";
 import { TransactionHistory } from "@/components/dashboard/TransactionHistory";
 import { ApiKeyManagement } from "@/components/dashboard/ApiKeyManagement";
 import { WalletBalance } from "@/components/dashboard/WalletBalance";
+import { AirtimePurchase } from "@/components/dashboard/AirtimePurchase";
+import { DataPurchase } from "@/components/dashboard/DataPurchase";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { User, Wallet, BookOpen, Key, Search, ShieldCheck, CreditCard, Printer, Sparkles } from "lucide-react";
+import { User, Wallet, BookOpen, Key, Search, ShieldCheck, CreditCard, Printer, Sparkles, Smartphone, Database } from "lucide-react";
 
 const DASHBOARD_GROUPS = [
   {
@@ -47,6 +49,8 @@ const DASHBOARD_GROUPS = [
       { value: "clearance", label: "Clearance", icon: ShieldCheck },
       { value: "personalization", label: "Personalization", icon: Sparkles },
       { value: "print-nin", label: "Print NIN", icon: Printer },
+      { value: "airtime", label: "Airtime", icon: Smartphone },
+      { value: "data", label: "Mobile Data", icon: Database },
     ],
   },
   {
@@ -186,6 +190,14 @@ export default function UserDashboard() {
 
           <TabsContent value="print-nin" className="space-y-6">
             <PrintNinSlip />
+          </TabsContent>
+
+          <TabsContent value="airtime" className="space-y-6">
+            <AirtimePurchase />
+          </TabsContent>
+
+          <TabsContent value="data" className="space-y-6">
+            <DataPurchase />
           </TabsContent>
 
           <TabsContent value="personalization" className="space-y-6">
