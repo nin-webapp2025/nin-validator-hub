@@ -5,6 +5,12 @@ import {
   type ExecutionRequestBody,
   type SupportedAction,
 } from "./_shared/unified-executor.ts";
+import {
+  recordOperationalEvent,
+  severityForStatus,
+  shouldAlertForStatus,
+  slowRequestSeverity,
+} from "./_shared/monitoring.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -141,6 +147,7 @@ async function processProviderStatusPoll(
   sb: ReturnType<typeof createClient>,
   job: BackgroundJob,
 ) {
+  const startedAt = Date.now();
   const payload = job.payload ?? {};
   const action = String(payload.action ?? "") as SupportedAction;
   const requestBody: ExecutionRequestBody = { action };
@@ -157,6 +164,60 @@ async function processProviderStatusPoll(
   await updateHistory(sb, payload, outcome.body);
 
   const state = normalizedState(outcome.body);
+  const durationMs = Date.now() - startedAt;
+  const normalized = asObject(asObject(outcome.body)?.normalized);
+  const requestId = typeof normalized?.request_id === "string"
+    ? normalized.request_id
+    : undefined;
+
+  await recordOperationalEvent(sb, {
+    source: "background_job",
+    component: "job-worker",
+    eventType: outcome.status >= 500 ? "job_request_failed" : "job_request_processed",
+    severity: severityForStatus(outcome.status),
+    message: normalizedMessage(outcome.body),
+    action,
+    statusCode: outcome.status,
+    durationMs,
+    requestId,
+    userId: typeof payload.user_id === "string" ? payload.user_id : undefined,
+    jobId: job.id,
+    provider: typeof normalized?.provider === "string" ? normalized.provider : undefined,
+    state,
+    createAlert: shouldAlertForStatus(outcome.status),
+    alertType: "background_job_failure",
+    alertTitle: "Background job request failure",
+    alertDedupeKey: shouldAlertForStatus(outcome.status)
+      ? `job-worker:${job.type}:${action}:${outcome.status}`
+      : undefined,
+    metadata: {
+      attempt_count: job.attempt_count,
+      max_attempts: job.max_attempts,
+    },
+  });
+
+  if (durationMs >= 8000) {
+    await recordOperationalEvent(sb, {
+      source: "background_job",
+      component: "job-worker",
+      eventType: "slow_job_request",
+      severity: slowRequestSeverity(durationMs),
+      message: `${job.type} took ${durationMs}ms for ${action}.`,
+      action,
+      statusCode: outcome.status,
+      durationMs,
+      requestId,
+      userId: typeof payload.user_id === "string" ? payload.user_id : undefined,
+      jobId: job.id,
+      provider: typeof normalized?.provider === "string" ? normalized.provider : undefined,
+      state,
+      createAlert: durationMs >= 15000,
+      alertType: "slow_background_job",
+      alertTitle: "Slow background job",
+      alertDedupeKey: durationMs >= 15000 ? `job-worker:slow:${job.type}:${action}` : undefined,
+    });
+  }
+
   if (state === "pending" || state === "submitted") {
     await sb.rpc("reschedule_background_job", {
       p_job_id: job.id,
@@ -216,6 +277,18 @@ serve(async (req) => {
     });
 
     if (claimError) {
+      await recordOperationalEvent(sb, {
+        source: "background_job",
+        component: "job-worker",
+        eventType: "claim_failed",
+        severity: "error",
+        message: claimError.message,
+        statusCode: 500,
+        createAlert: true,
+        alertType: "background_job_claim_failure",
+        alertTitle: "Background job claim failed",
+        alertDedupeKey: "job-worker:claim-failed",
+      });
       return json({ success: false, error: claimError.message }, 500);
     }
 
@@ -237,6 +310,19 @@ serve(async (req) => {
           p_retry_delay_seconds: 0,
           p_force_terminal: true,
         });
+        await recordOperationalEvent(sb, {
+          source: "background_job",
+          component: "job-worker",
+          eventType: "unknown_job_type",
+          severity: "error",
+          message: `Unknown job type: ${job.type}`,
+          statusCode: 500,
+          jobId: job.id,
+          createAlert: true,
+          alertType: "unknown_background_job_type",
+          alertTitle: "Unknown background job type",
+          alertDedupeKey: `job-worker:unknown:${job.type}`,
+        });
         results.push({ job_id: job.id, type: job.type, failed: true, reason: "unknown job type" });
       } catch (error) {
         const message = error instanceof Error ? error.message : "Unknown job error";
@@ -247,9 +333,40 @@ serve(async (req) => {
           p_retry_delay_seconds: pollDelaySeconds(job.attempt_count),
           p_force_terminal: false,
         });
+        await recordOperationalEvent(sb, {
+          source: "background_job",
+          component: "job-worker",
+          eventType: "job_iteration_failed",
+          severity: "error",
+          message,
+          statusCode: 500,
+          jobId: job.id,
+          createAlert: true,
+          alertType: "background_job_iteration_failure",
+          alertTitle: "Background job processing failed",
+          alertDedupeKey: `job-worker:job-failure:${job.type}`,
+          metadata: {
+            attempt_count: job.attempt_count,
+            max_attempts: job.max_attempts,
+          },
+        });
         results.push({ job_id: job.id, type: job.type, failed: true, reason: message });
       }
     }
+
+    await recordOperationalEvent(sb, {
+      source: "background_job",
+      component: "job-worker",
+      eventType: "worker_run_completed",
+      severity: "info",
+      message: `Worker claimed ${claimedJobs.length} jobs.`,
+      statusCode: 200,
+      metadata: {
+        worker: workerName,
+        claimed: claimedJobs.length,
+        requested_limit: Math.max(1, Math.min(body.limit ?? 10, 50)),
+      },
+    });
 
     return json({
       success: true,
@@ -259,6 +376,27 @@ serve(async (req) => {
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : "Unknown error";
     console.error("Job worker error:", message);
+    try {
+      const supabaseUrl = Deno.env.get("SUPABASE_URL");
+      const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+      if (supabaseUrl && serviceRoleKey) {
+        const sb = createClient(supabaseUrl, serviceRoleKey);
+        await recordOperationalEvent(sb, {
+          source: "background_job",
+          component: "job-worker",
+          eventType: "uncaught_exception",
+          severity: "critical",
+          message,
+          statusCode: 500,
+          createAlert: true,
+          alertType: "job_worker_exception",
+          alertTitle: "Job worker exception",
+          alertDedupeKey: "job-worker:uncaught-exception",
+        });
+      }
+    } catch {
+      // Best effort only.
+    }
     return json({ success: false, error: message }, 500);
   }
 });

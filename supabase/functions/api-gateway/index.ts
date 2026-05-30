@@ -6,6 +6,12 @@ import {
   type SupportedAction,
   VALID_ACTIONS,
 } from "./_shared/unified-executor.ts";
+import {
+  recordOperationalEvent,
+  severityForStatus,
+  shouldAlertForStatus,
+  slowRequestSeverity,
+} from "./_shared/monitoring.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -18,6 +24,12 @@ function json(body: unknown, status = 200) {
     status,
     headers: { ...corsHeaders, "Content-Type": "application/json" },
   });
+}
+
+function asObject(value: unknown) {
+  return value && typeof value === "object" && !Array.isArray(value)
+    ? (value as Record<string, unknown>)
+    : null;
 }
 
 async function sha256(text: string): Promise<string> {
@@ -57,10 +69,32 @@ serve(async (req) => {
       .single();
 
     if (keyErr || !keyRow) {
+      await recordOperationalEvent(sb, {
+        source: "edge_function",
+        component: "api-gateway",
+        eventType: "invalid_api_key",
+        severity: "warning",
+        message: "API gateway request rejected because the supplied API key was invalid.",
+        statusCode: 401,
+        metadata: {
+          ip_address: req.headers.get("x-forwarded-for") ||
+            req.headers.get("cf-connecting-ip") || null,
+        },
+      });
       return json({ error: "Invalid API key" }, 401);
     }
 
     if (!keyRow.is_active) {
+      await recordOperationalEvent(sb, {
+        source: "edge_function",
+        component: "api-gateway",
+        eventType: "inactive_api_key",
+        severity: "warning",
+        message: "API gateway request rejected because the API key is deactivated.",
+        statusCode: 403,
+        apiKeyId: keyRow.id,
+        userId: keyRow.user_id,
+      });
       return json({ error: "API key is deactivated" }, 403);
     }
 
@@ -70,6 +104,20 @@ serve(async (req) => {
     });
 
     if (Number(recentCount ?? 0) >= keyRow.rate_limit) {
+      await recordOperationalEvent(sb, {
+        source: "edge_function",
+        component: "api-gateway",
+        eventType: "rate_limit_exceeded",
+        severity: "warning",
+        message: "API gateway request exceeded the per-minute rate limit.",
+        statusCode: 429,
+        apiKeyId: keyRow.id,
+        userId: keyRow.user_id,
+        metadata: {
+          limit: keyRow.rate_limit,
+          window_seconds: 60,
+        },
+      });
       return json(
         {
           error: "Rate limit exceeded",
@@ -110,6 +158,15 @@ serve(async (req) => {
     });
 
     const elapsedMs = Date.now() - startMs;
+    const outcomeObject = asObject(outcome.body);
+    const normalized = asObject(outcomeObject?.normalized);
+    const state = String(normalized?.state ?? "");
+    const provider = typeof normalized?.provider === "string" ? normalized.provider : undefined;
+    const requestId = typeof normalized?.request_id === "string"
+      ? normalized.request_id
+      : typeof body.request_id === "string"
+      ? body.request_id
+      : undefined;
 
     await sb.from("api_gateway_logs").insert({
       api_key_id: keyRow.id,
@@ -120,6 +177,56 @@ serve(async (req) => {
       ip_address: req.headers.get("x-forwarded-for") ||
         req.headers.get("cf-connecting-ip") || null,
     });
+
+    await recordOperationalEvent(sb, {
+      source: "edge_function",
+      component: "api-gateway",
+      eventType: outcome.status >= 500 ? "request_failed" : "request_processed",
+      severity: severityForStatus(outcome.status),
+      message: typeof normalized?.message === "string"
+        ? normalized.message
+        : `API gateway ${action} request completed with status ${outcome.status}.`,
+      action,
+      statusCode: outcome.status,
+      durationMs: elapsedMs,
+      requestId,
+      userId: keyRow.user_id,
+      apiKeyId: keyRow.id,
+      provider,
+      state,
+      createAlert: shouldAlertForStatus(outcome.status),
+      alertType: "api_gateway_failure",
+      alertTitle: "API gateway request failure",
+      alertDedupeKey: shouldAlertForStatus(outcome.status)
+        ? `api-gateway:${action}:${outcome.status}`
+        : undefined,
+      metadata: {
+        charged: outcome.charged,
+        test_mode: outcome.isTestMode,
+      },
+    });
+
+    if (elapsedMs >= 8000) {
+      await recordOperationalEvent(sb, {
+        source: "edge_function",
+        component: "api-gateway",
+        eventType: "slow_request",
+        severity: slowRequestSeverity(elapsedMs),
+        message: `API gateway ${action} request took ${elapsedMs}ms.`,
+        action,
+        statusCode: outcome.status,
+        durationMs: elapsedMs,
+        requestId,
+        userId: keyRow.user_id,
+        apiKeyId: keyRow.id,
+        provider,
+        state,
+        createAlert: elapsedMs >= 15000,
+        alertType: "slow_api_request",
+        alertTitle: "Slow API gateway request",
+        alertDedupeKey: elapsedMs >= 15000 ? `api-gateway:slow:${action}` : undefined,
+      });
+    }
 
     await sb
       .from("api_keys")
@@ -133,6 +240,27 @@ serve(async (req) => {
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : "Internal error";
     console.error("API Gateway error:", msg);
+    try {
+      const supabaseUrl = Deno.env.get("SUPABASE_URL");
+      const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+      if (supabaseUrl && serviceRoleKey) {
+        const sb = createClient(supabaseUrl, serviceRoleKey);
+        await recordOperationalEvent(sb, {
+          source: "edge_function",
+          component: "api-gateway",
+          eventType: "uncaught_exception",
+          severity: "critical",
+          message: msg,
+          statusCode: 500,
+          createAlert: true,
+          alertType: "api_gateway_exception",
+          alertTitle: "API gateway exception",
+          alertDedupeKey: "api-gateway:uncaught-exception",
+        });
+      }
+    } catch {
+      // Best effort only.
+    }
     return json({ error: msg }, 500);
   }
 });

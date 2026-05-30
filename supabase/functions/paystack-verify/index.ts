@@ -1,5 +1,11 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import {
+  recordOperationalEvent,
+  severityForStatus,
+  shouldAlertForStatus,
+  slowRequestSeverity,
+} from "./_shared/monitoring.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -21,6 +27,7 @@ serve(async (req) => {
   }
 
   try {
+    const startMs = Date.now();
     const secretKey = Deno.env.get("PAYSTACK_SECRET_KEY");
     const supabaseUrl = Deno.env.get("SUPABASE_URL");
     const anonKey = Deno.env.get("SUPABASE_ANON_KEY");
@@ -78,6 +85,29 @@ serve(async (req) => {
 
     if (!verifyRes.ok) {
       const errorText = await verifyRes.text();
+      await recordOperationalEvent(serviceClient, {
+        source: "edge_function",
+        component: "paystack-verify",
+        eventType: "paystack_http_failure",
+        severity: severityForStatus(verifyRes.status),
+        message: `Paystack verify returned HTTP ${verifyRes.status}.`,
+        action: "wallet_top_up_verify",
+        statusCode: verifyRes.status,
+        durationMs: Date.now() - startMs,
+        requestId: reference,
+        userId: user.id,
+        provider: "paystack",
+        createAlert: shouldAlertForStatus(verifyRes.status),
+        alertType: "paystack_verify_failure",
+        alertTitle: "Paystack verification failed",
+        alertDedupeKey: shouldAlertForStatus(verifyRes.status)
+          ? `paystack-verify:http:${verifyRes.status}`
+          : undefined,
+        metadata: {
+          reference,
+          details: errorText.substring(0, 300),
+        },
+      });
       return json({
         success: false,
         error: `Paystack API returned HTTP ${verifyRes.status}`,
@@ -87,6 +117,25 @@ serve(async (req) => {
 
     const verifyData = await verifyRes.json();
     if (!verifyData.status || verifyData.data?.status !== "success") {
+      await recordOperationalEvent(serviceClient, {
+        source: "edge_function",
+        component: "paystack-verify",
+        eventType: "payment_not_successful",
+        severity: "warning",
+        message: "Paystack verification completed but the payment was not successful.",
+        action: "wallet_top_up_verify",
+        statusCode: 400,
+        durationMs: Date.now() - startMs,
+        requestId: reference,
+        userId: user.id,
+        provider: "paystack",
+        state: String(verifyData.data?.status ?? "unknown"),
+        metadata: {
+          reference,
+          paystack_status: verifyData.data?.status ?? null,
+          paystack_message: verifyData.message ?? null,
+        },
+      });
       return json({
         success: false,
         error: "Payment not successful.",
@@ -103,6 +152,23 @@ serve(async (req) => {
     )?.value;
 
     if (metadataUserId && metadataUserId !== user.id) {
+      await recordOperationalEvent(serviceClient, {
+        source: "edge_function",
+        component: "paystack-verify",
+        eventType: "payment_owner_mismatch",
+        severity: "warning",
+        message: "Wallet top-up verification was rejected because the payment belonged to another account.",
+        action: "wallet_top_up_verify",
+        statusCode: 403,
+        durationMs: Date.now() - startMs,
+        requestId: reference,
+        userId: user.id,
+        provider: "paystack",
+        metadata: {
+          reference,
+          metadata_user_id: metadataUserId,
+        },
+      });
       return json({
         success: false,
         error: "This payment reference does not belong to the current account.",
@@ -111,6 +177,24 @@ serve(async (req) => {
 
     const customerEmail = verifyData.data?.customer?.email;
     if (!metadataUserId && customerEmail && user.email && customerEmail !== user.email) {
+      await recordOperationalEvent(serviceClient, {
+        source: "edge_function",
+        component: "paystack-verify",
+        eventType: "payment_email_mismatch",
+        severity: "warning",
+        message: "Wallet top-up verification was rejected because the payment email belonged to another account.",
+        action: "wallet_top_up_verify",
+        statusCode: 403,
+        durationMs: Date.now() - startMs,
+        requestId: reference,
+        userId: user.id,
+        provider: "paystack",
+        metadata: {
+          reference,
+          customer_email: customerEmail,
+          user_email: user.email,
+        },
+      });
       return json({
         success: false,
         error: "This payment reference does not belong to the current account.",
@@ -129,9 +213,70 @@ serve(async (req) => {
     );
 
     if (walletError || !walletResult?.success) {
+      await recordOperationalEvent(serviceClient, {
+        source: "edge_function",
+        component: "paystack-verify",
+        eventType: "wallet_credit_failed",
+        severity: "error",
+        message: walletError?.message || walletResult?.message || "Failed to credit wallet.",
+        action: "wallet_top_up_verify",
+        statusCode: 500,
+        durationMs: Date.now() - startMs,
+        requestId: verifyData.data.reference,
+        userId: user.id,
+        provider: "paystack",
+        createAlert: true,
+        alertType: "wallet_credit_failure",
+        alertTitle: "Wallet credit failed after payment verification",
+        alertDedupeKey: "paystack-verify:wallet-credit-failed",
+        metadata: {
+          reference: verifyData.data.reference,
+          amount: amountInNaira,
+        },
+      });
       return json({
         success: false,
         error: walletError?.message || walletResult?.message || "Failed to credit wallet.",
+      });
+    }
+
+    const durationMs = Date.now() - startMs;
+    await recordOperationalEvent(serviceClient, {
+      source: "edge_function",
+      component: "paystack-verify",
+      eventType: "payment_verified",
+      severity: "info",
+      message: "Wallet top-up payment verified successfully.",
+      action: "wallet_top_up_verify",
+      statusCode: 200,
+      durationMs,
+      requestId: verifyData.data.reference,
+      userId: user.id,
+      provider: "paystack",
+      state: walletResult?.already_processed ? "already_processed" : "credited",
+      metadata: {
+        amount: amountInNaira,
+        already_processed: !!walletResult?.already_processed,
+      },
+    });
+
+    if (durationMs >= 8000) {
+      await recordOperationalEvent(serviceClient, {
+        source: "edge_function",
+        component: "paystack-verify",
+        eventType: "slow_payment_verification",
+        severity: slowRequestSeverity(durationMs),
+        message: `Wallet top-up verification took ${durationMs}ms.`,
+        action: "wallet_top_up_verify",
+        statusCode: 200,
+        durationMs,
+        requestId: verifyData.data.reference,
+        userId: user.id,
+        provider: "paystack",
+        createAlert: durationMs >= 15000,
+        alertType: "slow_paystack_verification",
+        alertTitle: "Slow Paystack verification",
+        alertDedupeKey: durationMs >= 15000 ? "paystack-verify:slow" : undefined,
       });
     }
 
@@ -148,6 +293,27 @@ serve(async (req) => {
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : "Unknown error";
     console.error("Paystack verify error:", message);
+    try {
+      const supabaseUrl = Deno.env.get("SUPABASE_URL");
+      const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+      if (supabaseUrl && serviceRoleKey) {
+        const serviceClient = createClient(supabaseUrl, serviceRoleKey);
+        await recordOperationalEvent(serviceClient, {
+          source: "edge_function",
+          component: "paystack-verify",
+          eventType: "uncaught_exception",
+          severity: "critical",
+          message,
+          statusCode: 500,
+          createAlert: true,
+          alertType: "paystack_verify_exception",
+          alertTitle: "Paystack verification exception",
+          alertDedupeKey: "paystack-verify:uncaught-exception",
+        });
+      }
+    } catch {
+      // Best effort only.
+    }
     return json({ success: false, error: message });
   }
 });
