@@ -56,6 +56,17 @@ const ENDPOINTS = [
       category: "new",
       success: true,
       nin: "12345678901",
+      normalized: {
+        action: "validate",
+        phase: "submit",
+        state: "succeeded",
+        message: "Validation Submission Successfull",
+        tracking_id: "CKW49TGENXXXXXX",
+        nin: "12345678901",
+        charged: true,
+        provider: "robosttech",
+        http_status: 200,
+      },
     },
   },
   {
@@ -76,21 +87,31 @@ const ENDPOINTS = [
     id: "clearance",
     name: "Clearance",
     method: "POST",
-    description: "Submit a NIN for clearance processing.",
+    description: "Submit a tracking ID for clearance processing.",
     price: API_ACTION_PRICES.clearance,
     body: { action: "clearance", tracking_id: "CKW49TGENXXXXXX" },
     response: {
       message: "Clearance Submission Successfull",
       approved: true,
       success: true,
-      nin: "12345678901",
+      tracking_id: "CKW49TGENXXXXXX",
+      normalized: {
+        action: "clearance",
+        phase: "submit",
+        state: "submitted",
+        message: "Clearance Submission Successfull",
+        tracking_id: "CKW49TGENXXXXXX",
+        charged: true,
+        provider: "robosttech",
+        http_status: 200,
+      },
     },
   },
   {
     id: "clearance_status",
     name: "Clearance Status",
     method: "POST",
-    description: "Check the status of a previously submitted clearance request.",
+    description: "Check the status of a previously submitted clearance request using its tracking ID.",
     price: API_ACTION_PRICES.clearance_status,
     body: { action: "clearance_status", tracking_id: "CKW49TGENXXXXXX" },
     response: {
@@ -112,6 +133,16 @@ const ENDPOINTS = [
       category: "to_get_slip",
       success: true,
       tracking_id: "CKW49TGENXXXXXX",
+      normalized: {
+        action: "personalization",
+        phase: "submit",
+        state: "succeeded",
+        message: "Personalization Submission Successfull",
+        tracking_id: "CKW49TGENXXXXXX",
+        charged: true,
+        provider: "robosttech",
+        http_status: 200,
+      },
     },
   },
   {
@@ -405,15 +436,19 @@ export default function ApiDocs() {
   // Map role → dashboard path with api-keys tab hash
   const apiKeysPath = (() => {
     if (!user) return "/auth";
+    if (role === "user") return "/dashboard/user/api-keys";
     const base = role === "admin" ? "/dashboard/admin"
       : role === "staff" ? "/dashboard/staff"
-      : role === "vip" ? "/dashboard/vip"
-      : "/dashboard/user";
+      : "/dashboard/vip";
     return `${base}?tab=api-keys`;
   })();
 
   const handleGetApiKey = () => {
     if (!user) { navigate("/auth"); return; }
+    if (role === "user") {
+      navigate("/dashboard/user/api-keys");
+      return;
+    }
     const base = role === "admin" ? "/dashboard/admin"
       : role === "staff" ? "/dashboard/staff"
       : role === "vip" ? "/dashboard/vip"
@@ -427,7 +462,7 @@ export default function ApiDocs() {
     let cancelled = false;
 
     const checkAccess = async () => {
-      if (role === "admin") {
+      if (role === "admin" || role === "user") {
         if (!cancelled) {
           setHasAccess(true);
           setAccessLoading(false);
@@ -447,7 +482,7 @@ export default function ApiDocs() {
       setHasAccess(allowed);
       setAccessLoading(false);
 
-      if (!allowed) {
+      if (!allowed && role !== "user") {
         navigate("/dashboard", { replace: true });
       }
     };

@@ -358,7 +358,7 @@ export default function Auth() {
             </div>
             <CardTitle className="text-xl sm:text-2xl font-bold">Account Created!</CardTitle>
             <CardDescription className="text-xs sm:text-sm">
-              Welcome to SparkID, your account is ready to use.
+              Welcome to SparkID.
             </CardDescription>
           </CardHeader>
           <CardContent className="p-4 sm:p-6 text-center space-y-4">
@@ -509,7 +509,7 @@ export default function Auth() {
                 </Button>
 
                 <p className="text-center text-xs text-slate-500 dark:text-slate-400">
-                  Use the same email you use for wallet funding and verification requests.
+                  Sign in with the email linked to your account.
                 </p>
               </form>
             </TabsContent>
@@ -563,7 +563,7 @@ export default function Auth() {
                 </Button>
 
                 <p className="text-center text-xs text-slate-500 dark:text-slate-400">
-                  You can update your profile, security settings, and notifications after signup.
+                  You can update your profile and security settings after signup.
                 </p>
               </form>
             </TabsContent>

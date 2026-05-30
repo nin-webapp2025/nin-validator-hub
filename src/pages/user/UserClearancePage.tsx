@@ -15,7 +15,7 @@ export default function UserClearancePage() {
     <UserJourneyPage
       eyebrow="Clearance Flow"
       title="Clearance"
-      description="Run clearance checks as a guided journey with a dedicated page for request submission, monitoring, and history."
+      description="Run clearance checks, track the status, and review recent activity from one page."
       steps={[
         {
           id: "request",
@@ -35,7 +35,7 @@ export default function UserClearancePage() {
           id: "review",
           label: "Review charge",
           title: "Keep the wallet ready for more requests",
-          description: "Clearance runs remain wallet-funded so you can price and monitor the workflow in one place.",
+          description: "Clearance requests remain wallet-funded, with pricing shown clearly before submission.",
           content: (
             <Card className="border-slate-200 dark:border-slate-700">
               <CardHeader>
@@ -48,9 +48,7 @@ export default function UserClearancePage() {
                 <p>
                   Each clearance request currently uses <strong>{formatNaira(OPERATION_PRICES.clearance)}</strong> from the wallet.
                 </p>
-                <p>
-                  Fund the wallet before repeated checks so you can stay inside the same flow instead of bouncing between tabs.
-                </p>
+                <p>Fund the wallet before repeated checks to avoid interruptions.</p>
                 <Button type="button" variant="outline" onClick={() => navigate("/dashboard/user/wallet")}>
                   Open wallet
                 </Button>
@@ -62,7 +60,7 @@ export default function UserClearancePage() {
           id: "history",
           label: "Recent requests",
           title: "Review your recent clearance activity",
-          description: "Stay on the same routed page while checking what has already been submitted.",
+          description: "Review what has already been submitted and export records when needed.",
           content: <ClearanceHistory />,
         },
       ]}

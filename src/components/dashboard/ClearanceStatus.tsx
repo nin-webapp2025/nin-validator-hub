@@ -40,7 +40,7 @@ export default function ClearanceStatus() {
 
     try {
       const { data, error } = await supabase.functions.invoke("robosttech-api", {
-        body: { action: "clearance_status", trackingId },
+        body: { action: "clearance_status", tracking_id: trackingId },
       });
 
       if (error) throw error;
@@ -75,12 +75,14 @@ export default function ClearanceStatus() {
   const getStatusIcon = (status: string) => {
     if (status === "completed") return <CheckCircle className="h-5 w-5 text-green-600" />;
     if (status === "pending" || status === "in-progress") return <Clock className="h-5 w-5 text-yellow-600" />;
+    if (status === "submitted" || status === "unknown") return <Clock className="h-5 w-5 text-blue-600" />;
     return <XCircle className="h-5 w-5 text-red-600" />;
   };
 
   const getStatusColor = (status: string) => {
     if (status === "completed") return "border-green-200 bg-green-50";
     if (status === "pending" || status === "in-progress") return "border-yellow-200 bg-yellow-50";
+    if (status === "submitted" || status === "unknown") return "border-blue-200 bg-blue-50";
     return "border-red-200 bg-red-50";
   };
 

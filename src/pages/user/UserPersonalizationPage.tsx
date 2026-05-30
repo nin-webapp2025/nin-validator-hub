@@ -15,20 +15,20 @@ export default function UserPersonalizationPage() {
     <UserJourneyPage
       eyebrow="Fulfillment Flow"
       title="Personalization"
-      description="Handle personalization requests through a dedicated page journey with clear steps for submission, tracking, and repeat activity."
+      description="Submit personalization requests, check their status, and review recent activity from one page."
       steps={[
         {
           id: "request",
           label: "Submit request",
           title: "Start a personalization request",
-          description: "Enter the required details for the personalization workflow without competing with other tools on the page.",
+          description: "Enter the required details for the personalization request.",
           content: <Personalization />,
         },
         {
           id: "status",
           label: "Track status",
           title: "Monitor personalization progress",
-          description: "Check the request state from the same page as part of a full user journey.",
+          description: "Check the current status of the request.",
           content: <PersonalizationStatus />,
         },
         {
@@ -59,7 +59,7 @@ export default function UserPersonalizationPage() {
           id: "history",
           label: "Recent activity",
           title: "Review recent personalization requests",
-          description: "Check what has already been submitted and export records as needed.",
+          description: "Review submitted requests and export records when needed.",
           content: <PersonalizationHistory />,
         },
       ]}

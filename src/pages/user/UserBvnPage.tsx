@@ -14,7 +14,7 @@ export default function UserBvnPage() {
     <UserJourneyPage
       eyebrow="Verification Flow"
       title="BVN Verification"
-      description="Work through BVN verification on its own routed page with dedicated steps for request entry, pricing review, and history."
+      description="Submit BVN verification requests, review pricing, and track recent activity from one page."
       steps={[
         {
           id: "verify",
@@ -40,9 +40,7 @@ export default function UserBvnPage() {
                 <p>
                   Each BVN verification deducts <strong>{formatNaira(OPERATION_PRICES.bvn_verification)}</strong> from the wallet.
                 </p>
-                <p>
-                  Keep this page open while you move through the journey so you can review the outcome and history without returning to a parent dashboard.
-                </p>
+                <p>Use the wallet as the payment source for each verification request.</p>
                 <Button type="button" variant="outline" onClick={() => navigate("/dashboard/user/wallet")}>
                   Open wallet
                 </Button>

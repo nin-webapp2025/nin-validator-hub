@@ -8,30 +8,30 @@ export default function UserAirtimePage() {
     <UserJourneyPage
       eyebrow="Payments Flow"
       title="Airtime"
-      description="This page is ready for a fintech-style airtime purchase journey and is already laid out as a dedicated route for the upcoming provider integration."
+      description="Buy airtime for major Nigerian mobile networks from one dedicated page."
       steps={[
         {
           id: "prepare",
           label: "Prepare purchase",
           title: "Choose network and amount",
-          description: "The current page shell is ready to hold the live airtime purchase form as soon as the VTU provider is wired in.",
+          description: "Select the mobile network, phone number, and amount for the airtime purchase.",
           content: <AirtimePurchase />,
         },
         {
           id: "wallet",
-          label: "Wallet readiness",
-          title: "Keep the balance funded for airtime flows",
-          description: "The future live airtime purchase experience should use the wallet like every other fintech flow in the app.",
+          label: "Wallet",
+          title: "Use your wallet for payments",
+          description: "Wallet funding stays central to airtime purchases and other account activity.",
           content: (
             <Card className="border-slate-200 dark:border-slate-700">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-lg">
                   <Wallet className="h-5 w-5 text-blue-600" />
-                  Wallet-first design
+                  Wallet payments
                 </CardTitle>
               </CardHeader>
               <CardContent className="text-sm text-slate-600 dark:text-slate-400">
-                Airtime is still in a pre-live state, but this dedicated route is already structured so the real provider integration can drop into a full page journey instead of a crowded dashboard tab.
+                Keep your wallet funded so purchases and service charges can be managed from one place.
               </CardContent>
             </Card>
           ),

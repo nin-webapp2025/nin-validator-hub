@@ -38,7 +38,7 @@ export default function UserNinSearchPage() {
               <CardContent className="space-y-4 text-sm text-slate-600 dark:text-slate-400">
                 <p>
                   Dashboard search operations use your wallet balance, including demographic lookups at{" "}
-                  <strong>{formatNaira(OPERATION_PRICES.nin_demo)}</strong>.
+                  <strong>{formatNaira(OPERATION_PRICES.nin_verification)}</strong>.
                 </p>
                 <p>
                   Keep the wallet funded and use the correct identifier for the search mode you choose so the experience stays fast and predictable.

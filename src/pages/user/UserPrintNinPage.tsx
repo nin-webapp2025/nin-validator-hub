@@ -13,13 +13,13 @@ export default function UserPrintNinPage() {
     <UserJourneyPage
       eyebrow="Fulfillment Flow"
       title="Print NIN"
-      description="Handle NIN slip printing inside a dedicated service page so the journey feels closer to a modern fintech task flow."
+      description="Generate and print NIN slips from one dedicated page."
       steps={[
         {
           id: "request",
           label: "Print request",
           title: "Prepare and submit the print request",
-          description: "Use the full print tool without sharing space with unrelated dashboard content.",
+          description: "Enter the required details and generate the print request.",
           content: <PrintNinSlip />,
         },
         {
@@ -40,9 +40,7 @@ export default function UserPrintNinPage() {
                   Printing currently uses either <strong>{formatNaira(OPERATION_PRICES.print_nin_slip_premium)}</strong> for premium slips or{" "}
                   <strong>{formatNaira(OPERATION_PRICES.print_nin_slip_long)}</strong> for long slips.
                 </p>
-                <p>
-                  If you need to add funds before printing, jump to the wallet and come right back into this routed page.
-                </p>
+                <p>If you need to add funds before printing, top up your wallet and return here.</p>
                 <Button type="button" variant="outline" onClick={() => navigate("/dashboard/user/wallet")}>
                   Open wallet
                 </Button>

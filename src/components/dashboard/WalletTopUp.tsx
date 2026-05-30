@@ -237,23 +237,15 @@ export function WalletTopUp() {
 
         // ── Path A: Edge function returned successfully ──
         if (!error && verifyData?.success) {
-          const result = await creditWallet(user!.id, verifyData.amount, reference);
-          if (result.success) {
-            clearPendingPayment();
-            setPendingPayment(null);
-            toast({
-              title: "Wallet Funded!",
-              description: `${formatNaira(verifyData.amount)} added to your wallet. Balance: ${formatNaira(result.balance)}`,
-            });
-            setAmount("");
-            setPayKey((k) => k + 1);
-          } else {
-            toast({
-              title: "Credit Error",
-              description: "Payment verified but wallet credit failed. Contact support. Ref: " + reference,
-              variant: "destructive",
-            });
-          }
+          clearPendingPayment();
+          setPendingPayment(null);
+          window.dispatchEvent(new Event("wallet-updated"));
+          toast({
+            title: verifyData.already_processed ? "Payment Already Applied" : "Wallet Funded!",
+            description: `${formatNaira(verifyData.amount)} is available in your wallet. Balance: ${formatNaira(verifyData.balance ?? 0)}`,
+          });
+          setAmount("");
+          setPayKey((k) => k + 1);
           return;
         }
 

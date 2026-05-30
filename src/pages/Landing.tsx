@@ -58,14 +58,14 @@ export default function Landing() {
     {
       icon: CreditCard,
       title: "BVN Verification",
-      description: "Verify Bank Verification Numbers instantly. Get comprehensive identity details with basic and advanced BVN validation options for banking and financial services.",
+      description: "Verify Bank Verification Numbers instantly and retrieve identity details for banking and financial workflows.",
       color: "bg-emerald-500",
       lightBg: "bg-emerald-50 dark:bg-emerald-950/30",
     },
     {
       icon: FileSearch,
       title: "NIN Personalization",
-      description: "Generate personalized NIN slips with custom data. Perfect for creating identification documents with tracking and status monitoring.",
+      description: "Generate personalized NIN slips and track each request from submission to completion.",
       color: "bg-purple-500",
       lightBg: "bg-purple-50 dark:bg-purple-950/30",
     },
@@ -86,7 +86,7 @@ export default function Landing() {
     {
       icon: BarChart3,
       title: "Usage Analytics",
-      description: "Monitor your usage, track validation success rates, and view detailed history with charts. Stay on top of your verification operations.",
+      description: "Monitor usage, track validation activity, and review detailed account history in one place.",
       color: "bg-indigo-500",
       lightBg: "bg-indigo-50 dark:bg-indigo-950/30",
     },

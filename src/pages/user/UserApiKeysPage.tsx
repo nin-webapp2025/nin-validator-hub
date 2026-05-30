@@ -15,7 +15,7 @@ export default function UserApiKeysPage() {
             API Keys
           </CardTitle>
           <CardDescription>
-            Generate, rotate, and manage developer keys from a dedicated account page instead of a crowded dashboard tab.
+            Generate, rotate, and manage developer keys from one dedicated page.
           </CardDescription>
         </CardHeader>
       </Card>

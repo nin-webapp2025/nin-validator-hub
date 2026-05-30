@@ -15,7 +15,7 @@ export default function UserNinValidationPage() {
     <UserJourneyPage
       eyebrow="Verification Flow"
       title="NIN Validation"
-      description="Run a focused NIN validation flow with clear steps for submitting details, confirming the charge, checking processing status, and reviewing your recent requests."
+      description="Submit NIN validation requests, check their status, and review recent activity from one page."
       steps={[
         {
           id: "request",
@@ -28,7 +28,7 @@ export default function UserNinValidationPage() {
           id: "review",
           label: "Review charge",
           title: "Confirm the request setup before submission",
-          description: "Keep your wallet funded and make sure the validation request matches the user journey you intend to run.",
+          description: "Keep your wallet funded and confirm the validation details before submission.",
           content: (
             <Card className="border-slate-200 dark:border-slate-700">
               <CardHeader>
@@ -44,7 +44,7 @@ export default function UserNinValidationPage() {
                 <ul className="space-y-2">
                   <li>Use a valid 11-digit NIN and make sure the wallet is funded before submission.</li>
                   <li>Status checks happen separately, so you can submit now and track the request in the next step.</li>
-                  <li>Your recent validations remain accessible from this page without going back to a master dashboard.</li>
+                  <li>Your recent validations remain accessible from this page.</li>
                 </ul>
                 <Button type="button" variant="outline" onClick={() => navigate("/dashboard/user/wallet")}>
                   Open wallet
@@ -57,7 +57,7 @@ export default function UserNinValidationPage() {
           id: "status",
           label: "Track status",
           title: "Check the validation processing state",
-          description: "Use the same page journey to confirm whether the submitted validation has completed.",
+          description: "Check whether the submitted validation has completed.",
           content: <ValidationStatus />,
         },
         {

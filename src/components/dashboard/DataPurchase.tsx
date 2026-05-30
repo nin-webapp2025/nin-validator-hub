@@ -68,8 +68,8 @@ export function DataPurchase() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     toast({
-      title: "Data purchase coming soon",
-      description: "The UI is ready. The next step is connecting a live data-bundle provider.",
+      title: "Data purchase unavailable",
+      description: "Data bundle purchases are temporarily unavailable at the moment.",
     });
   };
 
@@ -86,9 +86,6 @@ export function DataPurchase() {
               Pick a network and plan, then activate data bundles from your wallet.
             </CardDescription>
           </div>
-          <Badge variant="outline" className="border-blue-200 bg-blue-50 text-blue-700 dark:border-blue-900 dark:bg-blue-950/40 dark:text-blue-300">
-            Plans UI
-          </Badge>
         </div>
       </CardHeader>
       <CardContent>

@@ -23,6 +23,7 @@ interface ClearanceHistoryProps {
       message?: string;
       approved?: boolean;
       status?: string;
+      tracking_id?: string;
     };
     created_at: string;
   }>;
@@ -98,7 +99,7 @@ export function ClearanceHistory({ history: historyProp, isAdmin }: ClearanceHis
     }
 
     const exportData = history.map(record => ({
-      nin: record.nin,
+      tracking_id: record.response?.tracking_id || record.nin,
       status: record.response?.status || "N/A",
       approved: record.response?.approved ? "Yes" : "No",
       message: record.response?.message || "N/A",
@@ -160,7 +161,7 @@ export function ClearanceHistory({ history: historyProp, isAdmin }: ClearanceHis
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
             <Input
-              placeholder="Search by NIN..."
+              placeholder="Search by tracking ID..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-9 h-9 text-sm dark:bg-slate-900 dark:border-slate-700"
@@ -193,7 +194,7 @@ export function ClearanceHistory({ history: historyProp, isAdmin }: ClearanceHis
                       </div>
                       <div className="flex-1">
                         <p className="font-mono text-sm font-medium text-slate-900 dark:text-slate-100">
-                          NIN: {item.nin}
+                          Tracking ID: {item.response?.tracking_id || item.nin}
                         </p>
                         <div className="flex items-center gap-2 mt-1 flex-wrap">
                           {item.response?.approved !== undefined && (

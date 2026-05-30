@@ -16,7 +16,7 @@ POST https://robosttech.com/api/validation
 
 ### Body Example
 {
-  "nin": "18855414402"
+  "tracking_id": "CKW49TGEN0001D4"
 }
 
 ### Sample Response
@@ -71,7 +71,7 @@ POST https://robosttech.com/api/clearance
   "message": "Clearance Submission Successfull",
   "approved": true,
   "success": true,
-  "nin": "18855414402"
+  "tracking_id": "CKW49TGEN0001D4"
 }
 
 ---
@@ -85,7 +85,7 @@ Headers:
 
 Body Example:
 {
-  "nin": "18855414402"
+  "tracking_id": "CKW49TGEN0001D4"
 }
 
 Sample Response:

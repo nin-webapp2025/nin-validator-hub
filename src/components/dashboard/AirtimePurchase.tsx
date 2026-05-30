@@ -31,8 +31,8 @@ export function AirtimePurchase() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     toast({
-      title: "Airtime purchase coming soon",
-      description: "The dashboard tab is ready. We only need to connect a VTU provider before going live.",
+      title: "Airtime purchase unavailable",
+      description: "Airtime purchases are temporarily unavailable at the moment.",
     });
   };
 
@@ -49,9 +49,6 @@ export function AirtimePurchase() {
               Top up any major Nigerian mobile network from your dashboard.
             </CardDescription>
           </div>
-          <Badge variant="outline" className="border-blue-200 bg-blue-50 text-blue-700 dark:border-blue-900 dark:bg-blue-950/40 dark:text-blue-300">
-            VTU Ready
-          </Badge>
         </div>
       </CardHeader>
       <CardContent>
@@ -120,7 +117,7 @@ export function AirtimePurchase() {
               <span className={cn("inline-flex rounded-full border px-2 py-0.5 text-xs font-semibold", selectedNetwork.accent)}>
                 {selectedNetwork.label}
               </span>
-              <span className="ml-2">Airtime purchase flow will be activated once a VTU provider is connected.</span>
+              <span className="ml-2">Review your selected network before proceeding.</span>
             </p>
           </div>
 
