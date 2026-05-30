@@ -11,7 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { DataDisplayModal } from "@/components/ui/data-display-modal";
 import { trackApiRequest } from "./RateLimitIndicator";
-import { deductWallet, refundWallet } from "@/lib/wallet";
+import { createRequestId } from "@/lib/request-id";
 
 interface BvnFormProps {
   onSuccess?: () => void;
@@ -58,21 +58,11 @@ export function BvnVerification({ onSuccess }: BvnFormProps) {
       }
 
       // Wallet deduction for BVN Verification (₦800)
-      const walletResult = await deductWallet(user.id, "bvn_verification");
-      if (!walletResult.success) {
-        toast({
-          title: "Insufficient Balance",
-          description: walletResult.message || "Please fund your wallet to continue.",
-          variant: "destructive",
-        });
-        setLoading(false);
-        return;
-      }
-
       trackApiRequest();
 
       const { data, error } = await supabase.functions.invoke("robosttech-api", {
         body: { 
+          request_id: createRequestId("bvn"),
           action: "bvn_advance",
           bvn,
           number: bvn
@@ -118,10 +108,6 @@ export function BvnVerification({ onSuccess }: BvnFormProps) {
       console.error("BVN verification error:", error);
 
       // Refund wallet since API call failed
-      if (user?.id) {
-        await refundWallet(user.id, "bvn_verification").catch(console.error);
-      }
-      
       // Save error to database
       try {
         await supabase

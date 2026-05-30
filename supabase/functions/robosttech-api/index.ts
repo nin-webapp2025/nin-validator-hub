@@ -1,223 +1,125 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import {
+  ACTION_TO_WALLET_OPERATION,
+  executeUnifiedAction,
+  type ExecutionRequestBody,
+  type SupportedAction,
+  VALID_ACTIONS,
+} from "./_shared/unified-executor.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers":
+    "authorization, x-client-info, apikey, x-idempotency-key, content-type",
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 
-const ROBOSTTECH_API_URL = "https://robosttech.com/api";
-const PREMBLY_API_URL = "https://api.prembly.com/verification";
+function json(body: unknown, status = 200) {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: { ...corsHeaders, "Content-Type": "application/json" },
+  });
+}
 
-interface RequestBody {
-  action: "validate" | "validation_status" | "personalization" | "personalization_status" | "clearance" | "clearance_status" | "nin_search" | "nin_phone" | "nin_demo" | "nin_basic" | "nin_advance" | "bvn_basic" | "bvn_advance";
-  nin?: string;
-  tracking_id?: string;
-  trackingId?: string;
-  phone?: string;
-  number?: string;
-  bvn?: string;
-  firstname?: string;
-  lastname?: string;
-  middlename?: string;
-  gender?: string;
-  dateOfBirth?: string;
+function addStatusMetadata(body: unknown, status: number) {
+  if (status < 400) return body;
+
+  if (body && typeof body === "object" && !Array.isArray(body)) {
+    return { ...(body as Record<string, unknown>), __upstream_status: status };
+  }
+
+  return { data: body, __upstream_status: status };
 }
 
 serve(async (req) => {
-  // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const robosttechApiKey = Deno.env.get("ROBOSTTECH_API_KEY");
-    const premblyApiKey = Deno.env.get("PREMBLY_API_KEY");
-    
-    const body: RequestBody = await req.json();
-    console.log("Received request:", { action: body.action, body: JSON.stringify(body) });
+    const supabaseUrl = Deno.env.get("SUPABASE_URL");
+    const anonKey = Deno.env.get("SUPABASE_ANON_KEY");
+    const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
 
-    // Determine which API to use based on action
-    const isPrembly = ["nin_basic", "nin_advance", "bvn_basic", "bvn_advance"].includes(body.action);
-    const apiKey = isPrembly ? premblyApiKey : robosttechApiKey;
-    const apiUrl = isPrembly ? PREMBLY_API_URL : ROBOSTTECH_API_URL;
-    
-    console.log(`Using ${isPrembly ? "Prembly" : "RobostTech"} API`);
-    console.log(`API Key exists: ${!!apiKey}`);
-    
-    if (!apiKey) {
-      console.error(`${isPrembly ? "PREMBLY" : "ROBOSTTECH"}_API_KEY not configured`);
-      return new Response(
-        JSON.stringify({ 
-          error: "API key not configured", 
-          success: false,
-          debug: {
-            isPrembly,
-            action: body.action,
-            premblyKeyExists: !!premblyApiKey,
-            robosttechKeyExists: !!robosttechApiKey
-          }
-        }),
-        {
-          status: 200,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        }
-      );
+    if (!supabaseUrl || !anonKey || !serviceRoleKey) {
+      return json({
+        error: "Supabase environment is not configured.",
+        success: false,
+      });
     }
 
-    let endpoint = "";
-    let method = "POST";
-    let requestBody: Record<string, unknown> | null = null;
-    let headers: Record<string, string> = {
-      "Content-Type": "application/json",
-    };
+    const serviceClient = createClient(supabaseUrl, serviceRoleKey);
+    const body: ExecutionRequestBody = await req.json();
+    const idempotencyKey = req.headers.get("x-idempotency-key")?.trim();
+    if (idempotencyKey && !body.request_id && !body.idempotency_key) {
+      body.request_id = idempotencyKey;
+    }
+    const action = String(body.action ?? "") as SupportedAction;
 
-    switch (body.action) {
-      case "validate":
-        endpoint = "/validation";
-        requestBody = { nin: body.nin };
-        headers["api-key"] = apiKey!;
-        break;
-      case "validation_status":
-        endpoint = "/validation_status";
-        requestBody = { nin: body.nin };
-        headers["api-key"] = apiKey!;
-        break;
-      case "personalization":
-        endpoint = "/personalization";
-        requestBody = { tracking_id: body.tracking_id };
-        headers["api-key"] = apiKey!;
-        break;
-      case "personalization_status":
-        endpoint = "/personalization_status";
-        requestBody = { tracking_id: body.tracking_id };
-        headers["api-key"] = apiKey!;
-        break;
-      case "clearance":
-        endpoint = "/clearance";
-        requestBody = { trackingId: body.trackingId || body.tracking_id };
-        headers["api-key"] = apiKey!;
-        break;
-      case "clearance_status":
-        endpoint = "/clearance_status";
-        requestBody = { trackingId: body.trackingId || body.tracking_id };
-        headers["api-key"] = apiKey!;
-        break;
-      case "nin_search":
-        endpoint = "/nin_search";
-        requestBody = { nin: body.nin };
-        headers["api-key"] = apiKey!;
-        break;
-      case "nin_phone":
-        endpoint = "/nin_phone";
-        requestBody = { phone: body.phone };
-        headers["api-key"] = apiKey!;
-        break;
-      case "nin_demo":
-        endpoint = "/nin_demo";
-        requestBody = {
-          firstname: body.firstname,
-          lastname: body.lastname,
-          middlename: body.middlename ?? "",
-          gender: body.gender,
-          dateOfBirth: body.dateOfBirth,
-        };
-        headers["api-key"] = apiKey!;
-        break;
-      case "nin_basic":
-        endpoint = "/vnin-basic";
-        requestBody = { number: body.nin || body.number };
-        headers["X-Api-Key"] = apiKey!;
-        headers["content-type"] = "application/json";
-        headers["accept"] = "application/json";
-        break;
-      case "nin_advance":
-        endpoint = "/nin_advance";
-        requestBody = { number: body.nin || body.number };
-        headers["X-Api-Key"] = apiKey!;
-        headers["content-type"] = "application/json";
-        headers["accept"] = "application/json";
-        console.log("NIN Advance Request:", {
-          url: `${PREMBLY_API_URL}${endpoint}`,
-          headers: { ...headers, "X-Api-Key": "***" },
-          body: requestBody
-        });
-        break;
-      case "bvn_basic":
-        endpoint = "/bvn_validation";
-        requestBody = { number: body.bvn || body.number };
-        headers["X-Api-Key"] = apiKey!;
-        headers["content-type"] = "application/json";
-        headers["accept"] = "application/json";
-        break;
-      case "bvn_advance":
-        endpoint = "/bvn";
-        requestBody = { number: body.bvn || body.number };
-        headers["X-Api-Key"] = apiKey!;
-        headers["content-type"] = "application/json";
-        headers["accept"] = "application/json";
-        break;
-      default:
-        return new Response(
-          JSON.stringify({ error: "Invalid action" }),
+    if (!VALID_ACTIONS.has(action)) {
+      return json({ error: "Invalid action", success: false }, 400);
+    }
+
+    let authenticatedUserId: string | null = null;
+    const walletOperation = ACTION_TO_WALLET_OPERATION[action];
+
+    if (walletOperation) {
+      const authHeader = req.headers.get("Authorization");
+      if (!authHeader) {
+        return json(
           {
-            status: 400,
-            headers: { ...corsHeaders, "Content-Type": "application/json" },
-          }
+            success: false,
+            error: "Authentication required. Please sign in and try again.",
+          },
+          401,
         );
-    }
-
-    console.log(`Making request to ${apiUrl}${endpoint}`);
-    console.log("Request body:", JSON.stringify(requestBody));
-
-    const response = await fetch(`${apiUrl}${endpoint}`, {
-      method,
-      headers,
-      body: JSON.stringify(requestBody),
-    });
-
-    const raw = await response.text();
-    console.log("Raw response:", raw.substring(0, 500));
-    
-    let data: unknown = null;
-    try {
-      data = raw ? JSON.parse(raw) : null;
-    } catch {
-      data = { success: false, error: "Upstream returned invalid JSON", raw };
-    }
-
-    console.log("API response status:", response.status);
-    console.log("API response data:", JSON.stringify(data).substring(0, 500));
-
-    // Supabase `functions.invoke` treats non-2xx as exceptions. For upstream 4xx (business errors like
-    // insufficient balance), return 200 so the client can handle the payload without a hard error.
-    const outgoingStatus = response.status >= 400 && response.status < 500 ? 200 : response.status;
-
-    if (outgoingStatus !== response.status) {
-      if (data && typeof data === "object" && !Array.isArray(data)) {
-        (data as Record<string, unknown>).__upstream_status = response.status;
-      } else {
-        data = { data, __upstream_status: response.status };
       }
+
+      const userClient = createClient(supabaseUrl, anonKey, {
+        global: { headers: { Authorization: authHeader } },
+      });
+
+      const {
+        data: { user },
+        error: authError,
+      } = await userClient.auth.getUser();
+
+      if (authError || !user) {
+        return json(
+          {
+            success: false,
+            error: "Unable to verify your session. Please sign in again.",
+          },
+          401,
+        );
+      }
+
+      authenticatedUserId = user.id;
     }
 
-    return new Response(JSON.stringify(data), {
-      status: outgoingStatus,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    const outcome = await executeUnifiedAction({
+      action,
+      body,
+      serviceClient,
+      billingUserId: authenticatedUserId,
     });
+
+    if (outcome.status >= 400) {
+      return json(addStatusMetadata(outcome.body, outcome.status), 200);
+    }
+
+    return json(outcome.body, outcome.status);
   } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : "Unknown error";
+    const errorMessage = error instanceof Error
+      ? error.message
+      : "Unknown error";
     console.error("Edge function error:", errorMessage);
-    console.error("Error stack:", error instanceof Error ? error.stack : "No stack trace");
-    return new Response(
-      JSON.stringify({ 
-        error: "Internal server error", 
-        message: errorMessage,
-        success: false 
-      }),
-      {
-        status: 200, // Return 200 so client can handle gracefully
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      }
-    );
+
+    return json({
+      error: "Internal server error",
+      message: errorMessage,
+      success: false,
+    });
   }
 });

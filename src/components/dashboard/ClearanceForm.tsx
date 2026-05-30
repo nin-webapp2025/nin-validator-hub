@@ -8,7 +8,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { Loader2, ShieldCheck, Copy, CheckCircle } from "lucide-react";
 import { z } from "zod";
 import { useAuth } from "@/hooks/useAuth";
-import { deductWallet, refundWallet } from "@/lib/wallet";
+import { createRequestId } from "@/lib/request-id";
+import { enqueueProviderStatusPoll } from "@/lib/background-jobs";
 
 const trackingIdSchema = z.string().length(15, "Tracking ID must be exactly 15 characters");
 
@@ -47,19 +48,12 @@ export default function ClearanceForm({ onSuccess }: { onSuccess?: () => void })
       }
 
       // Wallet deduction for Clearance (₦3,000)
-      const walletResult = await deductWallet(user.id, "clearance");
-      if (!walletResult.success) {
-        toast({
-          title: "Insufficient Balance",
-          description: walletResult.message || "Please fund your wallet to continue.",
-          variant: "destructive",
-        });
-        setLoading(false);
-        return;
-      }
-
       const { data, error } = await supabase.functions.invoke("robosttech-api", {
-        body: { action: "clearance", trackingId },
+        body: {
+          request_id: createRequestId("clearance"),
+          action: "clearance",
+          tracking_id: trackingId,
+        },
       });
 
       if (error) throw error;
@@ -75,13 +69,26 @@ export default function ClearanceForm({ onSuccess }: { onSuccess?: () => void })
 
         // Save to clearance history
         const { data: { user } } = await supabase.auth.getUser();
+        let historyId: string | undefined;
         if (user) {
-          await supabase.from("clearance_history").insert({
+          const { data: historyRow } = await supabase.from("clearance_history").insert({
             user_id: user.id,
             nin: trackingId,
             response: data,
-            status: "success",
-          });
+            status: data.status || "success",
+          }).select("id").single();
+          historyId = historyRow?.id;
+
+          await enqueueProviderStatusPoll(
+            {
+              user_id: user.id,
+              action: "clearance_status",
+              history_table: "clearance_history",
+              history_id: historyId,
+              tracking_id: trackingId,
+            },
+            `clearance-status:${user.id}:${trackingId}:${historyId ?? "latest"}`,
+          );
         }
 
         onSuccess?.();
@@ -94,10 +101,6 @@ export default function ClearanceForm({ onSuccess }: { onSuccess?: () => void })
       }
     } catch (error: any) {
       console.error("Clearance error:", error);
-      // Refund wallet since API call failed
-      if (user?.id) {
-        await refundWallet(user.id, "clearance").catch(console.error);
-      }
       toast({
         title: "Error",
         description: error.message || "An unexpected error occurred.",
@@ -163,8 +166,14 @@ export default function ClearanceForm({ onSuccess }: { onSuccess?: () => void })
               </div>
               {result.approved !== undefined && (
                 <div className="flex justify-between items-center">
-                  <span className="text-sm font-medium">Approved:</span>
-                  <span className="text-sm">{result.approved ? "Yes" : "No"}</span>
+                <span className="text-sm font-medium">Approved:</span>
+                <span className="text-sm">{result.approved ? "Yes" : "No"}</span>
+              </div>
+              )}
+              {result.status && (
+                <div className="flex justify-between items-center">
+                  <span className="text-sm font-medium">Status:</span>
+                  <span className="text-sm capitalize">{result.status}</span>
                 </div>
               )}
               <div className="flex justify-between items-center">

@@ -4,7 +4,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { trackApiRequest } from "@/components/dashboard/RateLimitIndicator";
 import { createNotification } from "@/lib/notifications";
 import { deductCredit } from "@/lib/credits";
-import { deductWallet, refundWallet } from "@/lib/wallet";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,6 +13,8 @@ import { Loader2, Search, CheckCircle, XCircle, Copy, CheckCheck } from "lucide-
 import { FunctionsFetchError, FunctionsHttpError, FunctionsRelayError } from "@supabase/supabase-js";
 import { z } from "zod";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { createRequestId } from "@/lib/request-id";
+import { enqueueProviderStatusPoll } from "@/lib/background-jobs";
 
 const ninSchema = z.string().trim().length(11, "NIN must be exactly 11 digits").regex(/^\d+$/, "NIN must contain only numbers");
 
@@ -75,17 +76,6 @@ export function ValidationForm({ onSuccess }: ValidationFormProps) {
       }
 
       // Wallet deduction for NIN Validation (₦5,000)
-      const walletResult = await deductWallet(user.id, "nin_validation");
-      if (!walletResult.success) {
-        toast({
-          title: "Insufficient Balance",
-          description: walletResult.message || "Please fund your wallet to continue.",
-          variant: "destructive",
-        });
-        setIsValidating(false);
-        return;
-      }
-
       // Credit deduction disabled until payment system is implemented
       // if (user?.id) {
       //   const creditResult = await deductCredit(user.id);
@@ -102,6 +92,7 @@ export function ValidationForm({ onSuccess }: ValidationFormProps) {
 
       const { data, error } = await supabase.functions.invoke("robosttech-api", {
         body: {
+          request_id: createRequestId("validate"),
           action: "validate",
           nin: nin,
           number: nin,
@@ -138,14 +129,16 @@ export function ValidationForm({ onSuccess }: ValidationFormProps) {
       const isSuccess = payload?.status === "success" || payload?.success === true;
 
       // Save to history (including failed/billing responses) – only if logged in
+      let validationHistoryId: string | null = null;
       if (user?.id) {
-        await supabase.from("validation_history").insert({
+        const { data: historyRow } = await supabase.from("validation_history").insert({
           user_id: user.id,
           nin: nin,
           status: isSuccess ? "success" : "failed",
           result: payload,
           tracking_id: payload?.tracking_id || null,
-        });
+        }).select("id").single();
+        validationHistoryId = historyRow?.id ?? null;
       }
 
       // Only show result card for actual validation payloads
@@ -156,6 +149,19 @@ export function ValidationForm({ onSuccess }: ValidationFormProps) {
       }
 
       onSuccess?.();
+
+      if (isSuccess && user?.id) {
+        await enqueueProviderStatusPoll(
+          {
+            user_id: user.id,
+            action: "validation_status",
+            history_table: "validation_history",
+            history_id: validationHistoryId ?? undefined,
+            nin,
+          },
+          `validation-status:${user.id}:${nin}:${validationHistoryId ?? payload?.tracking_id ?? "latest"}`,
+        );
+      }
 
       // Create in-app notification
       createNotification({
@@ -179,6 +185,8 @@ export function ValidationForm({ onSuccess }: ValidationFormProps) {
       const description =
         typeof payload?.message === "string"
           ? payload.message
+          : typeof payload?.error === "string"
+            ? payload.error
           : "NIN validation completed.";
 
       toast({
@@ -227,10 +235,6 @@ export function ValidationForm({ onSuccess }: ValidationFormProps) {
       }
 
       // Refund wallet since API call failed
-      if (user?.id) {
-        await refundWallet(user.id, "nin_validation").catch(console.error);
-      }
-
       toast({
         title: errorTitle,
         description: errorMessage,

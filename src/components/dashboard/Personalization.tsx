@@ -8,7 +8,8 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, UserCheck, CheckCircle, XCircle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { deductWallet, refundWallet } from "@/lib/wallet";
+import { createRequestId } from "@/lib/request-id";
+import { enqueueProviderStatusPoll } from "@/lib/background-jobs";
 
 interface PersonalizationResult {
   message?: string;
@@ -52,19 +53,9 @@ export function Personalization({ onSuccess }: PersonalizationProps) {
       }
 
       // Wallet deduction for Personalization (₦1,500)
-      const walletResult = await deductWallet(user.id, "personalization");
-      if (!walletResult.success) {
-        toast({
-          title: "Insufficient Balance",
-          description: walletResult.message || "Please fund your wallet to continue.",
-          variant: "destructive",
-        });
-        setIsSubmitting(false);
-        return;
-      }
-
       const { data, error } = await supabase.functions.invoke("robosttech-api", {
         body: {
+          request_id: createRequestId("personalization"),
           action: "personalization",
           tracking_id: trackingId,
         },
@@ -73,14 +64,29 @@ export function Personalization({ onSuccess }: PersonalizationProps) {
       if (error) throw error;
 
       // Save to personalization history if logged in
+      let historyId: string | undefined;
       if (user?.id) {
-        await supabase.from("personalization_history").insert({
+        const { data: historyRow } = await supabase.from("personalization_history").insert({
           user_id: user.id,
           nin: "", // Not available at this stage
           tracking_id: trackingId,
           status: data?.success ? "success" : "failed",
           result: data,
-        });
+        }).select("id").single();
+        historyId = historyRow?.id;
+
+        if (data?.success) {
+          await enqueueProviderStatusPoll(
+            {
+              user_id: user.id,
+              action: "personalization_status",
+              history_table: "personalization_history",
+              history_id: historyId,
+              tracking_id: trackingId,
+            },
+            `personalization-status:${user.id}:${trackingId}:${historyId ?? "latest"}`,
+          );
+        }
       }
 
       setResult(data as PersonalizationResult);
@@ -94,9 +100,6 @@ export function Personalization({ onSuccess }: PersonalizationProps) {
       });
     } catch (error: unknown) {
       // Refund wallet since API call failed
-      if (user?.id) {
-        await refundWallet(user.id, "personalization").catch(console.error);
-      }
       toast({
         title: "Error",
         description: error instanceof Error ? error.message : "Failed to submit personalization",

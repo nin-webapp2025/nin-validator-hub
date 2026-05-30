@@ -17,6 +17,7 @@ import {
   AlertCircle
 } from "lucide-react";
 import { exportToCSV } from "@/lib/export";
+import { createRequestId } from "@/lib/request-id";
 
 interface BatchResult {
   nin: string;
@@ -85,6 +86,7 @@ export function BatchValidation() {
     try {
       const { data, error } = await supabase.functions.invoke("robosttech-api", {
         body: {
+          request_id: createRequestId(`batch-validate-${nin}`),
           action: "validate",
           nin: nin,
         },

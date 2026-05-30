@@ -11,8 +11,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DataDisplayModal } from "@/components/ui/data-display-modal";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/hooks/useAuth";
-import { deductWallet, refundWallet } from "@/lib/wallet";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { createRequestId } from "@/lib/request-id";
 
 const ninSchema = z.string().regex(/^\d{11}$/, "NIN must be exactly 11 digits");
 const phoneSchema = z.string().regex(/^0\d{10}$/, "Phone must be 11 digits starting with 0");
@@ -132,18 +132,13 @@ export default function NinSearch() {
         return;
       }
 
-      const walletResult = await deductWallet(user.id, "nin_verification");
-      if (!walletResult.success) {
-        toast({
-          title: "Insufficient Balance",
-          description: walletResult.message || "Please fund your wallet to continue.",
-          variant: "destructive",
-        });
-        return;
-      }
-
       const { data, error } = await supabase.functions.invoke("robosttech-api", {
-        body: { action: "nin_advance", nin, number: nin },
+        body: {
+          request_id: createRequestId("nin-search"),
+          action: "nin_advance",
+          nin,
+          number: nin,
+        },
       });
 
       if (error) throw error;
@@ -171,9 +166,6 @@ export default function NinSearch() {
         description: data.message || "NIN data retrieved successfully.",
       });
     } catch (error: any) {
-      if (user?.id) {
-        await refundWallet(user.id, "nin_verification").catch(console.error);
-      }
       toast({
         title: "Error",
         description: error.message || "An unexpected error occurred.",
@@ -209,18 +201,12 @@ export default function NinSearch() {
         return;
       }
 
-      const walletResult = await deductWallet(user.id, "nin_verification");
-      if (!walletResult.success) {
-        toast({
-          title: "Insufficient Balance",
-          description: walletResult.message || "Please fund your wallet to continue.",
-          variant: "destructive",
-        });
-        return;
-      }
-
       const { data, error } = await supabase.functions.invoke("robosttech-api", {
-        body: { action: "nin_phone", phone },
+        body: {
+          request_id: createRequestId("nin-phone"),
+          action: "nin_phone",
+          phone,
+        },
       });
 
       if (error) throw error;
@@ -241,9 +227,6 @@ export default function NinSearch() {
         description: data.message || "NIN retrieved successfully.",
       });
     } catch (error: any) {
-      if (user?.id) {
-        await refundWallet(user.id, "nin_verification").catch(console.error);
-      }
       toast({
         title: "Error",
         description: error.message || "An unexpected error occurred.",
@@ -284,6 +267,7 @@ export default function NinSearch() {
     try {
       const { data, error } = await supabase.functions.invoke("robosttech-api", {
         body: {
+          request_id: createRequestId("nin-demo"),
           action: "nin_demo",
           firstname: payload.firstname.toUpperCase(),
           lastname: payload.lastname.toUpperCase(),

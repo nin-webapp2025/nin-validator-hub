@@ -1,6 +1,7 @@
 /**
- * Wallet utility — check balance, deduct per-operation cost, credit on top-up.
- * All amounts are in Naira (₦).
+ * Wallet utilities.
+ * Browser code may read wallet state and request a server-side deduction,
+ * but credits and refunds are now restricted to trusted server flows.
  */
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -8,185 +9,90 @@ import {
   DASHBOARD_OPERATION_PRICES,
 } from "../../shared/pricing";
 
-// ─── Pricing per operation (Naira) ───────────────────────────
 export const OPERATION_PRICES = DASHBOARD_OPERATION_PRICES;
-
 export const OPERATION_LABELS = DASHBOARD_OPERATION_LABELS;
 
-// ─── Get wallet balance ──────────────────────────────────────
 export async function getWalletBalance(userId: string): Promise<number> {
-  const { data } = await (supabase as any)
-    .from("wallet_balances")
-    .select("balance")
-    .eq("user_id", userId)
-    .single();
+  const { data, error } = await (supabase as any).rpc("wallet_get_balance", {
+    p_user_id: userId,
+  });
 
-  if (!data) {
-    // Auto-provision wallet row if missing
-    await (supabase as any)
-      .from("wallet_balances")
-      .insert({ user_id: userId, balance: 0, total_deposited: 0, total_spent: 0 });
+  if (error) {
+    console.error("Wallet balance fetch error:", error);
     return 0;
   }
 
-  return Number(data.balance);
+  return Number(data ?? 0);
 }
 
-// ─── Deduct from wallet ──────────────────────────────────────
 export async function deductWallet(
   userId: string,
-  operation: string
+  operation: string,
+  requestKey: string
 ): Promise<{ success: boolean; balance: number; message?: string }> {
-  const price = OPERATION_PRICES[operation];
-  if (!price) return { success: false, balance: 0, message: "Unknown operation." };
-
-  const currentBalance = await getWalletBalance(userId);
-  if (currentBalance < price) {
-    return {
-      success: false,
-      balance: currentBalance,
-      message: `Insufficient balance. This operation costs ₦${price.toLocaleString()} but your wallet has ₦${currentBalance.toLocaleString()}.`,
-    };
-  }
-
-  // Deduct
-  const newBalance = currentBalance - price;
-  const newTotalSpent = (await getTotalSpent(userId)) + price;
-  const { error } = await (supabase as any)
-    .from("wallet_balances")
-    .update({
-      balance: newBalance,
-      total_spent: newTotalSpent,
-      updated_at: new Date().toISOString(),
-    })
-    .eq("user_id", userId);
+  const { data, error } = await (supabase as any).rpc("wallet_charge_operation", {
+    p_user_id: userId,
+    p_operation: operation,
+    p_request_key: requestKey,
+  });
 
   if (error) {
     console.error("Wallet deduction error:", error);
-    return { success: false, balance: currentBalance, message: "Failed to deduct from wallet." };
+    return {
+      success: false,
+      balance: 0,
+      message: "Failed to deduct from wallet.",
+    };
   }
 
-  // Record transaction
-  await (supabase as any).from("wallet_transactions").insert({
-    user_id: userId,
-    type: "deduction",
-    amount: price,
-    description: `${OPERATION_LABELS[operation] || operation} — ₦${price.toLocaleString()}`,
-    operation,
-    status: "success",
-  });
+  if (data?.success) {
+    window.dispatchEvent(new Event("wallet-updated"));
+  }
 
-  // Emit event so UI components update
-  window.dispatchEvent(new Event("wallet-updated"));
-
-  return { success: true, balance: newBalance };
+  return {
+    success: !!data?.success,
+    balance: Number(data?.balance ?? 0),
+    message: data?.message,
+  };
 }
 
-// ─── Credit wallet (after Paystack payment verified) ─────────
 export async function creditWallet(
-  userId: string,
-  amount: number,
-  reference: string
-): Promise<{ success: boolean; balance: number }> {
-  // Check if this reference was already processed
-  const { data: existing } = await (supabase as any)
-    .from("wallet_transactions")
-    .select("id")
-    .eq("reference", reference)
-    .single();
-
-  if (existing) {
-    // Already credited — idempotent
-    const balance = await getWalletBalance(userId);
-    return { success: true, balance };
-  }
-
-  const currentBalance = await getWalletBalance(userId);
-  const newBalance = currentBalance + amount;
-
-  const { error } = await (supabase as any)
-    .from("wallet_balances")
-    .update({
-      balance: newBalance,
-      total_deposited: (await getTotalDeposited(userId)) + amount,
-      updated_at: new Date().toISOString(),
-    })
-    .eq("user_id", userId);
-
-  if (error) {
-    console.error("Wallet credit error:", error);
-    return { success: false, balance: currentBalance };
-  }
-
-  // Record transaction
-  await (supabase as any).from("wallet_transactions").insert({
-    user_id: userId,
-    type: "top_up",
-    amount,
-    description: `Wallet top-up — ₦${amount.toLocaleString()}`,
-    reference,
-    status: "success",
-  });
-
-  window.dispatchEvent(new Event("wallet-updated"));
-
-  return { success: true, balance: newBalance };
+  _userId: string,
+  _amount: number,
+  _reference: string
+): Promise<{ success: boolean; balance: number; message?: string }> {
+  return {
+    success: false,
+    balance: 0,
+    message: "Client-side wallet credit is disabled. Use the verified payment flow.",
+  };
 }
 
-// ─── Refund wallet (when downstream API fails after deduction) ──
 export async function refundWallet(
   userId: string,
-  operation: string
+  operation: string,
+  requestKey?: string
 ): Promise<void> {
-  const price = OPERATION_PRICES[operation];
-  if (!price) return;
-
-  const currentBalance = await getWalletBalance(userId);
-  const newBalance = currentBalance + price;
-  const currentTotalSpent = await getTotalSpent(userId);
-
-  await (supabase as any)
-    .from("wallet_balances")
-    .update({
-      balance: newBalance,
-      total_spent: Math.max(0, currentTotalSpent - price),
-      updated_at: new Date().toISOString(),
-    })
-    .eq("user_id", userId);
-
-  // Record refund transaction
-  await (supabase as any).from("wallet_transactions").insert({
-    user_id: userId,
-    type: "top_up",
-    amount: price,
-    description: `Refund — ${OPERATION_LABELS[operation] || operation} failed`,
-    operation,
-    status: "success",
+  const { data, error } = await (supabase as any).rpc("wallet_refund_operation", {
+    p_user_id: userId,
+    p_operation: operation,
+    p_reason: "manual client refund",
+    p_request_key: requestKey ?? null,
   });
 
-  window.dispatchEvent(new Event("wallet-updated"));
+  if (error) {
+    console.error("Wallet refund error:", error);
+    return;
+  }
+
+  if (data?.success) {
+    window.dispatchEvent(new Event("wallet-updated"));
+  }
 }
 
-// ─── Helpers ─────────────────────────────────────────────────
-async function getTotalSpent(userId: string): Promise<number> {
-  const { data } = await (supabase as any)
-    .from("wallet_balances")
-    .select("total_spent")
-    .eq("user_id", userId)
-    .single();
-  return Number(data?.total_spent ?? 0);
-}
-
-async function getTotalDeposited(userId: string): Promise<number> {
-  const { data } = await (supabase as any)
-    .from("wallet_balances")
-    .select("total_deposited")
-    .eq("user_id", userId)
-    .single();
-  return Number(data?.total_deposited ?? 0);
-}
-
-// ─── Format currency ─────────────────────────────────────────
 export function formatNaira(amount: number): string {
-  return `₦${amount.toLocaleString("en-NG", { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`;
+  return `₦${amount.toLocaleString("en-NG", {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 2,
+  })}`;
 }

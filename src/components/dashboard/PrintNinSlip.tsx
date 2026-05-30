@@ -2,7 +2,6 @@ import { useState, useRef, useCallback } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { deductCredit } from "@/lib/credits";
-import { deductWallet, refundWallet } from "@/lib/wallet";
 import { createNotification } from "@/lib/notifications";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -16,6 +15,7 @@ import { z } from "zod";
 import { QRCodeSVG } from "qrcode.react";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
+import { createRequestId } from "@/lib/request-id";
 
 // ---------- Validation schemas ----------
 const ninSchema = z.string().trim().length(11, "NIN must be exactly 11 digits").regex(/^\d+$/, "NIN must contain only numbers");
@@ -766,18 +766,6 @@ export function PrintNinSlip() {
       }
 
       // Wallet deduction: ₦600 for premium slip, ₦400 for long slip
-      const slipOperation = slipType === "premium" ? "print_nin_slip_premium" : "print_nin_slip_long";
-      const walletResult = await deductWallet(user.id, slipOperation);
-      if (!walletResult.success) {
-        toast({
-          title: "Insufficient Balance",
-          description: walletResult.message || "Please fund your wallet to continue.",
-          variant: "destructive",
-        });
-        setLoading(false);
-        return;
-      }
-
       // Credit deduction disabled until payment system is implemented
       // if (user?.id) {
       //   const cr = await deductCredit(user.id);
@@ -790,34 +778,29 @@ export function PrintNinSlip() {
 
       // For NIN input: use nin_advance (Prembly) which returns full data + photo
       // For phone input: first get NIN from nin_phone, then look up nin_advance
+      const slipAction =
+        slipType === "premium"
+          ? "print_nin_slip_premium"
+          : "print_nin_slip_long";
+      const requestId = createRequestId(`print-${slipType}`);
       let finalPayload: any = null;
 
       if (searchMode === "nin") {
         const { data, error } = await supabase.functions.invoke("robosttech-api", {
-          body: { action: "nin_advance", nin: ninInput, number: ninInput },
+          body: { request_id: requestId, action: slipAction, nin: ninInput, number: ninInput },
         });
         if (error) throw error;
         finalPayload = data;
       } else {
         // Step 1: phone → NIN
-        const { data: phoneData, error: phoneError } = await supabase.functions.invoke("robosttech-api", {
-          body: { action: "nin_phone", phone: phoneInput },
-        });
-        if (phoneError) throw phoneError;
-
-        const foundNin = phoneData?.nin || phoneData?.data?.nin || phoneData?.NIN;
-        if (!foundNin) {
-          toast({ title: "Not Found", description: phoneData?.message || "Could not retrieve NIN from this phone number.", variant: "destructive" });
-          setLoading(false);
-          return;
-        }
-
-        // Step 2: NIN → full data
         const { data, error } = await supabase.functions.invoke("robosttech-api", {
-          body: { action: "nin_advance", nin: foundNin, number: foundNin },
+          body: { request_id: requestId, action: slipAction, phone: phoneInput },
         });
         if (error) throw error;
+
         finalPayload = data;
+
+        // Step 2: NIN → full data
       }
 
       console.log("Print NIN response:", finalPayload);
@@ -859,10 +842,6 @@ export function PrintNinSlip() {
     } catch (err: any) {
       console.error("Print NIN error:", err);
       // Refund wallet since API call failed
-      if (user?.id) {
-        const slipOp = slipType === "premium" ? "print_nin_slip_premium" : "print_nin_slip_long";
-        await refundWallet(user.id, slipOp).catch(console.error);
-      }
       toast({ title: "Error", description: err?.message || "An unexpected error occurred.", variant: "destructive" });
     } finally {
       setLoading(false);
