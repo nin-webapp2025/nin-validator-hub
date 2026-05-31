@@ -36,6 +36,7 @@ export function AdminModificationRequests() {
   const [requests, setRequests] = useState<NinModificationRequest[]>([]);
   const [staffUsers, setStaffUsers] = useState<Array<{ id: string; email: string }>>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [selectedRequest, setSelectedRequest] = useState<NinModificationRequest | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [actionType, setActionType] = useState<"approve" | "reject" | null>(null);
@@ -45,6 +46,46 @@ export function AdminModificationRequests() {
   const [rejectionReason, setRejectionReason] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const extractErrorMessage = (error: unknown) => {
+    if (!error) return "Unknown error";
+    if (typeof error === "string") return error;
+    if (error instanceof Error) {
+      const anyError = error as Error & {
+        code?: string;
+        details?: string;
+        hint?: string;
+      };
+      return [
+        anyError.message,
+        anyError.code ? `Code: ${anyError.code}` : null,
+        anyError.details ? `Details: ${anyError.details}` : null,
+        anyError.hint ? `Hint: ${anyError.hint}` : null,
+      ]
+        .filter(Boolean)
+        .join(" | ");
+    }
+
+    if (typeof error === "object") {
+      const anyError = error as {
+        message?: string;
+        code?: string;
+        details?: string;
+        hint?: string;
+        error_description?: string;
+      };
+      return [
+        anyError.message || anyError.error_description || "Unknown error",
+        anyError.code ? `Code: ${anyError.code}` : null,
+        anyError.details ? `Details: ${anyError.details}` : null,
+        anyError.hint ? `Hint: ${anyError.hint}` : null,
+      ]
+        .filter(Boolean)
+        .join(" | ");
+    }
+
+    return "Unknown error";
+  };
+
   useEffect(() => {
     fetchRequests();
     fetchStaffUsers();
@@ -52,6 +93,7 @@ export function AdminModificationRequests() {
 
   const fetchRequests = async () => {
     try {
+      setLoadError(null);
       const { data, error } = await (supabase as any)
         .from("nin_modification_requests")
         .select("*")
@@ -61,9 +103,11 @@ export function AdminModificationRequests() {
       setRequests(data || []);
     } catch (error) {
       console.error("Error fetching requests:", error);
+      const message = extractErrorMessage(error);
+      setLoadError(message);
       toast({
         title: "Error",
-        description: "Failed to load modification requests",
+        description: message,
         variant: "destructive",
       });
     } finally {
@@ -103,6 +147,11 @@ export function AdminModificationRequests() {
       }
     } catch (error) {
       console.error("Error fetching staff users:", error);
+      toast({
+        title: "Staff list error",
+        description: extractErrorMessage(error),
+        variant: "destructive",
+      });
     }
   };
 
@@ -176,7 +225,7 @@ export function AdminModificationRequests() {
       console.error("Error updating request:", error);
       toast({
         title: "Update Failed",
-        description: error instanceof Error ? error.message : "Failed to update request",
+        description: extractErrorMessage(error),
         variant: "destructive",
       });
     } finally {
@@ -207,7 +256,15 @@ export function AdminModificationRequests() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {requests.length === 0 ? (
+          {loadError ? (
+            <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-900 dark:border-red-900/60 dark:bg-red-950/30 dark:text-red-200">
+              <p className="font-semibold">Unable to load modification requests</p>
+              <p className="mt-2">{loadError}</p>
+              <p className="mt-3 text-xs text-red-800/80 dark:text-red-200/80">
+                This usually means the production database is missing the `nin_modification_requests` table or the admin SELECT policy for it.
+              </p>
+            </div>
+          ) : requests.length === 0 ? (
             <p className="text-center text-gray-500 dark:text-slate-400 py-8">No modification requests found</p>
           ) : (
             <div className="space-y-4">

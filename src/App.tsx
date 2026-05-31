@@ -16,6 +16,7 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
 import ApiDocs from "./pages/ApiDocs";
 import NotFound from "./pages/NotFound";
+import MfaRequired from "./pages/MfaRequired";
 import { UserAppShell } from "@/components/dashboard/UserAppShell";
 import UserOverviewPage from "./pages/user/UserOverviewPage";
 import UserNinValidationPage from "./pages/user/UserNinValidationPage";
@@ -71,6 +72,14 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Landing />} />
             <Route path="/auth" element={<Auth />} />
+            <Route
+              path="/mfa-required"
+              element={
+                <ProtectedRoute>
+                  <MfaRequired />
+                </ProtectedRoute>
+              }
+            />
             {/* Legacy dashboard route - redirects to role-based dashboard */}
             <Route 
               path="/dashboard" 

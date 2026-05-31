@@ -1,5 +1,5 @@
 import { ReactNode, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useRole, UserRole } from '@/hooks/useRole';
 import { Loader2 } from 'lucide-react';
@@ -25,13 +25,21 @@ export function ProtectedRoute({
   allowedRoles,
   redirectTo = '/auth' 
 }: ProtectedRouteProps) {
-  const { user, loading: authLoading } = useAuth();
+  const {
+    user,
+    loading: authLoading,
+    mfaLoading,
+    mfaHasVerifiedFactor,
+    mfaAssuranceLevel,
+  } = useAuth();
   const { role, isLoading: roleLoading } = useRole();
   const navigate = useNavigate();
+  const location = useLocation();
+  const requiresAdminMfa = !!allowedRoles?.includes('admin') && role === 'admin';
 
   useEffect(() => {
     // Wait for both auth and role to load
-    if (authLoading || roleLoading) return;
+    if (authLoading || roleLoading || mfaLoading) return;
 
     // Redirect to auth if not logged in
     if (!user) {
@@ -52,12 +60,33 @@ export function ProtectedRoute({
         
         const targetPath = role ? userDashboardMap[role] : '/dashboard/user';
         navigate(targetPath, { replace: true });
+        return;
       }
     }
-  }, [user, role, authLoading, roleLoading, allowedRoles, navigate, redirectTo]);
+
+    if (requiresAdminMfa && (!mfaHasVerifiedFactor || mfaAssuranceLevel !== 'aal2')) {
+      navigate('/mfa-required', {
+        replace: true,
+        state: { returnTo: location.pathname },
+      });
+    }
+  }, [
+    user,
+    role,
+    authLoading,
+    roleLoading,
+    mfaLoading,
+    mfaHasVerifiedFactor,
+    mfaAssuranceLevel,
+    allowedRoles,
+    navigate,
+    redirectTo,
+    requiresAdminMfa,
+    location.pathname,
+  ]);
 
   // Show loading state while checking auth and role
-  if (authLoading || roleLoading) {
+  if (authLoading || roleLoading || mfaLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-blue-50">
         <div className="text-center">

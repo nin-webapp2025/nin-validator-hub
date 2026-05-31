@@ -6,9 +6,14 @@ interface AuthContextType {
   user: User | null;
   session: Session | null;
   loading: boolean;
+  mfaLoading: boolean;
+  mfaHasVerifiedFactor: boolean;
+  mfaAssuranceLevel: string | null;
+  mfaNextLevel: string | null;
   signUp: (email: string, password: string, fullName: string) => Promise<{ error: Error | null }>;
   signIn: (email: string, password: string) => Promise<{ error: Error | null; mfaRequired?: boolean }>;
   signOut: () => Promise<void>;
+  refreshMFAStatus: () => Promise<void>;
   // MFA methods
   enrollMFA: () => Promise<AuthMFAEnrollResponse>;
   challengeMFA: (factorId: string) => Promise<AuthMFAChallengeResponse>;
@@ -22,6 +27,46 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const [mfaLoading, setMfaLoading] = useState(true);
+  const [mfaHasVerifiedFactor, setMfaHasVerifiedFactor] = useState(false);
+  const [mfaAssuranceLevel, setMfaAssuranceLevel] = useState<string | null>(null);
+  const [mfaNextLevel, setMfaNextLevel] = useState<string | null>(null);
+
+  const refreshMFAStatus = async () => {
+    if (!session?.user) {
+      setMfaHasVerifiedFactor(false);
+      setMfaAssuranceLevel(null);
+      setMfaNextLevel(null);
+      setMfaLoading(false);
+      return;
+    }
+
+    setMfaLoading(true);
+
+    try {
+      const assurancePromise =
+        typeof (supabase.auth.mfa as any).getAuthenticatorAssuranceLevel === "function"
+          ? (supabase.auth.mfa as any).getAuthenticatorAssuranceLevel()
+          : Promise.resolve({ data: null });
+
+      const [{ data: factors }, { data: assuranceData }] = await Promise.all([
+        supabase.auth.mfa.listFactors(),
+        assurancePromise,
+      ]);
+
+      const hasVerifiedTOTP = factors?.totp?.some((factor) => factor.status === "verified") ?? false;
+      setMfaHasVerifiedFactor(hasVerifiedTOTP);
+      setMfaAssuranceLevel((assuranceData?.currentLevel as string | undefined) ?? null);
+      setMfaNextLevel((assuranceData?.nextLevel as string | undefined) ?? null);
+    } catch (error) {
+      console.error("Error refreshing MFA status:", error);
+      setMfaHasVerifiedFactor(false);
+      setMfaAssuranceLevel(null);
+      setMfaNextLevel(null);
+    } finally {
+      setMfaLoading(false);
+    }
+  };
 
   useEffect(() => {
     // Set up auth state listener FIRST
@@ -42,6 +87,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     return () => subscription.unsubscribe();
   }, []);
+
+  useEffect(() => {
+    refreshMFAStatus();
+  }, [session?.user?.id, session?.access_token]);
 
   const signUp = async (email: string, password: string, fullName: string) => {
     const { data, error } = await supabase.auth.signUp({
@@ -91,7 +140,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, session, loading, signUp, signIn, signOut, enrollMFA, challengeMFA, verifyMFA, unenrollMFA }}>
+    <AuthContext.Provider value={{
+      user,
+      session,
+      loading,
+      mfaLoading,
+      mfaHasVerifiedFactor,
+      mfaAssuranceLevel,
+      mfaNextLevel,
+      signUp,
+      signIn,
+      signOut,
+      refreshMFAStatus,
+      enrollMFA,
+      challengeMFA,
+      verifyMFA,
+      unenrollMFA,
+    }}>
       {children}
     </AuthContext.Provider>
   );

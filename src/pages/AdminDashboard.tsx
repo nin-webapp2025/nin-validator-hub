@@ -13,6 +13,7 @@ import { AdminModificationRequests } from "@/components/dashboard/AdminModificat
 import { UserRoleManagement } from "@/components/dashboard/UserRoleManagement";
 import { AuditLog } from "@/components/dashboard/AuditLog";
 import { OperationalMonitoring } from "@/components/dashboard/OperationalMonitoring";
+import { ReconciliationOps } from "@/components/dashboard/ReconciliationOps";
 import { PrintNinSlip } from "@/components/dashboard/PrintNinSlip";
 import { WalletTopUp } from "@/components/dashboard/WalletTopUp";
 import { TransactionHistory } from "@/components/dashboard/TransactionHistory";
@@ -90,6 +91,7 @@ export default function AdminDashboard() {
               <TabsTrigger value="users" className="text-xs sm:text-sm py-2 sm:py-2.5 whitespace-nowrap">User Roles</TabsTrigger>
               <TabsTrigger value="audit" className="text-xs sm:text-sm py-2 sm:py-2.5 whitespace-nowrap">Audit Log</TabsTrigger>
               <TabsTrigger value="monitoring" className="text-xs sm:text-sm py-2 sm:py-2.5 whitespace-nowrap">Monitoring</TabsTrigger>
+              <TabsTrigger value="reconciliation" className="text-xs sm:text-sm py-2 sm:py-2.5 whitespace-nowrap">Reconciliation</TabsTrigger>
               <TabsTrigger value="validation" className="text-xs sm:text-sm py-2 sm:py-2.5 whitespace-nowrap">Validation</TabsTrigger>
               <TabsTrigger value="personalization" className="text-xs sm:text-sm py-2 sm:py-2.5 whitespace-nowrap">Personalize</TabsTrigger>
               <TabsTrigger value="clearance" className="text-xs sm:text-sm py-2 sm:py-2.5 whitespace-nowrap">Clearance</TabsTrigger>
@@ -114,6 +116,10 @@ export default function AdminDashboard() {
 
           <TabsContent value="monitoring" className="space-y-6">
             <OperationalMonitoring />
+          </TabsContent>
+
+          <TabsContent value="reconciliation" className="space-y-6">
+            <ReconciliationOps />
           </TabsContent>
 
           <TabsContent value="validation" className="space-y-6">
