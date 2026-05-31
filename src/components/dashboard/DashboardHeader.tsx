@@ -48,15 +48,23 @@ export function DashboardHeader({ onNavigateToProfile, onNavigateToWallet }: Das
   useEffect(() => {
     if (!user) return;
     const fetchNotifications = async () => {
-      const { data } = await (supabase as any)
-        .from("notifications")
-        .select("*")
-        .eq("user_id", user.id)
-        .order("created_at", { ascending: false })
-        .limit(20);
+      const [{ data }, { count }] = await Promise.all([
+        (supabase as any)
+          .from("notifications")
+          .select("*")
+          .eq("user_id", user.id)
+          .order("created_at", { ascending: false })
+          .limit(20),
+        (supabase as any)
+          .from("notifications")
+          .select("id", { count: "exact", head: true })
+          .eq("user_id", user.id)
+          .eq("read", false),
+      ]);
+
       if (data) {
         setNotifications(data as Notification[]);
-        setUnreadCount((data as Notification[]).filter((n: Notification) => !n.read).length);
+        setUnreadCount(count ?? 0);
       }
     };
     fetchNotifications();

@@ -39,51 +39,71 @@ const COLORS = {
 
 export function Analytics() {
   const { user } = useAuth();
+  const analyticsWindowStart = subDays(new Date(), 30).toISOString();
 
-  // Fetch validation data
-  const { data: validationData } = useQuery({
-    queryKey: ["analytics-validation", user?.id],
+  const { data: analyticsSummary } = useQuery({
+    queryKey: ["analytics-summary", user?.id],
     queryFn: async () => {
-      if (!user) return [];
-      const { data } = await supabase
-        .from("validation_history")
-        .select("status, created_at")
-        .eq("user_id", user.id)
-        .order("created_at", { ascending: true });
-      return data || [];
+      if (!user) return null;
+      const [
+        { count: validationTotal },
+        { count: validationSuccess },
+        { count: personalizationTotal },
+        { count: clearanceTotal },
+      ] = await Promise.all([
+        supabase.from("validation_history").select("id", { count: "exact", head: true }).eq("user_id", user.id),
+        supabase.from("validation_history").select("id", { count: "exact", head: true }).eq("user_id", user.id).eq("status", "success"),
+        supabase.from("personalization_history").select("id", { count: "exact", head: true }).eq("user_id", user.id),
+        supabase.from("clearance_history").select("id", { count: "exact", head: true }).eq("user_id", user.id),
+      ]);
+
+      return {
+        validationTotal: validationTotal ?? 0,
+        validationSuccess: validationSuccess ?? 0,
+        personalizationTotal: personalizationTotal ?? 0,
+        clearanceTotal: clearanceTotal ?? 0,
+      };
     },
     enabled: !!user,
   });
 
-  // Fetch personalization data
-  const { data: personalizationData } = useQuery({
-    queryKey: ["analytics-personalization", user?.id],
+  const { data: analyticsWindow } = useQuery({
+    queryKey: ["analytics-window", user?.id, analyticsWindowStart],
     queryFn: async () => {
-      if (!user) return [];
-      const { data } = await supabase
-        .from("personalization_history")
-        .select("status, created_at")
-        .eq("user_id", user.id)
-        .order("created_at", { ascending: true });
-      return data || [];
+      if (!user) return null;
+      const [validation, personalization, clearance] = await Promise.all([
+        supabase
+          .from("validation_history")
+          .select("status, created_at")
+          .eq("user_id", user.id)
+          .gte("created_at", analyticsWindowStart)
+          .order("created_at", { ascending: true }),
+        supabase
+          .from("personalization_history")
+          .select("status, created_at")
+          .eq("user_id", user.id)
+          .gte("created_at", analyticsWindowStart)
+          .order("created_at", { ascending: true }),
+        supabase
+          .from("clearance_history")
+          .select("status, created_at")
+          .eq("user_id", user.id)
+          .gte("created_at", analyticsWindowStart)
+          .order("created_at", { ascending: true }),
+      ]);
+
+      return {
+        validation: validation.data || [],
+        personalization: personalization.data || [],
+        clearance: clearance.data || [],
+      };
     },
     enabled: !!user,
   });
 
-  // Fetch clearance data
-  const { data: clearanceData } = useQuery({
-    queryKey: ["analytics-clearance", user?.id],
-    queryFn: async () => {
-      if (!user) return [];
-      const { data } = await supabase
-        .from("clearance_history")
-        .select("status, created_at")
-        .eq("user_id", user.id)
-        .order("created_at", { ascending: true });
-      return data || [];
-    },
-    enabled: !!user,
-  });
+  const validationData = analyticsWindow?.validation || [];
+  const personalizationData = analyticsWindow?.personalization || [];
+  const clearanceData = analyticsWindow?.clearance || [];
 
   // Process data for charts
   const last30Days = Array.from({ length: 30 }, (_, i) => {
@@ -119,17 +139,17 @@ export function Analytics() {
   const serviceComparison = [
     {
       service: "Validations",
-      count: validationData?.length || 0,
+      count: analyticsSummary?.validationTotal || 0,
       color: COLORS.validation,
     },
     {
       service: "Personalizations",
-      count: personalizationData?.length || 0,
+      count: analyticsSummary?.personalizationTotal || 0,
       color: COLORS.personalization,
     },
     {
       service: "Clearances",
-      count: clearanceData?.length || 0,
+      count: analyticsSummary?.clearanceTotal || 0,
       color: COLORS.clearance,
     },
   ];
@@ -163,7 +183,7 @@ export function Analytics() {
               <div>
                 <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400">Total Validations</p>
                 <p className="text-lg sm:text-2xl font-bold text-slate-900 dark:text-slate-100 mt-1">
-                  {validationData?.length || 0}
+                  {analyticsSummary?.validationTotal || 0}
                 </p>
               </div>
               <Activity className="h-8 w-8 sm:h-10 sm:w-10 text-blue-600 dark:text-blue-400" />
@@ -177,9 +197,9 @@ export function Analytics() {
               <div>
                 <p className="text-sm text-slate-600 dark:text-slate-400">Success Rate</p>
                 <p className="text-2xl font-bold text-green-600 dark:text-green-400 mt-1">
-                  {validationData?.length
+                  {analyticsSummary?.validationTotal
                     ? Math.round(
-                        (statusDistribution[0].value / validationData.length) * 100
+                        ((analyticsSummary?.validationSuccess || 0) / analyticsSummary.validationTotal) * 100
                       )
                     : 0}
                   %
@@ -210,9 +230,9 @@ export function Analytics() {
               <div>
                 <p className="text-sm text-slate-600 dark:text-slate-400">All Services</p>
                 <p className="text-2xl font-bold text-slate-900 dark:text-slate-100 mt-1">
-                  {(validationData?.length || 0) +
-                    (personalizationData?.length || 0) +
-                    (clearanceData?.length || 0)}
+                  {(analyticsSummary?.validationTotal || 0) +
+                    (analyticsSummary?.personalizationTotal || 0) +
+                    (analyticsSummary?.clearanceTotal || 0)}
                 </p>
               </div>
               <PieChartIcon className="h-10 w-10 text-orange-600 dark:text-orange-400" />

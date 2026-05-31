@@ -1,3 +1,5 @@
+import { executeProviderRequest } from "./providers/registry.ts";
+
 const API_ACTION_PRICES = {
   validate: 5000,
   validation_status: 0,
@@ -15,9 +17,6 @@ const API_ACTION_PRICES = {
   print_nin_slip_premium: 600,
   print_nin_slip_long: 400,
 } as const;
-
-const ROBOSTTECH_API_URL = "https://robosttech.com/api";
-const PREMBLY_API_URL = "https://api.prembly.com/verification";
 
 const NIN_RE = /^\d{11}$/;
 const BVN_RE = /^\d{11}$/;
@@ -55,12 +54,6 @@ interface WalletRpcClient {
     fn: string,
     args: Record<string, unknown>,
   ): Promise<{ data: any; error: { message?: string } | null }>;
-}
-
-interface UpstreamResult {
-  status: number;
-  ok: boolean;
-  body: unknown;
 }
 
 type NormalizedPhase = "submit" | "status" | "lookup" | "verify";
@@ -360,42 +353,6 @@ function validationErrorFor(action: SupportedAction, body: ExecutionRequestBody)
   return null;
 }
 
-function normalizeClearanceResponse(
-  action: "clearance" | "clearance_status",
-  trackingId: string,
-  statusCode: number,
-  raw: string,
-  parsed: unknown,
-) {
-  const trimmed = raw.trim();
-  if (trimmed || statusCode < 200 || statusCode >= 300) {
-    return parsed;
-  }
-
-  if (action === "clearance") {
-    return {
-      success: true,
-      approved: true,
-      status: "submitted",
-      tracking_id: trackingId,
-      provider_response_empty: true,
-      provider_status_code: statusCode,
-      message:
-        "Clearance request submitted successfully. The provider returned no response body.",
-    };
-  }
-
-  return {
-    success: true,
-    status: "unknown",
-    tracking_id: trackingId,
-    provider_response_empty: true,
-    provider_status_code: statusCode,
-    message:
-      "Clearance status request completed. The provider returned no response body.",
-  };
-}
-
 function inferPhase(action: SupportedAction): NormalizedPhase {
   if (action.endsWith("_status")) return "status";
   if (
@@ -512,7 +469,7 @@ function normalizeProviderResponse(
   body: ExecutionRequestBody,
   statusCode: number,
   payload: unknown,
-  options?: { charged?: boolean; requestKey?: string; provider?: "robosttech" | "prembly" | "internal" },
+  options?: { charged?: boolean; requestKey?: string; provider?: "robosttech" | "prembly" | "internal" | "print_orchestrator" },
 ) {
   const payloadObject = asObject(payload) ?? {};
   const phase = inferPhase(action);
@@ -589,251 +546,6 @@ async function refundIfNeeded(
   if (error) {
     console.error("Wallet refund failed:", error.message ?? error);
   }
-}
-
-async function parseUpstreamResponse(response: Response) {
-  const raw = await response.text();
-  let data: unknown = null;
-
-  try {
-    data = raw ? JSON.parse(raw) : null;
-  } catch {
-    data = { success: false, error: "Upstream returned invalid JSON", raw };
-  }
-
-  return { raw, data };
-}
-
-async function callUpstream(
-  url: string,
-  headers: Record<string, string>,
-  requestBody: Record<string, unknown>,
-) {
-  const response = await fetch(url, {
-    method: "POST",
-    headers,
-    body: JSON.stringify(requestBody),
-  });
-
-  const { raw, data } = await parseUpstreamResponse(response);
-  return { response, raw, data };
-}
-
-function extractNinFromLookup(payload: unknown) {
-  const obj = asObject(payload);
-  if (!obj) return "";
-
-  const direct = obj.nin;
-  if (typeof direct === "string" && direct.trim()) return direct.trim();
-
-  const nested = asObject(obj.data);
-  if (nested?.nin && typeof nested.nin === "string" && nested.nin.trim()) {
-    return nested.nin.trim();
-  }
-
-  const upper = obj.NIN;
-  if (typeof upper === "string" && upper.trim()) return upper.trim();
-
-  return "";
-}
-
-async function executePrintSlipRequest(body: ExecutionRequestBody): Promise<UpstreamResult> {
-  const premblyKey = Deno.env.get("PREMBLY_API_KEY");
-  const robosttechKey = Deno.env.get("ROBOSTTECH_API_KEY");
-
-  if (!premblyKey || !robosttechKey) {
-    return {
-      status: 503,
-      ok: false,
-      body: { success: false, error: "Upstream API not configured" },
-    };
-  }
-
-  let ninToLookup = String(body.nin || body.number || "").trim();
-
-  if (!ninToLookup && body.phone) {
-    const lookup = await callUpstream(
-      `${ROBOSTTECH_API_URL}/nin_phone`,
-      {
-        "Content-Type": "application/json",
-        "api-key": robosttechKey,
-      },
-      { phone: body.phone },
-    );
-
-    if (!lookup.response.ok || isBusinessFailure(lookup.data)) {
-      return {
-        status: lookup.response.status,
-        ok: lookup.response.ok && !isBusinessFailure(lookup.data),
-        body: lookup.data,
-      };
-    }
-
-    ninToLookup = extractNinFromLookup(lookup.data);
-    if (!ninToLookup) {
-      return {
-        status: 422,
-        ok: false,
-        body: {
-          success: false,
-          error: "Could not retrieve a NIN from the supplied phone number.",
-          message: "The phone lookup completed but did not return a usable NIN.",
-        },
-      };
-    }
-  }
-
-  const slipLookup = await callUpstream(
-    `${PREMBLY_API_URL}/nin_advance`,
-    {
-      "Content-Type": "application/json",
-      "X-Api-Key": premblyKey,
-      "accept": "application/json",
-    },
-    { number: ninToLookup },
-  );
-
-  return {
-    status: slipLookup.response.status,
-    ok: slipLookup.response.ok,
-    body: slipLookup.data,
-  };
-}
-
-async function executeProviderRequest(
-  action: SupportedAction,
-  body: ExecutionRequestBody,
-): Promise<UpstreamResult> {
-  if (action === "print_nin_slip_premium" || action === "print_nin_slip_long") {
-    return executePrintSlipRequest(body);
-  }
-
-  const isPrembly = [
-    "nin_basic",
-    "nin_advance",
-    "bvn_basic",
-    "bvn_advance",
-  ].includes(action);
-
-  const upstreamKey = isPrembly
-    ? Deno.env.get("PREMBLY_API_KEY")
-    : Deno.env.get("ROBOSTTECH_API_KEY");
-
-  if (!upstreamKey) {
-    return {
-      status: 503,
-      ok: false,
-      body: { success: false, error: "Upstream API not configured" },
-    };
-  }
-
-  let endpoint = "";
-  let headers: Record<string, string> = { "Content-Type": "application/json" };
-  let requestBody: Record<string, unknown> = {};
-
-  switch (action) {
-    case "validate":
-      endpoint = "/validation";
-      requestBody = { nin: body.nin };
-      headers["api-key"] = upstreamKey;
-      break;
-    case "validation_status":
-      endpoint = "/validation_status";
-      requestBody = { nin: body.nin };
-      headers["api-key"] = upstreamKey;
-      break;
-    case "personalization":
-      endpoint = "/personalization";
-      requestBody = { tracking_id: body.tracking_id || body.trackingId };
-      headers["api-key"] = upstreamKey;
-      break;
-    case "personalization_status":
-      endpoint = "/personalization_status";
-      requestBody = { tracking_id: body.tracking_id || body.trackingId };
-      headers["api-key"] = upstreamKey;
-      break;
-    case "clearance":
-      endpoint = "/clearance";
-      requestBody = { tracking_id: body.tracking_id || body.trackingId };
-      headers["api-key"] = upstreamKey;
-      break;
-    case "clearance_status":
-      endpoint = "/clearance_status";
-      requestBody = { tracking_id: body.tracking_id || body.trackingId };
-      headers["api-key"] = upstreamKey;
-      break;
-    case "nin_search":
-      endpoint = "/nin_search";
-      requestBody = { nin: body.nin };
-      headers["api-key"] = upstreamKey;
-      break;
-    case "nin_phone":
-      endpoint = "/nin_phone";
-      requestBody = { phone: body.phone };
-      headers["api-key"] = upstreamKey;
-      break;
-    case "nin_demo":
-      endpoint = "/nin_demo";
-      requestBody = {
-        firstname: String(body.firstname ?? "").trim().toUpperCase(),
-        lastname: String(body.lastname ?? "").trim().toUpperCase(),
-        middlename: String(body.middlename ?? "").trim().toUpperCase(),
-        gender: String(body.gender ?? "").trim().toLowerCase(),
-        dateOfBirth: String(body.dateOfBirth ?? "").trim(),
-      };
-      headers["api-key"] = upstreamKey;
-      break;
-    case "nin_basic":
-      endpoint = "/vnin-basic";
-      requestBody = { number: body.nin || body.number };
-      headers["X-Api-Key"] = upstreamKey;
-      headers["accept"] = "application/json";
-      break;
-    case "nin_advance":
-      endpoint = "/nin_advance";
-      requestBody = { number: body.nin || body.number };
-      headers["X-Api-Key"] = upstreamKey;
-      headers["accept"] = "application/json";
-      break;
-    case "bvn_basic":
-      endpoint = "/bvn_validation";
-      requestBody = { number: body.bvn || body.number };
-      headers["X-Api-Key"] = upstreamKey;
-      headers["accept"] = "application/json";
-      break;
-    case "bvn_advance":
-      endpoint = "/bvn";
-      requestBody = { number: body.bvn || body.number };
-      headers["X-Api-Key"] = upstreamKey;
-      headers["accept"] = "application/json";
-      break;
-    default:
-      return {
-        status: 400,
-        ok: false,
-        body: { success: false, error: "Invalid action" },
-      };
-  }
-
-  const baseUrl = isPrembly ? PREMBLY_API_URL : ROBOSTTECH_API_URL;
-  const upstream = await callUpstream(`${baseUrl}${endpoint}`, headers, requestBody);
-
-  let responseBody = upstream.data;
-  if (action === "clearance" || action === "clearance_status") {
-    responseBody = normalizeClearanceResponse(
-      action,
-      String(body.tracking_id || body.trackingId || ""),
-      upstream.response.status,
-      upstream.raw,
-      upstream.data,
-    );
-  }
-
-  return {
-    status: upstream.response.status,
-    ok: upstream.response.ok,
-    body: responseBody,
-  };
 }
 
 export async function executeUnifiedAction({
@@ -999,9 +711,7 @@ export async function executeUnifiedAction({
       {
         charged,
         requestKey,
-        provider: ["nin_basic", "nin_advance", "bvn_basic", "bvn_advance", "print_nin_slip_premium", "print_nin_slip_long"].includes(action)
-          ? "prembly"
-          : "robosttech",
+        provider: upstream.provider as "robosttech" | "prembly" | "internal" | "print_orchestrator",
       },
     );
 
@@ -1043,9 +753,7 @@ export async function executeUnifiedAction({
           bvn: typeof body.bvn === "string" ? body.bvn : typeof body.number === "string" ? body.number : undefined,
           charged: false,
           request_id: requestKey,
-          provider: ["nin_basic", "nin_advance", "bvn_basic", "bvn_advance", "print_nin_slip_premium", "print_nin_slip_long"].includes(action)
-            ? "prembly"
-            : "robosttech",
+          provider: "internal",
           http_status: 502,
           has_data: false,
           is_terminal: true,

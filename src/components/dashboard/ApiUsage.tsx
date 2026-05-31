@@ -50,62 +50,81 @@ const STATUS_COLORS = {
 
 export function ApiUsage() {
   const { user } = useAuth();
+  const analyticsWindowStart = subDays(new Date(), 30).toISOString();
 
-  // Fetch validation history
-  const { data: validationHistory } = useQuery({
-    queryKey: ["api-usage-validation", user?.id],
+  const { data: usageSummary } = useQuery({
+    queryKey: ["api-usage-summary", user?.id],
     queryFn: async () => {
       if (!user) return [];
-      const { data } = await supabase
-        .from("validation_history")
-        .select("*")
-        .eq("user_id", user.id)
-        .order("created_at", { ascending: false });
-      return data || [];
+      const [
+        { count: validationTotal },
+        { count: validationSuccess },
+        { count: personalizationTotal },
+        { count: personalizationSuccess },
+        { count: clearanceTotal },
+        { count: clearanceSuccess },
+      ] = await Promise.all([
+        supabase.from("validation_history").select("id", { count: "exact", head: true }).eq("user_id", user.id),
+        supabase.from("validation_history").select("id", { count: "exact", head: true }).eq("user_id", user.id).eq("status", "success"),
+        supabase.from("personalization_history").select("id", { count: "exact", head: true }).eq("user_id", user.id),
+        supabase.from("personalization_history").select("id", { count: "exact", head: true }).eq("user_id", user.id).eq("status", "success"),
+        supabase.from("clearance_history").select("id", { count: "exact", head: true }).eq("user_id", user.id),
+        supabase.from("clearance_history").select("id", { count: "exact", head: true }).eq("user_id", user.id).eq("status", "success"),
+      ]);
+
+      const totalRequests = (validationTotal ?? 0) + (personalizationTotal ?? 0) + (clearanceTotal ?? 0);
+      const successfulRequests = (validationSuccess ?? 0) + (personalizationSuccess ?? 0) + (clearanceSuccess ?? 0);
+      const failedRequests = Math.max(totalRequests - successfulRequests, 0);
+
+      return { totalRequests, successfulRequests, failedRequests };
     },
     enabled: !!user,
   });
 
-  // Fetch personalization history
-  const { data: personalizationHistory } = useQuery({
-    queryKey: ["api-usage-personalization", user?.id],
+  const { data: usageWindow } = useQuery({
+    queryKey: ["api-usage-window", user?.id, analyticsWindowStart],
     queryFn: async () => {
       if (!user) return [];
-      const { data } = await supabase
-        .from("personalization_history")
-        .select("*")
-        .eq("user_id", user.id)
-        .order("created_at", { ascending: false });
-      return data || [];
-    },
-    enabled: !!user,
-  });
+      const [validation, personalization, clearance] = await Promise.all([
+        supabase
+          .from("validation_history")
+          .select("status, created_at")
+          .eq("user_id", user.id)
+          .gte("created_at", analyticsWindowStart)
+          .order("created_at", { ascending: false }),
+        supabase
+          .from("personalization_history")
+          .select("status, created_at")
+          .eq("user_id", user.id)
+          .gte("created_at", analyticsWindowStart)
+          .order("created_at", { ascending: false }),
+        supabase
+          .from("clearance_history")
+          .select("status, created_at")
+          .eq("user_id", user.id)
+          .gte("created_at", analyticsWindowStart)
+          .order("created_at", { ascending: false }),
+      ]);
 
-  // Fetch clearance history
-  const { data: clearanceHistory } = useQuery({
-    queryKey: ["api-usage-clearance", user?.id],
-    queryFn: async () => {
-      if (!user) return [];
-      const { data } = await supabase
-        .from("clearance_history")
-        .select("*")
-        .eq("user_id", user.id)
-        .order("created_at", { ascending: false });
-      return data || [];
+      return {
+        validation: validation.data || [],
+        personalization: personalization.data || [],
+        clearance: clearance.data || [],
+      };
     },
     enabled: !!user,
   });
 
   // Calculate API metrics
   const allRequests = [
-    ...(validationHistory?.map((v) => ({ ...v, endpoint: "validation" })) || []),
-    ...(personalizationHistory?.map((p) => ({ ...p, endpoint: "personalization" })) || []),
-    ...(clearanceHistory?.map((c) => ({ ...c, endpoint: "clearance" })) || []),
+    ...(usageWindow?.validation.map((v) => ({ ...v, endpoint: "validation" })) || []),
+    ...(usageWindow?.personalization.map((p) => ({ ...p, endpoint: "personalization" })) || []),
+    ...(usageWindow?.clearance.map((c) => ({ ...c, endpoint: "clearance" })) || []),
   ].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
 
-  const totalRequests = allRequests.length;
-  const successfulRequests = allRequests.filter((r) => r.status === "success").length;
-  const failedRequests = allRequests.filter((r) => r.status === "failed").length;
+  const totalRequests = usageSummary?.totalRequests ?? 0;
+  const successfulRequests = usageSummary?.successfulRequests ?? 0;
+  const failedRequests = usageSummary?.failedRequests ?? 0;
   const successRate = totalRequests > 0 ? (successfulRequests / totalRequests) * 100 : 0;
 
   // Hourly requests (last 24 hours)

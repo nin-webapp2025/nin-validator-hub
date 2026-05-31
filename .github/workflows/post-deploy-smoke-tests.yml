@@ -1,0 +1,79 @@
+name: Post-Deploy Smoke Tests
+
+on:
+  workflow_run:
+    workflows: ["Deploy Supabase Edge Functions"]
+    types: [completed]
+  workflow_dispatch:
+
+jobs:
+  smoke-tests:
+    if: >
+      github.event_name == 'workflow_dispatch' ||
+      github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Run smoke tests
+        shell: bash
+        env:
+          SUPABASE_PROJECT_ID: ${{ secrets.SUPABASE_PROJECT_ID }}
+          HEALTH_CHECK_TOKEN: ${{ secrets.HEALTH_CHECK_TOKEN }}
+        run: |
+          set -euo pipefail
+
+          BASE_URL="https://${SUPABASE_PROJECT_ID}.supabase.co/functions/v1"
+
+          assert_status() {
+            local actual="$1"
+            local expected="$2"
+            local label="$3"
+            if [[ "$actual" != "$expected" ]]; then
+              echo "Smoke test failed for ${label}: expected ${expected}, got ${actual}"
+              exit 1
+            fi
+          }
+
+          HEALTH_HEADERS=(-H "Content-Type: application/json")
+          if [[ -n "${HEALTH_CHECK_TOKEN:-}" ]]; then
+            HEALTH_HEADERS+=(-H "x-health-token: ${HEALTH_CHECK_TOKEN}")
+          fi
+
+          echo "1. health-check should report ok"
+          HEALTH_STATUS=$(curl -sS -o health.json -w "%{http_code}" \
+            -X GET "${BASE_URL}/health-check" \
+            "${HEALTH_HEADERS[@]}")
+          assert_status "$HEALTH_STATUS" "200" "health-check"
+          jq -e '.ok == true and .status == "ok"' health.json > /dev/null
+
+          echo "2. paystack-verify should reject unauthenticated requests"
+          PAYSTACK_STATUS=$(curl -sS -o paystack.json -w "%{http_code}" \
+            -X POST "${BASE_URL}/paystack-verify" \
+            -H "Content-Type: application/json" \
+            -d '{"reference":"smoke-test"}')
+          assert_status "$PAYSTACK_STATUS" "401" "paystack-verify"
+
+          echo "3. api-gateway should reject invalid API keys"
+          API_GATEWAY_STATUS=$(curl -sS -o gateway.json -w "%{http_code}" \
+            -X POST "${BASE_URL}/api-gateway" \
+            -H "Content-Type: application/json" \
+            -H "x-api-key: invalid-key" \
+            -d '{"action":"validate","nin":"12345678901"}')
+          assert_status "$API_GATEWAY_STATUS" "401" "api-gateway"
+
+          echo "4. robosttech-api should reject invalid actions cleanly"
+          ROBOS_STATUS=$(curl -sS -o robos.json -w "%{http_code}" \
+            -X POST "${BASE_URL}/robosttech-api" \
+            -H "Content-Type: application/json" \
+            -d '{"action":"invalid_action"}')
+          assert_status "$ROBOS_STATUS" "400" "robosttech-api"
+
+          echo "5. job-worker should boot and return success JSON"
+          WORKER_STATUS=$(curl -sS -o worker.json -w "%{http_code}" \
+            -X POST "${BASE_URL}/job-worker" \
+            -H "Content-Type: application/json" \
+            -d '{"limit":1}')
+          assert_status "$WORKER_STATUS" "200" "job-worker"
+          jq -e '.success == true' worker.json > /dev/null
+
+          echo "All smoke tests passed."

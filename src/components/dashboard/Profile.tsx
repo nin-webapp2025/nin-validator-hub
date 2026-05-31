@@ -52,32 +52,92 @@ export function Profile({ onNavigateToSettings }: ProfileProps = {}) {
     queryKey: ["account-stats", user?.id],
     queryFn: async () => {
       if (!user) return null;
-      const [validationRes, personalizationRes, clearanceRes, bvnRes, walletBalance] = await Promise.all([
-        supabase.from("validation_history").select("status, created_at").eq("user_id", user.id),
-        supabase.from("personalization_history").select("status, created_at").eq("user_id", user.id),
-        supabase.from("clearance_history").select("status, created_at").eq("user_id", user.id),
-        supabase.from("bvn_history").select("status, created_at").eq("user_id", user.id),
+      const successStatuses = ["success", "completed", "verified", "approved", "sent"];
+      const failedStatuses = ["failed", "error", "rejected"];
+
+      const [
+        validationTotalRes,
+        validationSuccessRes,
+        validationFailedRes,
+        validationRecentRes,
+        personalizationTotalRes,
+        personalizationSuccessRes,
+        personalizationFailedRes,
+        personalizationRecentRes,
+        clearanceTotalRes,
+        clearanceSuccessRes,
+        clearanceFailedRes,
+        clearanceRecentRes,
+        bvnTotalRes,
+        bvnSuccessRes,
+        bvnFailedRes,
+        bvnRecentRes,
+        walletBalance,
+      ] = await Promise.all([
+        supabase.from("validation_history").select("id", { count: "exact", head: true }).eq("user_id", user.id),
+        supabase.from("validation_history").select("id", { count: "exact", head: true }).eq("user_id", user.id).in("status", successStatuses),
+        supabase.from("validation_history").select("id", { count: "exact", head: true }).eq("user_id", user.id).in("status", failedStatuses),
+        supabase.from("validation_history").select("created_at").eq("user_id", user.id).order("created_at", { ascending: false }).limit(1),
+        supabase.from("personalization_history").select("id", { count: "exact", head: true }).eq("user_id", user.id),
+        supabase.from("personalization_history").select("id", { count: "exact", head: true }).eq("user_id", user.id).in("status", successStatuses),
+        supabase.from("personalization_history").select("id", { count: "exact", head: true }).eq("user_id", user.id).in("status", failedStatuses),
+        supabase.from("personalization_history").select("created_at").eq("user_id", user.id).order("created_at", { ascending: false }).limit(1),
+        supabase.from("clearance_history").select("id", { count: "exact", head: true }).eq("user_id", user.id),
+        supabase.from("clearance_history").select("id", { count: "exact", head: true }).eq("user_id", user.id).in("status", successStatuses),
+        supabase.from("clearance_history").select("id", { count: "exact", head: true }).eq("user_id", user.id).in("status", failedStatuses),
+        supabase.from("clearance_history").select("created_at").eq("user_id", user.id).order("created_at", { ascending: false }).limit(1),
+        supabase.from("bvn_history").select("id", { count: "exact", head: true }).eq("user_id", user.id),
+        supabase.from("bvn_history").select("id", { count: "exact", head: true }).eq("user_id", user.id).in("status", successStatuses),
+        supabase.from("bvn_history").select("id", { count: "exact", head: true }).eq("user_id", user.id).in("status", failedStatuses),
+        supabase.from("bvn_history").select("created_at").eq("user_id", user.id).order("created_at", { ascending: false }).limit(1),
         getWalletBalance(user.id),
       ]);
 
-      if (validationRes.error) throw validationRes.error;
-      if (personalizationRes.error) throw personalizationRes.error;
-      if (clearanceRes.error) throw clearanceRes.error;
-      if (bvnRes.error) throw bvnRes.error;
+      const possibleErrors = [
+        validationTotalRes.error,
+        validationSuccessRes.error,
+        validationFailedRes.error,
+        validationRecentRes.error,
+        personalizationTotalRes.error,
+        personalizationSuccessRes.error,
+        personalizationFailedRes.error,
+        personalizationRecentRes.error,
+        clearanceTotalRes.error,
+        clearanceSuccessRes.error,
+        clearanceFailedRes.error,
+        clearanceRecentRes.error,
+        bvnTotalRes.error,
+        bvnSuccessRes.error,
+        bvnFailedRes.error,
+        bvnRecentRes.error,
+      ].filter(Boolean);
 
-      const allEvents = [
-        ...(validationRes.data ?? []).map((item) => ({ ...item, type: "validation" })),
-        ...(personalizationRes.data ?? []).map((item) => ({ ...item, type: "personalization" })),
-        ...(clearanceRes.data ?? []).map((item) => ({ ...item, type: "clearance" })),
-        ...(bvnRes.data ?? []).map((item) => ({ ...item, type: "bvn" })),
-      ].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+      if (possibleErrors.length > 0) {
+        throw possibleErrors[0];
+      }
 
-      const completedStatuses = new Set(["success", "completed", "verified", "approved", "sent"]);
-      const failedStatuses = new Set(["failed", "error", "rejected"]);
-      const successful = allEvents.filter((item) => completedStatuses.has(String(item.status).toLowerCase())).length;
-      const failed = allEvents.filter((item) => failedStatuses.has(String(item.status).toLowerCase())).length;
-      const total = allEvents.length;
-      const mostRecent = allEvents[0]?.created_at ?? null;
+      const validationTotal = validationTotalRes.count ?? 0;
+      const personalizationTotal = personalizationTotalRes.count ?? 0;
+      const clearanceTotal = clearanceTotalRes.count ?? 0;
+      const bvnTotal = bvnTotalRes.count ?? 0;
+
+      const successful = (validationSuccessRes.count ?? 0) +
+        (personalizationSuccessRes.count ?? 0) +
+        (clearanceSuccessRes.count ?? 0) +
+        (bvnSuccessRes.count ?? 0);
+      const failed = (validationFailedRes.count ?? 0) +
+        (personalizationFailedRes.count ?? 0) +
+        (clearanceFailedRes.count ?? 0) +
+        (bvnFailedRes.count ?? 0);
+      const total = validationTotal + personalizationTotal + clearanceTotal + bvnTotal;
+      const mostRecent = [
+        validationRecentRes.data?.[0]?.created_at,
+        personalizationRecentRes.data?.[0]?.created_at,
+        clearanceRecentRes.data?.[0]?.created_at,
+        bvnRecentRes.data?.[0]?.created_at,
+      ]
+        .filter(Boolean)
+        .sort((a, b) => new Date(String(b)).getTime() - new Date(String(a)).getTime())[0] ?? null;
       const successRate = total > 0 ? Math.round((successful / total) * 100) : 0;
 
       return {
@@ -86,10 +146,10 @@ export function Profile({ onNavigateToSettings }: ProfileProps = {}) {
         failed,
         mostRecent,
         successRate,
-        validationTotal: validationRes.data?.length ?? 0,
-        clearanceTotal: clearanceRes.data?.length ?? 0,
-        personalizationTotal: personalizationRes.data?.length ?? 0,
-        bvnTotal: bvnRes.data?.length ?? 0,
+        validationTotal,
+        clearanceTotal,
+        personalizationTotal,
+        bvnTotal,
         walletBalance,
       };
     },
@@ -100,16 +160,24 @@ export function Profile({ onNavigateToSettings }: ProfileProps = {}) {
     queryKey: ["personalization-stats", user?.id],
     queryFn: async () => {
       if (!user) return null;
-      const { data, error } = await supabase
+      const [{ count: total, error: totalError }, { count: successful, error: successError }] = await Promise.all([
+        supabase
         .from("personalization_history")
-        .select("status, created_at")
-        .eq("user_id", user.id);
-      
-      if (error) throw error;
+        .select("id", { count: "exact", head: true })
+        .eq("user_id", user.id),
+        supabase
+          .from("personalization_history")
+          .select("id", { count: "exact", head: true })
+          .eq("user_id", user.id)
+          .eq("status", "success"),
+      ]);
+
+      if (totalError) throw totalError;
+      if (successError) throw successError;
       
       return {
-        total: data.length,
-        successful: data.filter(p => p.status === "success").length,
+        total: total ?? 0,
+        successful: successful ?? 0,
       };
     },
     enabled: !!user,
@@ -119,16 +187,24 @@ export function Profile({ onNavigateToSettings }: ProfileProps = {}) {
     queryKey: ["clearance-stats", user?.id],
     queryFn: async () => {
       if (!user) return null;
-      const { data, error } = await supabase
-        .from("clearance_history")
-        .select("id, status, created_at")
-        .eq("user_id", user.id);
-      
-      if (error) throw error;
+      const [{ count: total, error: totalError }, { count: successful, error: successError }] = await Promise.all([
+        supabase
+          .from("clearance_history")
+          .select("id", { count: "exact", head: true })
+          .eq("user_id", user.id),
+        supabase
+          .from("clearance_history")
+          .select("id", { count: "exact", head: true })
+          .eq("user_id", user.id)
+          .eq("status", "success"),
+      ]);
+
+      if (totalError) throw totalError;
+      if (successError) throw successError;
       
       return {
-        total: data.length,
-        successful: data.filter(c => c.status === "success").length,
+        total: total ?? 0,
+        successful: successful ?? 0,
       };
     },
     enabled: !!user,
