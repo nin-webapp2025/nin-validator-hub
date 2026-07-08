@@ -42,10 +42,7 @@ export function AirtimePurchase() {
     [productId, products],
   );
   const numericAmount = Number(amount || 0);
-  const fee = selectedProduct
-    ? selectedProduct.fee_flat + (numericAmount * selectedProduct.fee_percent / 100)
-    : 0;
-  const total = numericAmount + fee;
+  const total = numericAmount;
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -59,14 +56,14 @@ export function AirtimePurchase() {
       toast({ title: "Invalid phone number", description: "Enter a valid 11-digit Nigerian phone number.", variant: "destructive" });
       return;
     }
-    if (
-      !Number.isFinite(numericAmount) ||
-      numericAmount < Number(selectedProduct.min_amount) ||
-      numericAmount > Number(selectedProduct.max_amount)
-    ) {
+    const minimumAmount = Number(selectedProduct.min_amount ?? 50);
+    const maximumAmount = selectedProduct.max_amount === null ? null : Number(selectedProduct.max_amount);
+    if (!Number.isFinite(numericAmount) || numericAmount < minimumAmount || (maximumAmount !== null && numericAmount > maximumAmount)) {
       toast({
         title: "Invalid amount",
-        description: `Enter an amount between ${formatNaira(Number(selectedProduct.min_amount))} and ${formatNaira(Number(selectedProduct.max_amount))}.`,
+        description: maximumAmount === null
+          ? `Enter an amount from ${formatNaira(minimumAmount)} upward.`
+          : `Enter an amount between ${formatNaira(minimumAmount)} and ${formatNaira(maximumAmount)}.`,
         variant: "destructive",
       });
       return;
@@ -182,9 +179,9 @@ export function AirtimePurchase() {
               <RadioTower className="h-4 w-4 text-blue-600" /> Purchase summary
             </div>
             <dl className="mt-3 space-y-2 text-sm">
-              <div className="flex justify-between"><dt className="text-slate-500">Airtime</dt><dd>{formatNaira(numericAmount)}</dd></div>
-              <div className="flex justify-between"><dt className="text-slate-500">Service fee</dt><dd>{formatNaira(fee)}</dd></div>
-              <div className="flex justify-between border-t border-slate-200 pt-2 font-semibold dark:border-slate-700"><dt>Total wallet charge</dt><dd>{formatNaira(total)}</dd></div>
+              <div className="flex justify-between"><dt className="text-slate-500">Airtime value</dt><dd>{formatNaira(numericAmount)}</dd></div>
+              <div className="flex justify-between"><dt className="text-slate-500">Service fee</dt><dd>{formatNaira(0)}</dd></div>
+              <div className="flex justify-between border-t border-slate-200 pt-2 font-semibold dark:border-slate-700"><dt>Wallet charge</dt><dd>{formatNaira(total)}</dd></div>
             </dl>
           </div>
 

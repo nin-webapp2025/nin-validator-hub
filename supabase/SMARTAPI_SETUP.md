@@ -22,6 +22,7 @@ Apply these migrations before deploying the updated functions:
 1. `supabase/migrations/20260706_add_smartapi_vtu.sql`
 2. `supabase/migrations/20260707_add_smartapi_product_import.sql`
 3. `supabase/migrations/20260708_seed_smartapi_data_prices.sql`
+4. `supabase/migrations/20260709_update_airtime_discount_pricing.sql`
 
 The seed migration imports the data-plan IDs from the supplied Smart API plan list and the cost prices from `Your Selling Price.docx`, then sets every data-plan `retail_price` at a 4% markup.
 
@@ -62,19 +63,30 @@ insert into public.vtu_products (
 
 `retail_price` must be greater than `provider_cost`, which protects the configured margin.
 
-Airtime example (replace every example value):
+The airtime migration seeds MTN, Airtel, and Glo with Smart API `plan_id = 1`.
+Smart API detects the actual recipient network from the phone number, while the UI still lets users choose the network before purchase.
+
+Airtime seed reference:
 
 ```sql
 insert into public.vtu_products (
   category, network, name, provider_plan_id, provider_cost,
   fee_percent, fee_flat, min_amount, max_amount, sort_order
-) values (
-  'airtime', 'MTN', 'MTN Airtime', 'REPLACE_PLAN_ID', 0,
-  4, 0, 50, 50000, 10
-);
+) values
+  ('airtime', 'MTN', 'MTN Airtime', '1', 0, 3, 0, 50, NULL, 10),
+  ('airtime', 'Airtel', 'Airtel Airtime', '1', 0, 3, 0, 50, NULL, 20),
+  ('airtime', 'Glo', 'Glo Airtime', '1', 0, 3, 0, 50, NULL, 30)
+on conflict (provider, category, network, provider_plan_id) do update
+set
+  fee_percent = excluded.fee_percent,
+  fee_flat = excluded.fee_flat,
+  min_amount = excluded.min_amount,
+  max_amount = excluded.max_amount,
+  is_active = true,
+  updated_at = now();
 ```
 
-The example charges a 4% service fee. Replace the airtime `provider_plan_id` values with the real Smart API airtime plan IDs before going live.
+The airtime setup uses Smart API's 97% provider cost model. Users pay the airtime face value, while the 3% provider discount is recorded internally as profit.
 
 ## 4. Configure the provider webhook
 
