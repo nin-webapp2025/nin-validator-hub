@@ -10,6 +10,11 @@ export interface ProviderRequestBody extends Record<string, unknown> {
   middlename?: string;
   gender?: string;
   dateOfBirth?: string;
+  product_id?: string;
+  amount?: number | string;
+  provider_plan_id?: string;
+  provider_amount?: number | string;
+  provider_reference?: string;
 }
 
 export interface ProviderResult {
@@ -30,6 +35,10 @@ export interface ProviderHelpers {
     url: string,
     headers: Record<string, string>,
     requestBody: Record<string, unknown>,
+  ) => Promise<ProviderHttpResult>;
+  callFormUpstream: (
+    url: string,
+    fields: Record<string, string>,
   ) => Promise<ProviderHttpResult>;
 }
 

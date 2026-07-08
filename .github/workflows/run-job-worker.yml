@@ -1,0 +1,31 @@
+name: Run Background Job Worker
+
+on:
+  schedule:
+    - cron: "*/5 * * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: background-job-worker
+  cancel-in-progress: false
+
+jobs:
+  run-worker:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Process queued jobs
+        shell: bash
+        env:
+          SUPABASE_PROJECT_ID: ${{ secrets.SUPABASE_PROJECT_ID }}
+          JOB_WORKER_TOKEN: ${{ secrets.JOB_WORKER_TOKEN }}
+        run: |
+          set -euo pipefail
+          test -n "${SUPABASE_PROJECT_ID}"
+          test -n "${JOB_WORKER_TOKEN}"
+
+          curl --fail-with-body --silent --show-error \
+            -X POST "https://${SUPABASE_PROJECT_ID}.supabase.co/functions/v1/job-worker" \
+            -H "Content-Type: application/json" \
+            -H "x-job-worker-token: ${JOB_WORKER_TOKEN}" \
+            -d '{"limit":25}'
+

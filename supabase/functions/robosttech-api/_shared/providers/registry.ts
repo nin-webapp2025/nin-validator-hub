@@ -1,12 +1,14 @@
-import { callUpstream } from "./http.ts";
+import { callFormUpstream, callUpstream } from "./http.ts";
 import { premblyAdapter } from "./prembly.ts";
 import { robosttechAdapter } from "./robosttech.ts";
+import { smartApiAdapter } from "./smartapi.ts";
 import type { ProviderHelpers, ProviderRequestBody, ProviderResult } from "./types.ts";
 
-const adapters = [premblyAdapter, robosttechAdapter];
+const adapters = [smartApiAdapter, premblyAdapter, robosttechAdapter];
 
 const helpers: ProviderHelpers = {
   callUpstream,
+  callFormUpstream,
 };
 
 export async function executeProviderRequest(

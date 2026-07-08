@@ -1,6 +1,6 @@
 Data and Airtime API Documentation
 
-API key: KMcX6aAH3Z7BC1GIQebTNFVJLDdE02W9SR5OUYP84f33839LFGbA05kEavCjJ8fDbBe
+API key: Store as the `SMARTAPI_API_KEY` Supabase Edge Function secret. Never place the value in this file or browser code.
 
 Airtime Endpoint:
 Error codes: 200 » success, 400 » pending, 800 » failed, 900 » reversed
@@ -10,7 +10,7 @@ curl_setopt($ch, CURLOPT_URL, 'https://sabuss.com/vtu/api/buy/{API_KEY}');
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 curl_setopt($ch, CURLOPT_POST, 1);
 $post = array(
-    'pin' => '0000',
+    'pin' => '{PRODUCTION_PIN}',
     'plan_id' => '1',
     'phone' => '08011223344',
     'amount' => 100,
@@ -32,7 +32,7 @@ curl_setopt($ch, CURLOPT_URL, 'https://sabuss.com/vtu/api/buy/{API_KEY}');
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 curl_setopt($ch, CURLOPT_POST, 1);
 $post = array(
-    'pin' => '0000',
+    'pin' => '{PRODUCTION_PIN}',
     'plan_id' => '1',
     'phone' => '08011223344',
     'reference' => ''
@@ -51,7 +51,7 @@ curl_setopt($ch, CURLOPT_URL, 'https://sabuss.com/vtu/api/query/{API_KEY}');
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 curl_setopt($ch, CURLOPT_POST, 1);
 curl_setopt($ch, CURLOPT_POSTFIELDS, array(
-'pin' => '0000',
+'pin' => '{PRODUCTION_PIN}',
 'reference' => '1234567876543'
 ));
 $result = json_decode(curl_exec($ch),true);
@@ -67,7 +67,7 @@ curl_setopt($ch, CURLOPT_URL, 'https://sabuss.com/vtu/api/plans/{API_KEY}');
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 curl_setopt($ch, CURLOPT_POST, 1);
 $post = array(
-    'pin' => '0000',
+    'pin' => '{PRODUCTION_PIN}',
     'category' => 'data', //airtime
 );
 curl_setopt($ch, CURLOPT_POSTFIELDS, $post);
@@ -113,7 +113,7 @@ curl_setopt($ch, CURLOPT_URL, 'https://sabuss.com/vtu/api/balance/{API_KEY}');
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 curl_setopt($ch, CURLOPT_POST, 1);
 curl_setopt($ch, CURLOPT_POSTFIELDS, array(
-'pin' => '0000'
+'pin' => '{PRODUCTION_PIN}'
 ));
 $result = json_decode(curl_exec($ch),true);
 if (curl_errno($ch)) {

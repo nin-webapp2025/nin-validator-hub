@@ -19,6 +19,7 @@ jobs:
         env:
           SUPABASE_PROJECT_ID: ${{ secrets.SUPABASE_PROJECT_ID }}
           HEALTH_CHECK_TOKEN: ${{ secrets.HEALTH_CHECK_TOKEN }}
+          JOB_WORKER_TOKEN: ${{ secrets.JOB_WORKER_TOKEN }}
         run: |
           set -euo pipefail
 
@@ -72,8 +73,16 @@ jobs:
           WORKER_STATUS=$(curl -sS -o worker.json -w "%{http_code}" \
             -X POST "${BASE_URL}/job-worker" \
             -H "Content-Type: application/json" \
+            -H "x-job-worker-token: ${JOB_WORKER_TOKEN}" \
             -d '{"limit":1}')
           assert_status "$WORKER_STATUS" "200" "job-worker"
           jq -e '.success == true' worker.json > /dev/null
+
+          echo "6. smartapi-webhook should reject unsigned requests"
+          SMARTAPI_WEBHOOK_STATUS=$(curl -sS -o smartapi-webhook.json -w "%{http_code}" \
+            -X POST "${BASE_URL}/smartapi-webhook" \
+            -H "Content-Type: application/json" \
+            -d '{"reference":"SMOKE_TEST_REFERENCE"}')
+          assert_status "$SMARTAPI_WEBHOOK_STATUS" "401" "smartapi-webhook"
 
           echo "All smoke tests passed."

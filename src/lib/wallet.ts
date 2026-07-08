@@ -1,9 +1,9 @@
 /**
  * Wallet utilities.
  * Browser code may read wallet state and request a server-side deduction,
- * but credits and refunds are now restricted to trusted server flows.
+ * but credits and refunds are restricted to trusted server flows.
  */
-import { supabase } from "@/integrations/supabase/client";
+import { rpcClient } from "@/lib/rpc-client";
 import {
   DASHBOARD_OPERATION_LABELS,
   DASHBOARD_OPERATION_PRICES,
@@ -13,7 +13,7 @@ export const OPERATION_PRICES = DASHBOARD_OPERATION_PRICES;
 export const OPERATION_LABELS = DASHBOARD_OPERATION_LABELS;
 
 export async function getWalletBalance(userId: string): Promise<number> {
-  const { data, error } = await (supabase as any).rpc("wallet_get_balance", {
+  const { data, error } = await rpcClient.rpc<number>("wallet_get_balance", {
     p_user_id: userId,
   });
 
@@ -24,13 +24,12 @@ export async function getWalletBalance(userId: string): Promise<number> {
 
   return Number(data ?? 0);
 }
-
 export async function deductWallet(
   userId: string,
   operation: string,
-  requestKey: string
+  requestKey: string,
 ): Promise<{ success: boolean; balance: number; message?: string }> {
-  const { data, error } = await (supabase as any).rpc("wallet_charge_operation", {
+  const { data, error } = await rpcClient.rpc<{ success?: boolean; balance?: number; message?: string }>("wallet_charge_operation", {
     p_user_id: userId,
     p_operation: operation,
     p_request_key: requestKey,
@@ -59,7 +58,7 @@ export async function deductWallet(
 export async function creditWallet(
   _userId: string,
   _amount: number,
-  _reference: string
+  _reference: string,
 ): Promise<{ success: boolean; balance: number; message?: string }> {
   return {
     success: false,
@@ -71,9 +70,9 @@ export async function creditWallet(
 export async function refundWallet(
   userId: string,
   operation: string,
-  requestKey?: string
+  requestKey?: string,
 ): Promise<void> {
-  const { data, error } = await (supabase as any).rpc("wallet_refund_operation", {
+  const { data, error } = await rpcClient.rpc<{ success?: boolean }>("wallet_refund_operation", {
     p_user_id: userId,
     p_operation: operation,
     p_reason: "manual client refund",
@@ -91,7 +90,7 @@ export async function refundWallet(
 }
 
 export function formatNaira(amount: number): string {
-  return `₦${amount.toLocaleString("en-NG", {
+  return `NGN ${amount.toLocaleString("en-NG", {
     minimumFractionDigits: 0,
     maximumFractionDigits: 2,
   })}`;

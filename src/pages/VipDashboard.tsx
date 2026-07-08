@@ -16,6 +16,7 @@ import { BvnHistory } from "@/components/dashboard/BvnHistory";
 import NinSearch from "@/components/dashboard/NinSearch";
 import { Profile } from "@/components/dashboard/Profile";
 import { VipModificationForm } from "@/components/dashboard/VipModificationForm";
+import { MyModificationRequests } from "@/components/dashboard/MyModificationRequests";
 import { PrintNinSlip } from "@/components/dashboard/PrintNinSlip";
 import { WalletTopUp } from "@/components/dashboard/WalletTopUp";
 import { TransactionHistory } from "@/components/dashboard/TransactionHistory";
@@ -28,6 +29,7 @@ import { Crown, Wallet } from "lucide-react";
  */
 export default function VipDashboard() {
   const [activeTab, setActiveTab] = useState("modification");
+  const [modificationRefreshKey, setModificationRefreshKey] = useState(0);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-900 via-purple-800 to-black overflow-x-hidden">
@@ -100,7 +102,8 @@ export default function VipDashboard() {
           </div>
 
           <TabsContent value="modification" className="space-y-6">
-            <VipModificationForm />
+            <VipModificationForm onSubmitted={() => setModificationRefreshKey((current) => current + 1)} />
+            <MyModificationRequests refreshKey={modificationRefreshKey} />
           </TabsContent>
 
           <TabsContent value="validate" className="space-y-6">

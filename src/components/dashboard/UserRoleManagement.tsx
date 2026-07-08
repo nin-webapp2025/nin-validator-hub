@@ -1,8 +1,7 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
@@ -24,55 +23,84 @@ const ROLE_COLORS: Record<UserRole, string> = {
   user: "bg-blue-500",
 };
 
+function extractErrorMessage(error: unknown) {
+  if (!error) return "Unknown error";
+  if (typeof error === "string") return error;
+
+  if (error instanceof Error) {
+    const anyError = error as Error & {
+      code?: string;
+      details?: string;
+      hint?: string;
+    };
+
+    return [
+      anyError.message,
+      anyError.code ? `Code: ${anyError.code}` : null,
+      anyError.details ? `Details: ${anyError.details}` : null,
+      anyError.hint ? `Hint: ${anyError.hint}` : null,
+    ]
+      .filter(Boolean)
+      .join(" | ");
+  }
+
+  if (typeof error === "object") {
+    const anyError = error as {
+      message?: string;
+      code?: string;
+      details?: string;
+      hint?: string;
+    };
+
+    return [
+      anyError.message || "Unknown error",
+      anyError.code ? `Code: ${anyError.code}` : null,
+      anyError.details ? `Details: ${anyError.details}` : null,
+      anyError.hint ? `Hint: ${anyError.hint}` : null,
+    ]
+      .filter(Boolean)
+      .join(" | ");
+  }
+
+  return "Unknown error";
+}
+
 /**
  * Admin User Role Management Component
- * Allows admins to view all users and change their roles
- * Industry standard: Admins manage roles, not users themselves
+ * Allows admins to view all users and change their roles.
  */
 export function UserRoleManagement() {
   const { toast } = useToast();
   const [users, setUsers] = useState<UserWithRole[]>([]);
   const [filteredUsers, setFilteredUsers] = useState<UserWithRole[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [updatingUserId, setUpdatingUserId] = useState<string | null>(null);
 
   const fetchUsers = async () => {
     try {
       setIsLoading(true);
+      setLoadError(null);
 
-      // Get all profiles (admins can see all via RLS policy)
-      const { data: profiles, error: profilesError } = await (supabase as any)
-        .from("profiles")
-        .select("id, email, created_at");
+      const { data, error } = await (supabase as any).rpc("get_admin_users_with_roles");
+      if (error) throw error;
 
-      if (profilesError) throw profilesError;
-
-      // Get all user roles (admins can see all via RLS policy)
-      const { data: userRoles, error: rolesError } = await (supabase as any)
-        .from("user_roles")
-        .select("user_id, role");
-
-      if (rolesError) throw rolesError;
-
-      // Combine data
-      const usersWithRoles: UserWithRole[] = (profiles || []).map(profile => {
-        const roleEntry = userRoles?.find(r => r.user_id === profile.id);
-        return {
-          id: profile.id,
-          email: profile.email || "No email",
-          created_at: profile.created_at,
-          role: (roleEntry?.role as UserRole) || 'user',
-        };
-      });
+      const usersWithRoles: UserWithRole[] = (data || []).map((row: any) => ({
+        id: row.id,
+        email: row.email || "No email",
+        created_at: row.created_at,
+        role: (row.role as UserRole) || "user",
+      }));
 
       setUsers(usersWithRoles);
-      setFilteredUsers(usersWithRoles);
     } catch (error) {
       console.error("Error fetching users:", error);
+      const message = extractErrorMessage(error);
+      setLoadError(message);
       toast({
         title: "Error",
-        description: "Failed to load users",
+        description: message,
         variant: "destructive",
       });
     } finally {
@@ -85,56 +113,50 @@ export function UserRoleManagement() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  useEffect(() => {
+    const trimmed = searchTerm.trim().toLowerCase();
+    if (!trimmed) {
+      setFilteredUsers(users);
+      return;
+    }
+
+    setFilteredUsers(
+      users.filter((user) => user.email.toLowerCase().includes(trimmed)),
+    );
+  }, [users, searchTerm]);
+
   const handleRoleChange = async (userId: string, newRole: UserRole) => {
+    const existingUser = users.find((user) => user.id === userId);
+    if (!existingUser || existingUser.role === newRole) return;
+
     setUpdatingUserId(userId);
 
     try {
-      // Update or insert role
-      const { error } = await (supabase as any)
-        .from("user_roles")
-        .upsert({ 
-          user_id: userId, 
-          role: newRole 
-        }, { 
-          onConflict: 'user_id,role',
-          ignoreDuplicates: false 
-        });
+      const { error } = await (supabase as any).rpc("admin_set_user_role", {
+        p_user_id: userId,
+        p_role: newRole,
+      });
 
-      if (error) {
-        // If upsert failed, try delete old + insert new
-        await (supabase as any)
-          .from("user_roles")
-          .delete()
-          .eq("user_id", userId);
-
-        const { error: insertError } = await (supabase as any)
-          .from("user_roles")
-          .insert({ user_id: userId, role: newRole });
-
-        if (insertError) throw insertError;
-      }
+      if (error) throw error;
 
       toast({
-        title: "✅ Role Updated",
+        title: "Role Updated",
         description: `User role changed to ${newRole.toUpperCase()}`,
       });
 
-      // Audit log
-      const targetUser = users.find(u => u.id === userId);
       logAuditEvent({
         action: "role_change",
         target_type: "user_role",
         target_id: userId,
-        metadata: { new_role: newRole, email: targetUser?.email },
+        metadata: { new_role: newRole, previous_role: existingUser.role, email: existingUser.email },
       });
 
-      // Refresh users list
-      fetchUsers();
+      await fetchUsers();
     } catch (error) {
       console.error("Error updating role:", error);
       toast({
         title: "Update Failed",
-        description: error instanceof Error ? error.message : "Failed to update user role",
+        description: extractErrorMessage(error),
         variant: "destructive",
       });
     } finally {
@@ -164,20 +186,28 @@ export function UserRoleManagement() {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        {/* Search */}
+        {loadError ? (
+          <div className="mb-6 rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-900 dark:border-red-900/60 dark:bg-red-950/30 dark:text-red-200">
+            <p className="font-semibold">Unable to load users</p>
+            <p className="mt-2">{loadError}</p>
+            <p className="mt-3 text-xs text-red-800/80 dark:text-red-200/80">
+              If this mentions policy recursion or permissions, apply the latest role-policy migration in production and refresh this page.
+            </p>
+          </div>
+        ) : null}
+
         <div className="mb-6">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 dark:text-slate-500" />
             <Input
               placeholder="Search users by email..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={(event) => setSearchTerm(event.target.value)}
               className="pl-10"
             />
           </div>
         </div>
 
-        {/* Users List */}
         {filteredUsers.length === 0 ? (
           <p className="text-center text-gray-500 dark:text-slate-400 py-8">
             {searchTerm ? "No users found matching your search" : "No users found"}
@@ -231,30 +261,29 @@ export function UserRoleManagement() {
           </div>
         )}
 
-        {/* Summary */}
         <div className="mt-6 pt-6 border-t">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
             <div>
               <p className="text-2xl font-bold text-blue-600">
-                {users.filter(u => u.role === 'user').length}
+                {users.filter((user) => user.role === "user").length}
               </p>
               <p className="text-xs text-gray-600 dark:text-slate-400">Users</p>
             </div>
             <div>
               <p className="text-2xl font-bold text-purple-600">
-                {users.filter(u => u.role === 'vip').length}
+                {users.filter((user) => user.role === "vip").length}
               </p>
               <p className="text-xs text-gray-600 dark:text-slate-400">VIP</p>
             </div>
             <div>
               <p className="text-2xl font-bold text-green-600">
-                {users.filter(u => u.role === 'staff').length}
+                {users.filter((user) => user.role === "staff").length}
               </p>
               <p className="text-xs text-gray-600 dark:text-slate-400">Staff</p>
             </div>
             <div>
               <p className="text-2xl font-bold text-red-600">
-                {users.filter(u => u.role === 'admin').length}
+                {users.filter((user) => user.role === "admin").length}
               </p>
               <p className="text-xs text-gray-600 dark:text-slate-400">Admins</p>
             </div>

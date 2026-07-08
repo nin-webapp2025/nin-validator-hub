@@ -11,7 +11,6 @@ import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
 import AdminDashboard from "./pages/AdminDashboard";
 import StaffDashboard from "./pages/StaffDashboard";
-import VipDashboard from "./pages/VipDashboard";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
 import ApiDocs from "./pages/ApiDocs";
@@ -19,6 +18,7 @@ import NotFound from "./pages/NotFound";
 import MfaRequired from "./pages/MfaRequired";
 import { UserAppShell } from "@/components/dashboard/UserAppShell";
 import UserOverviewPage from "./pages/user/UserOverviewPage";
+import UserModificationPage from "./pages/user/UserModificationPage";
 import UserNinValidationPage from "./pages/user/UserNinValidationPage";
 import UserNinSearchPage from "./pages/user/UserNinSearchPage";
 import UserBvnPage from "./pages/user/UserBvnPage";
@@ -53,7 +53,7 @@ const RoleBasedDashboard = () => {
     case 'staff':
       return <Navigate to="/dashboard/staff" replace />;
     case 'vip':
-      return <Navigate to="/dashboard/vip" replace />;
+      return <Navigate to="/dashboard/user/modification" replace />;
     case 'user':
     default:
       return <Navigate to="/dashboard/user" replace />;
@@ -101,12 +101,13 @@ const App = () => (
             <Route 
               path="/dashboard/user" 
               element={
-                <ProtectedRoute allowedRoles={['user']}>
+                <ProtectedRoute allowedRoles={['user', 'vip']}>
                   <UserAppShell />
                 </ProtectedRoute>
               }
             >
               <Route index element={<UserOverviewPage />} />
+              <Route path="modification" element={<UserModificationPage />} />
               <Route path="nin-validation" element={<UserNinValidationPage />} />
               <Route path="nin-search" element={<UserNinSearchPage />} />
               <Route path="bvn" element={<UserBvnPage />} />
@@ -131,7 +132,7 @@ const App = () => (
               path="/dashboard/vip" 
               element={
                 <ProtectedRoute allowedRoles={['vip']}>
-                  <VipDashboard />
+                  <Navigate to="/dashboard/user/modification" replace />
                 </ProtectedRoute>
               } 
             />

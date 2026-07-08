@@ -1,42 +1,22 @@
-import { Wallet } from "lucide-react";
+import { Database } from "lucide-react";
 import { DataPurchase } from "@/components/dashboard/DataPurchase";
-import { UserJourneyPage } from "@/components/dashboard/UserJourneyPage";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { VtuPurchaseHistory } from "@/components/dashboard/VtuPurchaseHistory";
+import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function UserDataPage() {
   return (
-    <UserJourneyPage
-      eyebrow="Payments Flow"
-      title="Mobile Data"
-      description="Buy data bundles from a dedicated mobile data page."
-      steps={[
-        {
-          id: "prepare",
-          label: "Prepare purchase",
-          title: "Select bundle and phone number",
-          description: "Choose the network, plan, and phone number for the data purchase.",
-          content: <DataPurchase />,
-        },
-        {
-          id: "wallet",
-          label: "Wallet",
-          title: "Use your wallet for payments",
-          description: "Wallet funding supports data purchases and other account activity.",
-          content: (
-            <Card className="border-slate-200 dark:border-slate-700">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-lg">
-                  <Wallet className="h-5 w-5 text-blue-600" />
-                  Wallet payments
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="text-sm text-slate-600 dark:text-slate-400">
-                Keep your wallet funded so purchases and service charges can be managed from one place.
-              </CardContent>
-            </Card>
-          ),
-        },
-      ]}
-    />
+    <div className="space-y-6">
+      <Card className="border-slate-200/80 bg-white/90 dark:border-slate-800 dark:bg-slate-900/90">
+        <CardHeader>
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-blue-600 dark:text-blue-400">Payments</p>
+          <CardTitle className="mt-2 flex items-center gap-2 text-2xl">
+            <Database className="h-6 w-6 text-blue-600" /> Mobile Data
+          </CardTitle>
+          <CardDescription>Buy a data bundle and follow its delivery status from one page.</CardDescription>
+        </CardHeader>
+      </Card>
+      <DataPurchase />
+      <VtuPurchaseHistory category="data" />
+    </div>
   );
 }

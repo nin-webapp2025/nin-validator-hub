@@ -7,7 +7,15 @@ import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -31,12 +39,11 @@ const MODIFICATION_LABELS: Record<ModificationType, string> = {
   change_dob: "Change of Date of Birth",
 };
 
-/**
- * VIP Modification Request Form
- * Allows VIP users to submit NIN modification requests
- * Requests go to admin for review and assignment to staff
- */
-export function VipModificationForm() {
+interface VipModificationFormProps {
+  onSubmitted?: () => void;
+}
+
+export function VipModificationForm({ onSubmitted }: VipModificationFormProps) {
   const { user } = useAuth();
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -65,28 +72,24 @@ export function VipModificationForm() {
     setIsSubmitting(true);
 
     try {
-      const { error } = await (supabase as any)
-        .from("nin_modification_requests")
-        .insert({
-          user_id: user.id,
-          nin: values.nin,
-          modification_type: values.modification_type,
-          current_value: values.current_value || null,
-          requested_value: values.requested_value,
-          reason: values.reason,
-          status: "pending",
-          priority: "medium",
-        });
+      const { error } = await (supabase as any).rpc("submit_modification_request", {
+        p_nin: values.nin,
+        p_modification_type: values.modification_type,
+        p_current_value: values.current_value || null,
+        p_requested_value: values.requested_value,
+        p_reason: values.reason,
+      });
 
       if (error) throw error;
 
       toast({
-        title: "✅ Request Submitted Successfully",
+        title: "Request Submitted Successfully",
         description: "Your modification request has been submitted and is pending admin review.",
         className: "bg-gradient-to-r from-amber-500 to-yellow-600 text-black border-amber-600",
       });
 
       form.reset();
+      onSubmitted?.();
     } catch (error) {
       console.error("Error submitting modification request:", error);
       toast({
@@ -109,7 +112,8 @@ export function VipModificationForm() {
           </CardTitle>
         </div>
         <CardDescription className="text-purple-200">
-          Submit a request to modify your NIN details. Your request will be reviewed by an admin and assigned to staff for processing.
+          Submit a request to modify your NIN details. Your request will be reviewed and then processed by an
+          administrator or assigned staff member.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -128,9 +132,7 @@ export function VipModificationForm() {
                       className="bg-purple-950/50 border-amber-500/30 text-white placeholder:text-purple-300"
                     />
                   </FormControl>
-                  <FormDescription className="text-purple-300">
-                    Enter your 11-digit NIN
-                  </FormDescription>
+                  <FormDescription className="text-purple-300">Enter your 11-digit NIN</FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
@@ -198,9 +200,7 @@ export function VipModificationForm() {
                       className="bg-purple-950/50 border-amber-500/30 text-white placeholder:text-purple-300"
                     />
                   </FormControl>
-                  <FormDescription className="text-purple-300">
-                    The new value you're requesting
-                  </FormDescription>
+                  <FormDescription className="text-purple-300">The new value you're requesting</FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
@@ -231,7 +231,7 @@ export function VipModificationForm() {
             <Button
               type="submit"
               disabled={isSubmitting}
-              className="w-full bg-gradient-to-r from-amber-500 to-yellow-600 hover:from-amber-600 hover:to-yellow-700 text-black font-semibold"
+              className="w-full bg-gradient-to-r from-amber-500 to-yellow-600 text-black font-semibold hover:from-amber-600 hover:to-yellow-700"
             >
               {isSubmitting ? (
                 <>

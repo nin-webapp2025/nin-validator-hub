@@ -2,6 +2,7 @@ import type { LucideIcon } from "lucide-react";
 import {
   ArrowRightLeft,
   BookOpen,
+  ClipboardList,
   CreditCard,
   Database,
   Key,
@@ -37,6 +38,12 @@ export const USER_NAV_GROUPS: UserNavGroup[] = [
         path: "/dashboard/user",
         icon: Wallet,
         description: "Wallet, activity, and shortcuts",
+      },
+      {
+        label: "Modification",
+        path: "/dashboard/user/modification",
+        icon: ClipboardList,
+        description: "Submit modification requests and track progress",
       },
       {
         label: "NIN Validation",
@@ -84,13 +91,13 @@ export const USER_NAV_GROUPS: UserNavGroup[] = [
         label: "Airtime",
         path: "/dashboard/user/airtime",
         icon: Smartphone,
-        description: "Buy airtime when provider integration is ready",
+        description: "Buy airtime and track delivery",
       },
       {
         label: "Mobile Data",
         path: "/dashboard/user/data",
         icon: Database,
-        description: "Manage data bundle purchases",
+        description: "Buy mobile data and track delivery",
       },
       {
         label: "Wallet",

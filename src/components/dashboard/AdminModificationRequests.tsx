@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -6,8 +6,15 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Shield, CheckCircle, XCircle, UserCog, AlertTriangle, Loader2 } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Shield, CheckCircle, XCircle, UserCog, Loader2 } from "lucide-react";
 import type { NinModificationRequest, Priority, RequestStatus } from "@/types/modification";
 
 const STATUS_COLORS: Record<RequestStatus, string> = {
@@ -26,11 +33,8 @@ const PRIORITY_COLORS: Record<Priority, string> = {
   urgent: "bg-red-500",
 };
 
-/**
- * Admin Modification Requests Management
- * Allows admins to review, assign, and manage NIN modification requests
- * Shows all requests from VIP users with ability to assign to staff
- */
+type AdminAction = "review" | "assign" | "start" | "complete" | "reject";
+
 export function AdminModificationRequests() {
   const { toast } = useToast();
   const [requests, setRequests] = useState<NinModificationRequest[]>([]);
@@ -39,8 +43,8 @@ export function AdminModificationRequests() {
   const [loadError, setLoadError] = useState<string | null>(null);
   const [selectedRequest, setSelectedRequest] = useState<NinModificationRequest | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [actionType, setActionType] = useState<"approve" | "reject" | null>(null);
-  const [selectedStaff, setSelectedStaff] = useState<string>("");
+  const [actionType, setActionType] = useState<AdminAction | null>(null);
+  const [selectedStaff, setSelectedStaff] = useState("");
   const [selectedPriority, setSelectedPriority] = useState<Priority>("medium");
   const [adminNotes, setAdminNotes] = useState("");
   const [rejectionReason, setRejectionReason] = useState("");
@@ -49,12 +53,14 @@ export function AdminModificationRequests() {
   const extractErrorMessage = (error: unknown) => {
     if (!error) return "Unknown error";
     if (typeof error === "string") return error;
+
     if (error instanceof Error) {
       const anyError = error as Error & {
         code?: string;
         details?: string;
         hint?: string;
       };
+
       return [
         anyError.message,
         anyError.code ? `Code: ${anyError.code}` : null,
@@ -73,6 +79,7 @@ export function AdminModificationRequests() {
         hint?: string;
         error_description?: string;
       };
+
       return [
         anyError.message || anyError.error_description || "Unknown error",
         anyError.code ? `Code: ${anyError.code}` : null,
@@ -86,9 +93,50 @@ export function AdminModificationRequests() {
     return "Unknown error";
   };
 
+  const getActionContent = (action: AdminAction | null) => {
+    switch (action) {
+      case "review":
+        return {
+          title: "Start Review",
+          description: "Move this request into review and capture any admin notes.",
+          buttonLabel: "Start Review",
+        };
+      case "assign":
+        return {
+          title: "Assign to Staff",
+          description: "Assign this request to a staff member for processing, or reassign it if needed.",
+          buttonLabel: "Assign Request",
+        };
+      case "start":
+        return {
+          title: "Start Processing",
+          description: "Handle this request directly and mark it as in progress.",
+          buttonLabel: "Start Processing",
+        };
+      case "complete":
+        return {
+          title: "Complete Request",
+          description: "Mark this request as completed and include any final notes.",
+          buttonLabel: "Mark Completed",
+        };
+      case "reject":
+        return {
+          title: "Reject Request",
+          description: "Provide a reason for rejecting this modification request.",
+          buttonLabel: "Reject Request",
+        };
+      default:
+        return {
+          title: "Update Request",
+          description: "Update the selected request.",
+          buttonLabel: "Save",
+        };
+    }
+  };
+
   useEffect(() => {
-    fetchRequests();
-    fetchStaffUsers();
+    void fetchRequests();
+    void fetchStaffUsers();
   }, []);
 
   const fetchRequests = async () => {
@@ -117,7 +165,6 @@ export function AdminModificationRequests() {
 
   const fetchStaffUsers = async () => {
     try {
-      // Join user_roles with profiles to get staff emails (no admin API needed)
       const { data: staffRoles, error: rolesError } = await (supabase as any)
         .from("user_roles")
         .select("user_id")
@@ -126,24 +173,22 @@ export function AdminModificationRequests() {
       if (rolesError) throw rolesError;
 
       if (staffRoles && staffRoles.length > 0) {
-        const staffIds = staffRoles.map(r => r.user_id);
-        
+        const staffIds = staffRoles.map((role: { user_id: string }) => role.user_id);
         const { data: profiles, error: profilesError } = await (supabase as any)
           .from("profiles")
           .select("id, email")
           .in("id", staffIds);
 
-        if (profilesError) {
-          console.error("Error fetching staff profiles:", profilesError);
-          return;
-        }
+        if (profilesError) throw profilesError;
 
-        const staffList = (profiles || []).map(p => ({
-          id: p.id,
-          email: p.email || "Unknown",
-        }));
-
-        setStaffUsers(staffList);
+        setStaffUsers(
+          (profiles || []).map((profile: { id: string; email: string | null }) => ({
+            id: profile.id,
+            email: profile.email || "Unknown",
+          }))
+        );
+      } else {
+        setStaffUsers([]);
       }
     } catch (error) {
       console.error("Error fetching staff users:", error);
@@ -155,32 +200,42 @@ export function AdminModificationRequests() {
     }
   };
 
-  const openDialog = (request: NinModificationRequest, action: "approve" | "reject") => {
+  const openDialog = (request: NinModificationRequest, action: AdminAction) => {
     setSelectedRequest(request);
     setActionType(action);
-    setAdminNotes("");
-    setRejectionReason("");
-    setSelectedStaff("");
+    setSelectedStaff(request.assigned_to || "");
     setSelectedPriority(request.priority || "medium");
+    setAdminNotes(request.admin_notes || "");
+    setRejectionReason(request.rejection_reason || "");
     setIsDialogOpen(true);
   };
 
-  const handleSubmit = async () => {
-    if (!selectedRequest) return;
+  const closeDialog = () => {
+    setIsDialogOpen(false);
+    setSelectedRequest(null);
+    setActionType(null);
+    setSelectedStaff("");
+    setSelectedPriority("medium");
+    setAdminNotes("");
+    setRejectionReason("");
+  };
 
-    if (actionType === "approve" && !selectedStaff) {
+  const handleSubmit = async () => {
+    if (!selectedRequest || !actionType) return;
+
+    if (actionType === "assign" && !selectedStaff) {
       toast({
         title: "Staff Assignment Required",
-        description: "Please select a staff member to assign this request to",
+        description: "Please select a staff member to assign this request to.",
         variant: "destructive",
       });
       return;
     }
 
-    if (actionType === "reject" && !rejectionReason) {
+    if (actionType === "reject" && !rejectionReason.trim()) {
       toast({
         title: "Rejection Reason Required",
-        description: "Please provide a reason for rejecting this request",
+        description: "Please provide a reason for rejecting this request.",
         variant: "destructive",
       });
       return;
@@ -189,38 +244,48 @@ export function AdminModificationRequests() {
     setIsSubmitting(true);
 
     try {
-      const updateData: any = {
-        updated_at: new Date().toISOString(),
-        reviewed_at: new Date().toISOString(),
-        admin_notes: adminNotes || null,
-      };
-
-      if (actionType === "approve") {
-        updateData.status = "assigned";
-        updateData.assigned_to = selectedStaff;
-        updateData.assigned_at = new Date().toISOString();
-        updateData.priority = selectedPriority;
-      } else {
-        updateData.status = "rejected";
-        updateData.rejection_reason = rejectionReason;
-      }
-
-      const { error } = await (supabase as any)
-        .from("nin_modification_requests")
-        .update(updateData)
-        .eq("id", selectedRequest.id);
-
-      if (error) throw error;
-
-      toast({
-        title: actionType === "approve" ? "✅ Request Approved" : "❌ Request Rejected",
-        description: actionType === "approve" 
-          ? "Request has been assigned to staff member"
-          : "Request has been rejected with reason provided",
+      const { data, error } = await (supabase as any).rpc("admin_process_modification_request", {
+        p_request_id: selectedRequest.id,
+        p_action: actionType,
+        p_priority: selectedPriority,
+        p_assigned_to: actionType === "assign" ? selectedStaff : null,
+        p_admin_notes: adminNotes.trim() || null,
+        p_rejection_reason: actionType === "reject" ? rejectionReason.trim() : null,
       });
 
-      setIsDialogOpen(false);
-      fetchRequests();
+      if (error) throw error;
+      if (!data) throw new Error("The modification request was updated but no record was returned.");
+
+      const successMessages: Record<AdminAction, { title: string; description: string }> = {
+        review: {
+          title: "Review started",
+          description: "The request is now under review.",
+        },
+        assign: {
+          title: "Request assigned",
+          description: "The request has been assigned to a staff member.",
+        },
+        start: {
+          title: "Processing started",
+          description: "The admin is now handling this request directly.",
+        },
+        complete: {
+          title: "Request completed",
+          description: "The modification request has been marked as completed.",
+        },
+        reject: {
+          title: "Request rejected",
+          description: "The request has been rejected and the user has been notified.",
+        },
+      };
+
+      toast({
+        title: successMessages[actionType].title,
+        description: successMessages[actionType].description,
+      });
+
+      closeDialog();
+      await fetchRequests();
     } catch (error) {
       console.error("Error updating request:", error);
       toast({
@@ -243,6 +308,8 @@ export function AdminModificationRequests() {
     );
   }
 
+  const dialogContent = getActionContent(actionType);
+
   return (
     <>
       <Card>
@@ -252,7 +319,7 @@ export function AdminModificationRequests() {
             <CardTitle>NIN Modification Requests</CardTitle>
           </div>
           <CardDescription>
-            Review and manage modification requests from VIP users
+            Review, assign, process, and complete modification requests from account users.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -261,21 +328,22 @@ export function AdminModificationRequests() {
               <p className="font-semibold">Unable to load modification requests</p>
               <p className="mt-2">{loadError}</p>
               <p className="mt-3 text-xs text-red-800/80 dark:text-red-200/80">
-                This usually means the production database is missing the `nin_modification_requests` table or the admin SELECT policy for it.
+                This usually means the production database is missing the `nin_modification_requests` table or the
+                admin SELECT policy for it.
               </p>
             </div>
           ) : requests.length === 0 ? (
-            <p className="text-center text-gray-500 dark:text-slate-400 py-8">No modification requests found</p>
+            <p className="py-8 text-center text-gray-500 dark:text-slate-400">No modification requests found</p>
           ) : (
             <div className="space-y-4">
               {requests.map((request) => (
                 <div
                   key={request.id}
-                  className="border rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-slate-800 dark:border-slate-700 transition-colors"
+                  className="rounded-lg border p-4 transition-colors hover:bg-gray-50 dark:border-slate-700 dark:hover:bg-slate-800"
                 >
-                  <div className="flex flex-col sm:flex-row sm:items-start gap-3 sm:justify-between">
-                    <div className="flex-1 min-w-0">
-                      <div className="flex flex-wrap items-center gap-2 mb-2">
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                    <div className="min-w-0 flex-1">
+                      <div className="mb-2 flex flex-wrap items-center gap-2">
                         <Badge className={STATUS_COLORS[request.status]}>
                           {request.status.replace("_", " ").toUpperCase()}
                         </Badge>
@@ -283,7 +351,7 @@ export function AdminModificationRequests() {
                           {request.priority.toUpperCase()}
                         </Badge>
                       </div>
-                      <p className="font-semibold text-lg">
+                      <p className="text-lg font-semibold">
                         {request.modification_type.replace("_", " ").toUpperCase()}
                       </p>
                       <p className="text-sm text-gray-600 dark:text-slate-400">NIN: {request.nin}</p>
@@ -300,36 +368,98 @@ export function AdminModificationRequests() {
                           <span className="font-medium">Reason:</span> {request.reason}
                         </p>
                       </div>
-                      <p className="text-xs text-gray-500 dark:text-slate-400 mt-2">
+                      <p className="mt-2 text-xs text-gray-500 dark:text-slate-400">
                         Submitted: {new Date(request.created_at).toLocaleString()}
                       </p>
+                      {request.admin_notes && (
+                        <p className="mt-2 text-sm text-gray-600 dark:text-slate-400">
+                          <span className="font-medium">Admin Notes:</span> {request.admin_notes}
+                        </p>
+                      )}
+                      {request.staff_notes && (
+                        <p className="mt-1 text-sm text-gray-600 dark:text-slate-400">
+                          <span className="font-medium">Staff Notes:</span> {request.staff_notes}
+                        </p>
+                      )}
+                      {request.rejection_reason && (
+                        <p className="mt-1 text-sm text-red-600 dark:text-red-300">
+                          <span className="font-medium">Rejection Reason:</span> {request.rejection_reason}
+                        </p>
+                      )}
                     </div>
-                    <div className="flex flex-row sm:flex-col gap-2">
+                    <div className="flex flex-row gap-2 sm:flex-col">
                       {request.status === "pending" && (
                         <>
-                          <Button
-                            size="sm"
-                            onClick={() => openDialog(request, "approve")}
-                            className="bg-green-600 hover:bg-green-700"
-                          >
-                            <CheckCircle className="h-4 w-4 mr-1" />
-                            Approve & Assign
+                          <Button size="sm" variant="outline" onClick={() => openDialog(request, "review")}>
+                            Start Review
                           </Button>
                           <Button
                             size="sm"
-                            variant="destructive"
-                            onClick={() => openDialog(request, "reject")}
+                            onClick={() => openDialog(request, "assign")}
+                            className="bg-green-600 hover:bg-green-700"
                           >
-                            <XCircle className="h-4 w-4 mr-1" />
+                            <CheckCircle className="mr-1 h-4 w-4" />
+                            Approve & Assign
+                          </Button>
+                          <Button size="sm" variant="secondary" onClick={() => openDialog(request, "start")}>
+                            Handle Directly
+                          </Button>
+                          <Button size="sm" variant="destructive" onClick={() => openDialog(request, "reject")}>
+                            <XCircle className="mr-1 h-4 w-4" />
                             Reject
                           </Button>
                         </>
                       )}
+
+                      {request.status === "under_review" && (
+                        <>
+                          <Button
+                            size="sm"
+                            onClick={() => openDialog(request, "assign")}
+                            className="bg-green-600 hover:bg-green-700"
+                          >
+                            <CheckCircle className="mr-1 h-4 w-4" />
+                            Assign Staff
+                          </Button>
+                          <Button size="sm" variant="secondary" onClick={() => openDialog(request, "start")}>
+                            Start Processing
+                          </Button>
+                          <Button size="sm" variant="destructive" onClick={() => openDialog(request, "reject")}>
+                            <XCircle className="mr-1 h-4 w-4" />
+                            Reject
+                          </Button>
+                        </>
+                      )}
+
                       {request.status === "assigned" && (
-                        <Badge variant="outline" className="bg-purple-100 dark:bg-purple-950/30 dark:text-purple-300">
-                          <UserCog className="h-3 w-3 mr-1" />
-                          Assigned to Staff
-                        </Badge>
+                        <>
+                          <Badge variant="outline" className="bg-purple-100 dark:bg-purple-950/30 dark:text-purple-300">
+                            <UserCog className="mr-1 h-3 w-3" />
+                            Assigned to Staff
+                          </Badge>
+                          <Button size="sm" variant="secondary" onClick={() => openDialog(request, "start")}>
+                            Take Over
+                          </Button>
+                          <Button size="sm" variant="outline" onClick={() => openDialog(request, "assign")}>
+                            Reassign
+                          </Button>
+                        </>
+                      )}
+
+                      {request.status === "in_progress" && (
+                        <>
+                          <Button
+                            size="sm"
+                            onClick={() => openDialog(request, "complete")}
+                            className="bg-green-600 hover:bg-green-700"
+                          >
+                            <CheckCircle className="mr-1 h-4 w-4" />
+                            Mark Complete
+                          </Button>
+                          <Button size="sm" variant="outline" onClick={() => openDialog(request, "assign")}>
+                            Assign Staff
+                          </Button>
+                        </>
                       )}
                     </div>
                   </div>
@@ -340,78 +470,78 @@ export function AdminModificationRequests() {
         </CardContent>
       </Card>
 
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+      <Dialog open={isDialogOpen} onOpenChange={(open) => (!open ? closeDialog() : setIsDialogOpen(true))}>
         <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
-            <DialogTitle>
-              {actionType === "approve" ? "Approve & Assign Request" : "Reject Request"}
-            </DialogTitle>
-            <DialogDescription>
-              {actionType === "approve" 
-                ? "Assign this request to a staff member for processing" 
-                : "Provide a reason for rejecting this request"}
-            </DialogDescription>
+            <DialogTitle>{dialogContent.title}</DialogTitle>
+            <DialogDescription>{dialogContent.description}</DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4 py-4">
-            {actionType === "approve" ? (
-              <>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Assign to Staff</label>
-                  <Select value={selectedStaff} onValueChange={setSelectedStaff}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select staff member" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {staffUsers.map((staff) => (
-                        <SelectItem key={staff.id} value={staff.id}>
-                          {staff.email}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
+            {actionType === "assign" && (
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Assign to Staff</label>
+                <Select value={selectedStaff} onValueChange={setSelectedStaff}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select staff member" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {staffUsers.map((staff) => (
+                      <SelectItem key={staff.id} value={staff.id}>
+                        {staff.email}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
 
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Priority</label>
-                  <Select value={selectedPriority} onValueChange={(val) => setSelectedPriority(val as Priority)}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="low">Low</SelectItem>
-                      <SelectItem value="medium">Medium</SelectItem>
-                      <SelectItem value="high">High</SelectItem>
-                      <SelectItem value="urgent">Urgent</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Admin Notes (Optional)</label>
-                  <Textarea
-                    value={adminNotes}
-                    onChange={(e) => setAdminNotes(e.target.value)}
-                    placeholder="Add any notes for the staff member..."
-                    rows={3}
-                  />
-                </div>
-              </>
-            ) : (
+            {actionType === "reject" && (
               <div className="space-y-2">
                 <label className="text-sm font-medium">Rejection Reason</label>
                 <Textarea
                   value={rejectionReason}
-                  onChange={(e) => setRejectionReason(e.target.value)}
+                  onChange={(event) => setRejectionReason(event.target.value)}
                   placeholder="Explain why this request is being rejected..."
                   rows={4}
                 />
               </div>
             )}
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Priority</label>
+              <Select value={selectedPriority} onValueChange={(value) => setSelectedPriority(value as Priority)}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="low">Low</SelectItem>
+                  <SelectItem value="medium">Medium</SelectItem>
+                  <SelectItem value="high">High</SelectItem>
+                  <SelectItem value="urgent">Urgent</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium">
+                {actionType === "assign" ? "Admin Notes for Staff (Optional)" : "Admin Notes (Optional)"}
+              </label>
+              <Textarea
+                value={adminNotes}
+                onChange={(event) => setAdminNotes(event.target.value)}
+                placeholder={
+                  actionType === "complete"
+                    ? "Add any final notes for the completed request..."
+                    : "Add any notes relevant to this request..."
+                }
+                rows={3}
+              />
+            </div>
           </div>
 
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsDialogOpen(false)} disabled={isSubmitting}>
+            <Button variant="outline" onClick={closeDialog} disabled={isSubmitting}>
               Cancel
             </Button>
             <Button onClick={handleSubmit} disabled={isSubmitting}>
@@ -420,10 +550,8 @@ export function AdminModificationRequests() {
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   Processing...
                 </>
-              ) : actionType === "approve" ? (
-                "Approve & Assign"
               ) : (
-                "Reject Request"
+                dialogContent.buttonLabel
               )}
             </Button>
           </DialogFooter>

@@ -38,6 +38,10 @@ serve(async (req) => {
   const robosttechKey = Deno.env.get("ROBOSTTECH_API_KEY");
   const premblyKey = Deno.env.get("PREMBLY_API_KEY");
   const paystackKey = Deno.env.get("PAYSTACK_SECRET_KEY");
+  const smartApiKey = Deno.env.get("SMARTAPI_API_KEY");
+  const smartApiPin = Deno.env.get("SMARTAPI_PIN");
+  const smartApiWebhookToken = Deno.env.get("SMARTAPI_WEBHOOK_TOKEN");
+  const jobWorkerToken = Deno.env.get("JOB_WORKER_TOKEN");
 
   const envChecks = {
     SUPABASE_URL: !!supabaseUrl,
@@ -45,6 +49,10 @@ serve(async (req) => {
     ROBOSTTECH_API_KEY: !!robosttechKey,
     PREMBLY_API_KEY: !!premblyKey,
     PAYSTACK_SECRET_KEY: !!paystackKey,
+    SMARTAPI_API_KEY: !!smartApiKey,
+    SMARTAPI_PIN: !!smartApiPin,
+    SMARTAPI_WEBHOOK_TOKEN: !!smartApiWebhookToken,
+    JOB_WORKER_TOKEN: !!jobWorkerToken,
   };
 
   if (!supabaseUrl || !serviceRoleKey) {
@@ -82,6 +90,8 @@ serve(async (req) => {
     runTableCheck("operational_events"),
     runTableCheck("operational_alerts"),
     runTableCheck("wallet_transactions"),
+    runTableCheck("vtu_products"),
+    runTableCheck("vtu_transactions"),
   ]);
 
   const missingEnvCount = Object.values(envChecks).filter((value) => !value).length;

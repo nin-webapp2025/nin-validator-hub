@@ -3,7 +3,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
 import { AppFooter } from "@/components/dashboard/AppFooter";
 import { StatsCards } from "@/components/dashboard/StatsCards";
-import { ApiUsage } from "@/components/dashboard/ApiUsage";
 import { ValidationHistory } from "@/components/dashboard/ValidationHistory";
 import { PersonalizationHistory } from "@/components/dashboard/PersonalizationHistory";
 import { ClearanceHistory } from "@/components/dashboard/ClearanceHistory";
@@ -78,11 +77,6 @@ export default function AdminDashboard() {
           totalPersonalizations={stats?.totalPersonalizations}
           totalClearances={stats?.totalClearances}
         />
-
-        {/* API Usage Analytics - Admin Only */}
-        <div className="mb-8">
-          <ApiUsage />
-        </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <div className="overflow-x-auto -mx-3 px-3 sm:mx-0 sm:px-0 no-scrollbar">

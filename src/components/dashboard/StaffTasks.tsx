@@ -87,22 +87,11 @@ export function StaffTasks() {
     setIsSubmitting(true);
 
     try {
-      const updateData: any = {
-        updated_at: new Date().toISOString(),
-        staff_notes: staffNotes || null,
-      };
-
-      if (actionType === "start") {
-        updateData.status = "in_progress";
-      } else if (actionType === "complete") {
-        updateData.status = "completed";
-        updateData.completed_at = new Date().toISOString();
-      }
-
-      const { error } = await (supabase as any)
-        .from("nin_modification_requests")
-        .update(updateData)
-        .eq("id", selectedTask.id);
+      const { error } = await (supabase as any).rpc("staff_process_modification_request", {
+        p_request_id: selectedTask.id,
+        p_action: actionType,
+        p_staff_notes: staffNotes || null,
+      });
 
       if (error) throw error;
 
