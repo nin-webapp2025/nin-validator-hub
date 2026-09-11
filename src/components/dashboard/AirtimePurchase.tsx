@@ -153,13 +153,17 @@ export function AirtimePurchase() {
 
           <div className="space-y-2">
             <Label htmlFor="airtime-amount">Airtime Amount</Label>
-            <Input
-              id="airtime-amount"
-              value={amount}
-              onChange={(event) => setAmount(event.target.value.replace(/[^\d.]/g, ""))}
-              placeholder="500"
-              inputMode="decimal"
-            />
+            <div className="relative">
+              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-xl font-semibold text-muted-foreground">₦</span>
+              <Input
+                id="airtime-amount"
+                value={amount}
+                onChange={(event) => setAmount(event.target.value.replace(/[^\d.]/g, ""))}
+                placeholder="0"
+                inputMode="decimal"
+                className="h-14 rounded-xl pl-9 font-mono text-2xl font-semibold tabular-nums"
+              />
+            </div>
             <div className="flex flex-wrap gap-2">
               {QUICK_AMOUNTS.map((value) => (
                 <button

@@ -43,19 +43,19 @@ export const USER_NAV_GROUPS: UserNavGroup[] = [
         label: "Modification",
         path: "/dashboard/user/modification",
         icon: ClipboardList,
-        description: "Submit modification requests and track progress",
+        description: "Fix or update details on an existing NIN record",
       },
       {
         label: "NIN Validation",
         path: "/dashboard/user/nin-validation",
         icon: Search,
-        description: "Submit and track NIN checks",
+        description: "Confirm a NIN is enrolled and valid",
       },
       {
-        label: "NIN Search",
+        label: "NIN Verification",
         path: "/dashboard/user/nin-search",
         icon: ArrowRightLeft,
-        description: "Search by NIN, phone, or demographics",
+        description: "Look up identity details by NIN, phone, or demographics",
       },
       {
         label: "BVN Verification",
@@ -67,13 +67,13 @@ export const USER_NAV_GROUPS: UserNavGroup[] = [
         label: "Clearance",
         path: "/dashboard/user/clearance",
         icon: ShieldCheck,
-        description: "Run approval and clearance checks",
+        description: "Resolve NIN enrollment exceptions and verify clearance",
       },
       {
         label: "Personalization",
         path: "/dashboard/user/personalization",
         icon: Sparkles,
-        description: "Submit personalization workflows",
+        description: "Request NIN card personalization after enrollment",
       },
       {
         label: "Print NIN",
@@ -133,11 +133,3 @@ export const USER_SECONDARY_LINK = {
   icon: BookOpen,
   description: "Read the developer documentation",
 };
-
-export const USER_QUICK_ACTIONS = [
-  "/dashboard/user/nin-validation",
-  "/dashboard/user/nin-search",
-  "/dashboard/user/bvn",
-  "/dashboard/user/wallet",
-  "/dashboard/user/api-keys",
-];
