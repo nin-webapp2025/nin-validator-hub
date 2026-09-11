@@ -1,6 +1,7 @@
 import { useEffect, useState, createContext, useContext, ReactNode } from "react";
 import { User, Session, AuthMFAEnrollResponse, AuthMFAChallengeResponse, AuthMFAVerifyResponse } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
+import { clearDevRoleOverride } from "@/lib/devRoleOverride";
 
 interface AuthContextType {
   user: User | null;
@@ -128,6 +129,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signOut = async () => {
     await supabase.auth.signOut();
+    // Belt-and-suspenders: the override is already scoped per user id, but
+    // clearing it here too keeps localStorage tidy across sign-outs.
+    clearDevRoleOverride();
   };
 
   const enrollMFA = () => supabase.auth.mfa.enroll({ factorType: "totp" });
