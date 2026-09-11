@@ -1,10 +1,8 @@
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "@/hooks/useAuth";
 import { useTheme } from "@/components/theme-provider";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { motion } from "framer-motion";
 import { 
   Shield, 
   CheckCircle, 
@@ -25,23 +23,14 @@ import {
   Linkedin,
   Mail,
   BookOpen,
-  Menu,
-  X
+  Menu
 } from "lucide-react";
-import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Sheet, SheetContent, SheetTrigger, SheetClose } from "@/components/ui/sheet";
 
 export default function Landing() {
   const navigate = useNavigate();
-  const { user } = useAuth();
   const { theme, setTheme } = useTheme();
-
-  useEffect(() => {
-    if (user) {
-      navigate("/dashboard");
-    }
-  }, [user, navigate]);
 
   const toggleTheme = () => {
     setTheme(theme === "light" ? "dark" : "light");
@@ -227,12 +216,7 @@ export default function Landing() {
 
       {/* Hero Section */}
       <section className="container mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-12 sm:pt-12 sm:pb-20 lg:pt-16 lg:pb-32">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="text-center max-w-4xl mx-auto"
-        >
+        <div className="text-center max-w-4xl mx-auto animate-in fade-in slide-in-from-bottom-3 duration-700">
           <Badge className="mb-6 px-4 py-1.5 bg-blue-50 dark:bg-blue-950/30 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800">
             <Sparkles className="h-3 w-3 mr-1.5" />
             Trusted Identity Verification
@@ -272,13 +256,8 @@ export default function Landing() {
 
           {/* Stats */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mt-10 sm:mt-20">
-            {stats.map((stat, index) => (
-              <motion.div
-                key={stat.label}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-              >
+            {stats.map((stat) => (
+              <div key={stat.label} className="animate-in fade-in slide-in-from-bottom-2 duration-500">
                 <Card className="border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900">
                   <CardContent className="p-3 sm:p-6 text-center">
                     <stat.icon className="h-6 w-6 sm:h-8 sm:w-8 mx-auto mb-2 sm:mb-3 text-blue-600" />
@@ -290,21 +269,15 @@ export default function Landing() {
                     </p>
                   </CardContent>
                 </Card>
-              </motion.div>
+              </div>
             ))}
           </div>
-        </motion.div>
+        </div>
       </section>
 
       {/* Features Section */}
       <section id="features" className="container mx-auto px-4 sm:px-6 lg:px-8 py-20 scroll-mt-16">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-16"
-        >
+        <div className="text-center mb-16">
           <Badge className="mb-4 px-4 py-1.5 bg-blue-50 dark:bg-blue-950/30 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800">
             Features
           </Badge>
@@ -314,18 +287,11 @@ export default function Landing() {
           <p className="text-lg text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
             Powerful tools and features designed for businesses of all sizes
           </p>
-        </motion.div>
+        </div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {features.map((feature, index) => (
-            <motion.div
-              key={feature.title}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-50px" }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
-              whileHover={{ y: -8, transition: { duration: 0.2 } }}
-            >
+          {features.map((feature) => (
+            <div key={feature.title} className="transition-transform duration-200 hover:-translate-y-2">
               <Card className="h-full border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 hover:shadow-lg dark:hover:shadow-2xl transition-all duration-300">
                 <CardContent className="p-6">
                   <div className={`${feature.lightBg} rounded-xl p-3 w-fit mb-4`}>
@@ -339,19 +305,14 @@ export default function Landing() {
                   </p>
                 </CardContent>
               </Card>
-            </motion.div>
+            </div>
           ))}
         </div>
       </section>
 
       {/* CTA Section */}
       <section id="services" className="container mx-auto px-4 sm:px-6 lg:px-8 py-20 scroll-mt-16">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          whileInView={{ opacity: 1, scale: 1 }}
-          viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 0.6 }}
-        >
+        <div>
           <Card className="bg-gradient-to-br from-blue-600 to-blue-700 border-0 shadow-2xl">
             <CardContent className="p-6 sm:p-12 lg:p-16 text-center">
               <h2 className="text-2xl sm:text-4xl lg:text-5xl font-bold text-white mb-4 sm:mb-6">
@@ -381,7 +342,7 @@ export default function Landing() {
               </div>
             </CardContent>
           </Card>
-        </motion.div>
+        </div>
       </section>
 
       {/* Footer */}
