@@ -54,7 +54,6 @@ export function ProtectedRoute({
         const userDashboardMap: Record<UserRole, string> = {
           admin: '/dashboard/admin',
           staff: '/dashboard/staff',
-          vip: '/dashboard/user/modification',
           user: '/dashboard/user',
         };
         
