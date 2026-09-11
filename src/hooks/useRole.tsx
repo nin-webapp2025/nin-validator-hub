@@ -3,7 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { getDevRoleOverride, setDevRoleOverride } from '@/lib/devRoleOverride';
 
-export type UserRole = 'admin' | 'user' | 'staff' | 'vip';
+export type UserRole = 'admin' | 'user' | 'staff';
 
 export { getDevRoleOverride, setDevRoleOverride };
 
@@ -13,7 +13,6 @@ interface UseRoleReturn {
   isAdmin: boolean;
   isUser: boolean;
   isStaff: boolean;
-  isVip: boolean;
   error: Error | null;
   refetch: () => Promise<void>;
 }
@@ -63,8 +62,12 @@ export function useRole(): UseRoleReturn {
         throw roleError;
       }
 
-      // Default to 'user' if no role is set
-      setRole(data?.role || 'user');
+      // Default to 'user' if no role is set. The 'vip' enum value still
+      // exists at the database layer (see supabase/migrations) even though
+      // the app no longer assigns or understands it — fall back to 'user'
+      // if a row somehow still carries it.
+      const fetchedRole = data?.role;
+      setRole(fetchedRole && fetchedRole !== 'vip' ? fetchedRole : 'user');
       resolvedForUserId.current = user.id;
     } catch (err) {
       console.error('Error fetching user role:', err);
@@ -104,7 +107,6 @@ export function useRole(): UseRoleReturn {
     isAdmin: role === 'admin',
     isUser: role === 'user',
     isStaff: role === 'staff',
-    isVip: role === 'vip',
     error,
     refetch: fetchRole,
   };

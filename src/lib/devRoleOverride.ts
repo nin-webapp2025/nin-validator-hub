@@ -1,7 +1,7 @@
 import type { UserRole } from "@/hooks/useRole";
 
 const DEV_ROLE_KEY = "sparkid_dev_role";
-const VALID_ROLES: UserRole[] = ["admin", "user", "staff", "vip"];
+const VALID_ROLES: UserRole[] = ["admin", "user", "staff"];
 
 interface StoredOverride {
   userId: string;

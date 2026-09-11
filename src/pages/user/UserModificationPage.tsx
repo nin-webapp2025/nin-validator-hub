@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { UserJourneyPage } from "@/components/dashboard/UserJourneyPage";
-import { VipModificationForm } from "@/components/dashboard/VipModificationForm";
+import { ModificationRequestForm } from "@/components/dashboard/ModificationRequestForm";
 import { MyModificationRequests } from "@/components/dashboard/MyModificationRequests";
 
 export default function UserModificationPage() {
@@ -17,7 +17,7 @@ export default function UserModificationPage() {
           label: "Submit request",
           title: "Start a new modification request",
           description: "Provide your NIN details, the requested change, and the reason for the update.",
-          content: <VipModificationForm onSubmitted={() => setRefreshKey((current) => current + 1)} />,
+          content: <ModificationRequestForm onSubmitted={() => setRefreshKey((current) => current + 1)} />,
         },
         {
           id: "track",

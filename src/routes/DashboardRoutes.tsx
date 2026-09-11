@@ -49,8 +49,6 @@ function RoleBasedDashboard() {
       return <Navigate to="/dashboard/admin" replace />;
     case "staff":
       return <Navigate to="/dashboard/staff" replace />;
-    case "vip":
-      return <Navigate to="/dashboard/user/modification" replace />;
     case "user":
     default:
       return <Navigate to="/dashboard/user" replace />;
@@ -90,7 +88,7 @@ export default function DashboardRoutes() {
             <Route
               path="user"
               element={
-                <ProtectedRoute allowedRoles={["user", "vip"]}>
+                <ProtectedRoute allowedRoles={["user"]}>
                   <UserAppShell />
                 </ProtectedRoute>
               }
@@ -114,14 +112,6 @@ export default function DashboardRoutes() {
               element={
                 <ProtectedRoute allowedRoles={["staff"]}>
                   <StaffDashboard />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="vip"
-              element={
-                <ProtectedRoute allowedRoles={["vip"]}>
-                  <Navigate to="/dashboard/user/modification" replace />
                 </ProtectedRoute>
               }
             />

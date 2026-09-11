@@ -19,7 +19,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Crown, Send, Loader2 } from "lucide-react";
+import { ClipboardList, Send, Loader2 } from "lucide-react";
 import type { ModificationType } from "@/types/modification";
 
 const formSchema = z.object({
@@ -39,11 +39,11 @@ const MODIFICATION_LABELS: Record<ModificationType, string> = {
   change_dob: "Change of Date of Birth",
 };
 
-interface VipModificationFormProps {
+interface ModificationRequestFormProps {
   onSubmitted?: () => void;
 }
 
-export function VipModificationForm({ onSubmitted }: VipModificationFormProps) {
+export function ModificationRequestForm({ onSubmitted }: ModificationRequestFormProps) {
   const { user } = useAuth();
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -106,7 +106,7 @@ export function VipModificationForm({ onSubmitted }: VipModificationFormProps) {
     <Card className="border-slate-200/80 bg-white/90 dark:border-slate-800 dark:bg-slate-900/90">
       <CardHeader>
         <div className="flex items-center gap-2">
-          <Crown className="h-5 w-5 text-primary" />
+          <ClipboardList className="h-5 w-5 text-primary" />
           <CardTitle className="text-slate-900 dark:text-slate-100">
             NIN Modification Request
           </CardTitle>
