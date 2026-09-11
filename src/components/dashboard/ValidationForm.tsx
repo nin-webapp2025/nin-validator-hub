@@ -263,11 +263,13 @@ export function ValidationForm({ onSuccess }: ValidationFormProps) {
             <Input
               id="nin"
               type="text"
+              inputMode="numeric"
               placeholder="Enter 11-digit NIN"
               value={nin}
               onChange={(e) => setNin(e.target.value.replace(/\D/g, "").slice(0, 11))}
               maxLength={11}
               required
+              className="h-12 rounded-xl font-mono text-lg tracking-wider tabular-nums"
             />
             <p className="text-xs text-muted-foreground">{nin.length}/11 digits</p>
           </div>

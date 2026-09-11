@@ -436,16 +436,16 @@ export function WalletTopUp() {
               Or enter amount (₦)
             </Label>
             <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground font-medium">₦</span>
+              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-xl font-semibold text-muted-foreground">₦</span>
               <Input
                 id="topup-amount"
                 type="number"
                 min={100}
                 step={100}
-                placeholder="Enter amount"
+                placeholder="0"
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
-                className="pl-7"
+                className="h-14 rounded-xl pl-9 font-mono text-2xl font-semibold tabular-nums"
               />
             </div>
             <p className="text-xs text-muted-foreground">Minimum top-up: ₦100</p>

@@ -56,7 +56,7 @@ export default function UserPrintNinPage() {
           content: (
             <div className="grid gap-3 md:grid-cols-3">
               <ActionLink
-                label="NIN Search"
+                label="NIN Verification"
                 description="Return to search before printing another slip."
                 onClick={() => navigate("/dashboard/user/nin-search")}
               />

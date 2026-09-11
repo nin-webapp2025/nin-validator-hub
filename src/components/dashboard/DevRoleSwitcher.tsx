@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useRole, UserRole, getDevRoleOverride, setDevRoleOverride } from "@/hooks/useRole";
+import { useAuth } from "@/hooks/useAuth";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -30,25 +31,27 @@ export function DevRoleSwitcher() {
   if (import.meta.env.PROD) return null;
 
   const { role } = useRole();
+  const { user } = useAuth();
   const navigate = useNavigate();
-  const [override, setOverride] = useState<UserRole | null>(getDevRoleOverride);
+  const [override, setOverride] = useState<UserRole | null>(() => getDevRoleOverride(user?.id));
 
-  // Keep local state in sync with external changes
+  // Keep local state in sync with external changes (and with account switches)
   useEffect(() => {
-    const sync = () => setOverride(getDevRoleOverride());
+    const sync = () => setOverride(getDevRoleOverride(user?.id));
+    sync();
     window.addEventListener("dev-role-changed", sync);
     return () => window.removeEventListener("dev-role-changed", sync);
-  }, []);
+  }, [user?.id]);
 
   const handleSelect = (newRole: UserRole) => {
-    setDevRoleOverride(newRole);
+    setDevRoleOverride(newRole, user?.id);
     setOverride(newRole);
     // Navigate to the matching dashboard
     navigate(ROLE_META[newRole].path, { replace: true });
   };
 
   const handleClear = () => {
-    setDevRoleOverride(null);
+    setDevRoleOverride(null, user?.id);
     setOverride(null);
     // Refresh to re-route based on real role
     navigate("/dashboard", { replace: true });

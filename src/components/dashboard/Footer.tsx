@@ -124,7 +124,7 @@ export function Footer() {
               <li>
                 <Link to="#" className="text-sm text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors font-medium flex items-center gap-2 group">
                   <span className="h-1 w-1 rounded-full bg-slate-300 dark:bg-slate-700 group-hover:bg-blue-600 dark:group-hover:bg-blue-400 transition-colors" />
-                  NIN Search
+                  NIN Verification
                 </Link>
               </li>
               <li>

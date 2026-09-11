@@ -61,19 +61,19 @@ export function WalletBalance({
       <button
         type="button"
         onClick={onClick}
-        className="w-full rounded-[24px] border border-blue-200/70 bg-[linear-gradient(135deg,#0f172a_0%,#1d4ed8_48%,#2563eb_100%)] p-4 text-left text-white shadow-[0_18px_56px_rgba(37,99,235,0.2)] transition-transform hover:-translate-y-0.5 hover:shadow-[0_22px_68px_rgba(37,99,235,0.26)] dark:border-blue-500/20 sm:p-5"
+        className="w-full rounded-[24px] border border-amber-300/40 bg-[linear-gradient(135deg,#0f172a_0%,#78350f_55%,#F59E0B_100%)] p-4 text-left text-white shadow-spark transition-transform hover:-translate-y-0.5 dark:border-amber-500/20 sm:p-5"
         title="Wallet Balance — Click to open wallet"
       >
         <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <div className="flex items-center gap-2 text-blue-100/90">
+            <div className="flex items-center gap-2 text-amber-100/90">
               <Wallet className="h-3.5 w-3.5" />
               <span className="text-xs font-semibold uppercase tracking-[0.22em]">{title}</span>
             </div>
-            <p className="mt-2 text-2xl font-black tracking-tight tabular-nums sm:text-4xl">
+            <p className="mt-2 font-mono text-2xl font-bold tracking-tight tabular-nums sm:text-4xl">
               {formatNaira(balance)}
             </p>
-            <p className="mt-1.5 max-w-xl text-xs text-blue-50/85 sm:text-sm">
+            <p className="mt-1.5 max-w-xl text-xs text-amber-50/85 sm:text-sm">
               {subtitle}
             </p>
           </div>

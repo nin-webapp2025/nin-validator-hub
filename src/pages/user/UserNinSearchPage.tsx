@@ -12,7 +12,7 @@ export default function UserNinSearchPage() {
   return (
     <UserJourneyPage
       eyebrow="Search Flow"
-      title="NIN Search"
+      title="NIN Verification"
       description="Search by NIN, phone number, or demographic data in a dedicated page flow that feels more focused than the old embedded tab experience."
       steps={[
         {
