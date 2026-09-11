@@ -36,7 +36,7 @@ const DASHBOARD_GROUPS = [
     description: "Identity checks and lookups",
     tabs: [
       { value: "validate", label: "NIN Validation", icon: Search },
-      { value: "search", label: "NIN Search", icon: Search },
+      { value: "search", label: "NIN Verification", icon: Search },
       { value: "bvn", label: "BVN Verification", icon: CreditCard },
     ],
   },

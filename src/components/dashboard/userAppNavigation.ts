@@ -20,8 +20,6 @@ export interface UserNavItem {
   path: string;
   icon: LucideIcon;
   description: string;
-  /** Surfaced as a quick action on the Overview page — keep this to 2-4 items. */
-  quickAction?: boolean;
 }
 
 export interface UserNavGroup {
@@ -52,14 +50,12 @@ export const USER_NAV_GROUPS: UserNavGroup[] = [
         path: "/dashboard/user/nin-validation",
         icon: Search,
         description: "Confirm a NIN is enrolled and valid",
-        quickAction: true,
       },
       {
-        label: "NIN Search",
+        label: "NIN Verification",
         path: "/dashboard/user/nin-search",
         icon: ArrowRightLeft,
         description: "Look up identity details by NIN, phone, or demographics",
-        quickAction: true,
       },
       {
         label: "BVN Verification",
@@ -108,7 +104,6 @@ export const USER_NAV_GROUPS: UserNavGroup[] = [
         path: "/dashboard/user/wallet",
         icon: Wallet,
         description: "Top up, track balance, and review charges",
-        quickAction: true,
       },
     ],
   },

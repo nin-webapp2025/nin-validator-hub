@@ -161,7 +161,7 @@ const ENDPOINTS = [
   },
   {
     id: "nin_search",
-    name: "NIN Search",
+    name: "NIN Verification",
     method: "POST",
     description: "Search for identity information using a NIN.",
     price: API_ACTION_PRICES.nin_search,
