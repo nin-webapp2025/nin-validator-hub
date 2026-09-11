@@ -276,9 +276,11 @@ export type Database = {
           completed_at: string | null
           created_at: string
           current_value: string | null
+          fee_amount: number | null
           id: string
           modification_type: string
           nin: string
+          payment_reference: string | null
           priority: string
           reason: string
           rejection_reason: string | null
@@ -297,9 +299,11 @@ export type Database = {
           completed_at?: string | null
           created_at?: string
           current_value?: string | null
+          fee_amount?: number | null
           id?: string
           modification_type: string
           nin: string
+          payment_reference?: string | null
           priority?: string
           reason: string
           rejection_reason?: string | null
@@ -318,9 +322,11 @@ export type Database = {
           completed_at?: string | null
           created_at?: string
           current_value?: string | null
+          fee_amount?: number | null
           id?: string
           modification_type?: string
           nin?: string
+          payment_reference?: string | null
           priority?: string
           reason?: string
           rejection_reason?: string | null
@@ -980,9 +986,11 @@ export type Database = {
           completed_at: string | null
           created_at: string
           current_value: string | null
+          fee_amount: number | null
           id: string
           modification_type: string
           nin: string
+          payment_reference: string | null
           priority: string
           reason: string
           rejection_reason: string | null
@@ -1086,6 +1094,15 @@ export type Database = {
         }
         Returns: boolean
       }
+      insert_audit_log: {
+        Args: {
+          p_action: string
+          p_metadata?: Json
+          p_target_id?: string
+          p_target_type: string
+        }
+        Returns: string
+      }
       list_my_vtu_transactions: {
         Args: { p_category?: string; p_limit?: number; p_offset?: number }
         Returns: {
@@ -1177,9 +1194,11 @@ export type Database = {
           completed_at: string | null
           created_at: string
           current_value: string | null
+          fee_amount: number | null
           id: string
           modification_type: string
           nin: string
+          payment_reference: string | null
           priority: string
           reason: string
           rejection_reason: string | null
@@ -1213,9 +1232,11 @@ export type Database = {
           completed_at: string | null
           created_at: string
           current_value: string | null
+          fee_amount: number | null
           id: string
           modification_type: string
           nin: string
+          payment_reference: string | null
           priority: string
           reason: string
           rejection_reason: string | null
@@ -1233,6 +1254,17 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
+      }
+      submit_paid_modification_request: {
+        Args: {
+          p_current_value?: string
+          p_modification_type: string
+          p_nin: string
+          p_reason?: string
+          p_request_key?: string
+          p_requested_value?: string
+        }
+        Returns: Json
       }
       update_operational_alert_status: {
         Args: { p_alert_id: string; p_status: string }

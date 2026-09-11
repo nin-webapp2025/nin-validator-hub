@@ -35,6 +35,8 @@ export interface NinModificationRequest {
   staff_notes?: string;
   rejection_reason?: string;
   supporting_documents?: string[];
+  payment_reference?: string;
+  fee_amount?: number;
   created_at: string;
   updated_at: string;
   reviewed_at?: string;

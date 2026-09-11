@@ -6,6 +6,10 @@ export const DASHBOARD_OPERATION_PRICES: Record<string, number> = {
   print_nin_slip_long: 400,
   clearance: 3000,
   personalization: 1500,
+  modification_change_name: 15000,
+  modification_change_phone: 15000,
+  modification_change_address: 15000,
+  modification_change_dob: 65000,
 };
 
 export const DASHBOARD_OPERATION_LABELS: Record<string, string> = {
@@ -16,6 +20,17 @@ export const DASHBOARD_OPERATION_LABELS: Record<string, string> = {
   print_nin_slip_long: "Print Long NIN Slip (NINS)",
   clearance: "Clearance",
   personalization: "Personalization",
+  modification_change_name: "Change of Name Modification",
+  modification_change_phone: "Change of Phone Number Modification",
+  modification_change_address: "Change of Address Modification",
+  modification_change_dob: "Change of Date of Birth Modification",
+};
+
+export const MODIFICATION_FEES: Record<"change_name" | "change_phone" | "change_address" | "change_dob", number> = {
+  change_name: DASHBOARD_OPERATION_PRICES.modification_change_name,
+  change_phone: DASHBOARD_OPERATION_PRICES.modification_change_phone,
+  change_address: DASHBOARD_OPERATION_PRICES.modification_change_address,
+  change_dob: DASHBOARD_OPERATION_PRICES.modification_change_dob,
 };
 
 export const API_ACTION_PRICES: Record<string, number> = {
