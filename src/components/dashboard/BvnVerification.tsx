@@ -82,7 +82,7 @@ export function BvnVerification({ onSuccess }: BvnFormProps) {
           user_id: user.id,
           bvn: bvn,
           verification_type: "advance",
-          status: data?.status || "completed",
+          status: data?.success === false ? "failed" : "completed",
           result: data,
         });
 
