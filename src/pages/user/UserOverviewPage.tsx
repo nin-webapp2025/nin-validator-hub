@@ -24,12 +24,14 @@ export default function UserOverviewPage() {
         onClick={() => navigate("/dashboard/user/wallet")}
       />
 
-      {/* Quick actions — the 3 things most people come here to do, not the full 13-item menu */}
+      {/* Quick actions — the 3 things most people come here to do, as a tile grid
+          (matches the "services grid under the balance card" pattern most Nigerian
+          fintech apps use) instead of a full-width list. */}
       <div>
         <p className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">
           Quick actions
         </p>
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+        <div className="grid grid-cols-3 gap-3">
           {quickActions.map((item) => {
             const Icon = item.icon;
             return (
@@ -37,24 +39,20 @@ export default function UserOverviewPage() {
                 key={item.path}
                 type="button"
                 onClick={() => navigate(item.path)}
+                title={item.description}
                 className={cn(
-                  "group flex items-center gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-4 text-left transition-all",
+                  "group flex flex-col items-center gap-2.5 rounded-2xl border border-slate-200 bg-white px-2 py-5 text-center transition-all sm:py-6",
                   "hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-spark",
                   "dark:border-slate-800 dark:bg-slate-900",
                   "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2",
                 )}
               >
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
-                  <Icon className="h-5 w-5" />
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground sm:h-14 sm:w-14">
+                  <Icon className="h-6 w-6" />
                 </div>
-                <div className="min-w-0">
-                  <p className="font-display text-sm font-semibold text-slate-900 dark:text-slate-100">
-                    {item.label}
-                  </p>
-                  <p className="truncate text-xs text-slate-500 dark:text-slate-400">
-                    {item.description}
-                  </p>
-                </div>
+                <p className="font-display text-xs font-semibold leading-tight text-slate-900 dark:text-slate-100 sm:text-sm">
+                  {item.label}
+                </p>
               </button>
             );
           })}
