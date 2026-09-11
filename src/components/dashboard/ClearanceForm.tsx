@@ -134,6 +134,7 @@ export default function ClearanceForm({ onSuccess }: { onSuccess?: () => void })
                 onChange={(e) => setTrackingId(e.target.value)}
                 maxLength={15}
                 required
+                className="h-12 rounded-xl font-mono text-lg tracking-wider"
               />
             </div>
             <Button type="submit" disabled={loading} className="w-full">

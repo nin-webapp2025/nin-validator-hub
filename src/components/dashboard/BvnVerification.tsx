@@ -157,12 +157,13 @@ export function BvnVerification({ onSuccess }: BvnFormProps) {
             <Input
               id="bvn"
               type="text"
+              inputMode="numeric"
               placeholder="Enter 11-digit BVN"
               value={bvn}
               onChange={(e) => setBvn(e.target.value.replace(/\D/g, "").slice(0, 11))}
               maxLength={11}
               disabled={loading}
-              className="font-mono"
+              className="h-12 rounded-xl font-mono text-lg tracking-wider tabular-nums"
             />
             <p className="text-xs text-slate-500 dark:text-slate-400">
               Your BVN is secure and will only be used for verification purposes

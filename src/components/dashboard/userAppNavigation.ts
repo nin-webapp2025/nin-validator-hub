@@ -20,6 +20,8 @@ export interface UserNavItem {
   path: string;
   icon: LucideIcon;
   description: string;
+  /** Surfaced as a quick action on the Overview page — keep this to 2-4 items. */
+  quickAction?: boolean;
 }
 
 export interface UserNavGroup {
@@ -43,19 +45,21 @@ export const USER_NAV_GROUPS: UserNavGroup[] = [
         label: "Modification",
         path: "/dashboard/user/modification",
         icon: ClipboardList,
-        description: "Submit modification requests and track progress",
+        description: "Fix or update details on an existing NIN record",
       },
       {
         label: "NIN Validation",
         path: "/dashboard/user/nin-validation",
         icon: Search,
-        description: "Submit and track NIN checks",
+        description: "Confirm a NIN is enrolled and valid",
+        quickAction: true,
       },
       {
         label: "NIN Search",
         path: "/dashboard/user/nin-search",
         icon: ArrowRightLeft,
-        description: "Search by NIN, phone, or demographics",
+        description: "Look up identity details by NIN, phone, or demographics",
+        quickAction: true,
       },
       {
         label: "BVN Verification",
@@ -67,13 +71,13 @@ export const USER_NAV_GROUPS: UserNavGroup[] = [
         label: "Clearance",
         path: "/dashboard/user/clearance",
         icon: ShieldCheck,
-        description: "Run approval and clearance checks",
+        description: "Resolve NIN enrollment exceptions and verify clearance",
       },
       {
         label: "Personalization",
         path: "/dashboard/user/personalization",
         icon: Sparkles,
-        description: "Submit personalization workflows",
+        description: "Request NIN card personalization after enrollment",
       },
       {
         label: "Print NIN",
@@ -104,6 +108,7 @@ export const USER_NAV_GROUPS: UserNavGroup[] = [
         path: "/dashboard/user/wallet",
         icon: Wallet,
         description: "Top up, track balance, and review charges",
+        quickAction: true,
       },
     ],
   },
@@ -133,11 +138,3 @@ export const USER_SECONDARY_LINK = {
   icon: BookOpen,
   description: "Read the developer documentation",
 };
-
-export const USER_QUICK_ACTIONS = [
-  "/dashboard/user/nin-validation",
-  "/dashboard/user/nin-search",
-  "/dashboard/user/bvn",
-  "/dashboard/user/wallet",
-  "/dashboard/user/api-keys",
-];
