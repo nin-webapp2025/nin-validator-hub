@@ -9,18 +9,18 @@ import { Loader2, RefreshCw, ClipboardList } from "lucide-react";
 import type { NinModificationRequest, Priority, RequestStatus } from "@/types/modification";
 
 const STATUS_COLORS: Record<RequestStatus, string> = {
-  pending: "bg-yellow-500",
-  under_review: "bg-blue-500",
-  assigned: "bg-purple-500",
-  in_progress: "bg-indigo-500",
-  completed: "bg-green-500",
+  pending: "bg-slate-400",
+  under_review: "bg-amber-400",
+  assigned: "bg-amber-500",
+  in_progress: "bg-amber-600",
+  completed: "bg-emerald-500",
   rejected: "bg-red-500",
 };
 
 const PRIORITY_COLORS: Record<Priority, string> = {
-  low: "bg-gray-500",
-  medium: "bg-blue-500",
-  high: "bg-orange-500",
+  low: "bg-slate-400",
+  medium: "bg-amber-400",
+  high: "bg-amber-600",
   urgent: "bg-red-500",
 };
 
@@ -77,16 +77,16 @@ export function MyModificationRequests({ refreshKey = 0 }: MyModificationRequest
   };
 
   return (
-    <Card className="bg-purple-900/30 backdrop-blur-lg border-amber-500/20">
+    <Card className="border-slate-200/80 bg-white/90 dark:border-slate-800 dark:bg-slate-900/90">
       <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <div className="flex items-center gap-2">
-            <ClipboardList className="h-5 w-5 text-amber-400" />
-            <CardTitle className="bg-gradient-to-r from-amber-300 to-yellow-200 bg-clip-text text-transparent">
+            <ClipboardList className="h-5 w-5 text-primary" />
+            <CardTitle className="text-slate-900 dark:text-slate-100">
               My Modification Requests
             </CardTitle>
           </div>
-          <CardDescription className="text-purple-200">
+          <CardDescription>
             Track the full progress of your modification requests from submission to completion.
           </CardDescription>
         </div>
@@ -95,7 +95,6 @@ export function MyModificationRequests({ refreshKey = 0 }: MyModificationRequest
           variant="outline"
           onClick={() => void fetchRequests()}
           disabled={isLoading}
-          className="border-amber-500/30 bg-purple-950/40 text-amber-100 hover:bg-purple-900/60 hover:text-white"
         >
           {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <RefreshCw className="mr-2 h-4 w-4" />}
           Refresh
@@ -104,10 +103,10 @@ export function MyModificationRequests({ refreshKey = 0 }: MyModificationRequest
       <CardContent>
         {isLoading ? (
           <div className="flex items-center justify-center py-10">
-            <Loader2 className="h-7 w-7 animate-spin text-amber-400" />
+            <Loader2 className="h-7 w-7 animate-spin text-primary" />
           </div>
         ) : requests.length === 0 ? (
-          <div className="rounded-lg border border-dashed border-amber-500/30 bg-purple-950/30 px-4 py-8 text-center text-sm text-purple-200">
+          <div className="rounded-lg border border-dashed border-slate-300 bg-slate-50 px-4 py-8 text-center text-sm text-slate-500 dark:border-slate-700 dark:bg-slate-800/50 dark:text-slate-400">
             You have not submitted any modification requests yet.
           </div>
         ) : (
@@ -115,7 +114,7 @@ export function MyModificationRequests({ refreshKey = 0 }: MyModificationRequest
             {requests.map((request) => (
               <div
                 key={request.id}
-                className="rounded-lg border border-amber-500/20 bg-purple-950/35 p-4 text-sm text-purple-100"
+                className="rounded-lg border border-slate-200 bg-slate-50 p-4 text-sm text-slate-700 dark:border-slate-700 dark:bg-slate-800/50 dark:text-slate-300"
               >
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                   <div className="min-w-0 flex-1">
@@ -125,68 +124,68 @@ export function MyModificationRequests({ refreshKey = 0 }: MyModificationRequest
                         {request.priority.toUpperCase()}
                       </Badge>
                     </div>
-                    <p className="text-base font-semibold text-white">
+                    <p className="text-base font-semibold text-slate-900 dark:text-slate-100">
                       {request.modification_type.replace("_", " ").toUpperCase()}
                     </p>
-                    <p className="mt-1 text-purple-200">NIN: {request.nin}</p>
+                    <p className="mt-1 text-slate-500 dark:text-slate-400">NIN: {request.nin}</p>
                     <div className="mt-3 space-y-1">
                       {request.current_value && (
                         <p>
-                          <span className="font-medium text-amber-100">Current Value:</span> {request.current_value}
+                          <span className="font-medium text-slate-500 dark:text-slate-400">Current Value:</span> {request.current_value}
                         </p>
                       )}
                       <p>
-                        <span className="font-medium text-amber-100">Requested Value:</span> {request.requested_value}
+                        <span className="font-medium text-slate-500 dark:text-slate-400">Requested Value:</span> {request.requested_value}
                       </p>
                       {request.reason && (
                         <p>
-                          <span className="font-medium text-amber-100">Reason:</span> {request.reason}
+                          <span className="font-medium text-slate-500 dark:text-slate-400">Reason:</span> {request.reason}
                         </p>
                       )}
                     </div>
                   </div>
-                  <div className="text-xs text-purple-300 sm:text-right">
+                  <div className="text-xs text-slate-400 dark:text-slate-500 sm:text-right">
                     <p>Submitted</p>
                     <p>{new Date(request.created_at).toLocaleString()}</p>
                   </div>
                 </div>
 
-                <div className="mt-4 grid gap-3 text-xs text-purple-200 sm:grid-cols-2">
+                <div className="mt-4 grid gap-3 text-xs text-slate-500 dark:text-slate-400 sm:grid-cols-2">
                   {request.reviewed_at && (
                     <p>
-                      <span className="font-medium text-amber-100">Reviewed:</span>{" "}
+                      <span className="font-medium text-slate-500 dark:text-slate-400">Reviewed:</span>{" "}
                       {new Date(request.reviewed_at).toLocaleString()}
                     </p>
                   )}
                   {request.assigned_at && (
                     <p>
-                      <span className="font-medium text-amber-100">Assigned:</span>{" "}
+                      <span className="font-medium text-slate-500 dark:text-slate-400">Assigned:</span>{" "}
                       {new Date(request.assigned_at).toLocaleString()}
                     </p>
                   )}
                   {request.completed_at && (
                     <p>
-                      <span className="font-medium text-amber-100">Completed:</span>{" "}
+                      <span className="font-medium text-slate-500 dark:text-slate-400">Completed:</span>{" "}
                       {new Date(request.completed_at).toLocaleString()}
                     </p>
                   )}
                 </div>
 
                 {(request.admin_notes || request.staff_notes || request.rejection_reason) && (
-                  <div className="mt-4 space-y-2 rounded-md border border-amber-500/20 bg-purple-900/25 p-3 text-xs text-purple-100">
+                  <div className="mt-4 space-y-2 rounded-md border border-slate-200 bg-white p-3 text-xs text-slate-600 dark:border-slate-700 dark:bg-slate-900/50 dark:text-slate-300">
                     {request.admin_notes && (
                       <p>
-                        <span className="font-medium text-amber-100">Admin Notes:</span> {request.admin_notes}
+                        <span className="font-medium text-slate-500 dark:text-slate-400">Admin Notes:</span> {request.admin_notes}
                       </p>
                     )}
                     {request.staff_notes && (
                       <p>
-                        <span className="font-medium text-amber-100">Processing Notes:</span> {request.staff_notes}
+                        <span className="font-medium text-slate-500 dark:text-slate-400">Processing Notes:</span> {request.staff_notes}
                       </p>
                     )}
                     {request.rejection_reason && (
-                      <p className="text-red-200">
-                        <span className="font-medium text-red-100">Rejection Reason:</span> {request.rejection_reason}
+                      <p className="text-red-600 dark:text-red-400">
+                        <span className="font-medium text-red-700 dark:text-red-300">Rejection Reason:</span> {request.rejection_reason}
                       </p>
                     )}
                   </div>

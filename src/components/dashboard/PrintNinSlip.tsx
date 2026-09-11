@@ -938,7 +938,7 @@ export function PrintNinSlip() {
             <div className="flex items-center justify-between">
               <div>
                 <CardTitle className="flex items-center gap-2 text-lg">
-                  <Printer className="h-5 w-5 text-green-600" />
+                  <Printer className="h-5 w-5 text-primary" />
                   {slipType === "premium" ? "Premium NIN Slip" : "Long NIN Slip"}
                 </CardTitle>
                 <CardDescription>Your NIN slip has been generated. Preview or download it below.</CardDescription>
@@ -999,7 +999,7 @@ export function PrintNinSlip() {
           <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
-                <Printer className="h-5 w-5 text-green-600" />
+                <Printer className="h-5 w-5 text-primary" />
                 {slipType === "premium" ? "Premium NIN Slip" : "Long NIN Slip"}
               </DialogTitle>
               <DialogDescription>Preview your NIN slip. Close this dialog and use the download buttons to save.</DialogDescription>
@@ -1023,7 +1023,7 @@ export function PrintNinSlip() {
       <Card className="shadow-card">
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-lg">
-            <Printer className="h-5 w-5 text-blue-600" />
+            <Printer className="h-5 w-5 text-primary" />
             Print NIN Slip
           </CardTitle>
           <CardDescription>
@@ -1059,7 +1059,7 @@ export function PrintNinSlip() {
                 htmlFor="long"
                 className={`flex items-start gap-3 rounded-xl border-2 p-4 cursor-pointer transition-all ${
                   slipType === "long"
-                    ? "border-blue-600 bg-blue-50 dark:bg-blue-950/30 dark:border-blue-500"
+                    ? "border-primary bg-primary/10"
                     : "border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600"
                 }`}
               >

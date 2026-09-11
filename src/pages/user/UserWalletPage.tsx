@@ -76,7 +76,7 @@ function WalletShortcut({
   return (
     <Card className="border-slate-200/80 bg-white/90 dark:border-slate-800 dark:bg-slate-900/90">
       <CardContent className="flex items-start gap-3 p-4">
-        <div className="rounded-xl bg-blue-100 p-2 text-blue-600 dark:bg-blue-500/15 dark:text-blue-400">
+        <div className="rounded-xl bg-primary/10 p-2 text-primary">
           <Icon className="h-4 w-4" />
         </div>
         <div>

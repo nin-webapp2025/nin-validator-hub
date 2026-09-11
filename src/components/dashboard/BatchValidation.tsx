@@ -213,7 +213,7 @@ export function BatchValidation() {
       <Card className="border-slate-200 dark:border-slate-700 shadow-lg dark:bg-slate-800">
         <CardHeader>
           <CardTitle className="text-lg sm:text-xl font-bold flex items-center gap-2">
-            <FileSpreadsheet className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600" />
+            <FileSpreadsheet className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
             <span className="text-base sm:text-xl">Batch NIN Validation</span>
           </CardTitle>
           <CardDescription className="text-xs sm:text-sm text-slate-600 dark:text-slate-400">
@@ -225,7 +225,7 @@ export function BatchValidation() {
           <div className="space-y-4">
             <div 
               onClick={() => fileInputRef.current?.click()}
-              className="border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-xl p-6 sm:p-8 text-center hover:border-blue-400 dark:hover:border-blue-600 transition-colors cursor-pointer bg-slate-50 dark:bg-slate-900/50"
+              className="border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-xl p-6 sm:p-8 text-center hover:border-primary/50 transition-colors cursor-pointer bg-slate-50 dark:bg-slate-900/50"
             >
               <Upload className="h-10 w-10 sm:h-12 sm:w-12 mx-auto mb-3 sm:mb-4 text-slate-400" />
               <p className="text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
@@ -244,14 +244,14 @@ export function BatchValidation() {
             </div>
 
             {/* CSV Format Example */}
-            <div className="bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+            <div className="bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg p-4">
               <div className="flex items-start gap-2">
-                <AlertCircle className="h-5 w-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
+                <AlertCircle className="h-5 w-5 text-slate-500 dark:text-slate-400 flex-shrink-0 mt-0.5" />
                 <div>
-                  <p className="text-sm font-semibold text-blue-900 dark:text-blue-100 mb-2">
+                  <p className="text-sm font-semibold text-slate-800 dark:text-slate-200 mb-2">
                     CSV Format Example:
                   </p>
-                  <pre className="text-xs bg-white dark:bg-slate-900 p-3 rounded border border-blue-200 dark:border-blue-800 font-mono">
+                  <pre className="text-xs bg-white dark:bg-slate-900 p-3 rounded border border-slate-200 dark:border-slate-700 font-mono">
 {`NIN
 12345678901
 98765432109
@@ -264,7 +264,7 @@ export function BatchValidation() {
             <Button
               onClick={processBatch}
               disabled={!file || processing}
-              className="w-full gap-2 bg-blue-600 hover:bg-blue-700"
+              className="w-full gap-2"
               size="lg"
             >
               {processing ? (

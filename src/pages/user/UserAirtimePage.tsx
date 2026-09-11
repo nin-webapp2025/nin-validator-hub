@@ -8,9 +8,9 @@ export default function UserAirtimePage() {
     <div className="space-y-6">
       <Card className="border-slate-200/80 bg-white/90 dark:border-slate-800 dark:bg-slate-900/90">
         <CardHeader>
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-blue-600 dark:text-blue-400">Payments</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">Payments</p>
           <CardTitle className="mt-2 flex items-center gap-2 text-2xl">
-            <Smartphone className="h-6 w-6 text-blue-600" /> Airtime
+            <Smartphone className="h-6 w-6 text-primary" /> Airtime
           </CardTitle>
           <CardDescription>Buy airtime and track provider confirmation from one page.</CardDescription>
         </CardHeader>

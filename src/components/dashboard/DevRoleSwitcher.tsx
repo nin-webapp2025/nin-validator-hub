@@ -16,7 +16,7 @@ import { Bug, Shield, User, Briefcase, Crown, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const ROLE_META: Record<UserRole, { label: string; icon: typeof Shield; color: string; path: string }> = {
-  admin: { label: "Admin", icon: Shield, color: "text-blue-600 bg-blue-100 dark:bg-blue-900/40 dark:text-blue-400", path: "/dashboard/admin" },
+  admin: { label: "Admin", icon: Shield, color: "text-red-600 bg-red-100 dark:bg-red-900/40 dark:text-red-400", path: "/dashboard/admin" },
   user: { label: "User", icon: User, color: "text-slate-600 bg-slate-100 dark:bg-slate-800 dark:text-slate-400", path: "/dashboard/user" },
   staff: { label: "Staff", icon: Briefcase, color: "text-green-600 bg-green-100 dark:bg-green-900/40 dark:text-green-400", path: "/dashboard/staff" },
   vip: { label: "VIP", icon: Crown, color: "text-amber-600 bg-amber-100 dark:bg-amber-900/40 dark:text-amber-400", path: "/dashboard/vip" },

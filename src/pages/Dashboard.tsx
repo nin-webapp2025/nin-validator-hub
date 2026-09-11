@@ -156,12 +156,12 @@ export default function Dashboard() {
                 Manage validation requests and identity verification
               </p>
             </div>
-            <div className="hidden lg:flex items-center gap-2 px-4 py-2 bg-blue-50 dark:bg-blue-950/30 rounded-xl border border-blue-100 dark:border-blue-900">
+            <div className="hidden lg:flex items-center gap-2 px-4 py-2 bg-emerald-50 dark:bg-emerald-950/30 rounded-xl border border-emerald-100 dark:border-emerald-900">
               <span className="relative flex h-2.5 w-2.5">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-500 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-blue-600"></span>
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-600"></span>
               </span>
-              <span className="text-sm font-semibold text-blue-900 dark:text-blue-300">System Operational</span>
+              <span className="text-sm font-semibold text-emerald-900 dark:text-emerald-300">System Operational</span>
             </div>
           </div>
         </div>
@@ -195,7 +195,7 @@ export default function Dashboard() {
             <TabsList className="grid grid-cols-3 md:grid-cols-7 lg:flex lg:flex-row w-full gap-1 bg-transparent p-0 h-auto">
               <TabsTrigger 
                 value="validate" 
-                className="flex items-center justify-center gap-1.5 px-2 py-2.5 sm:py-3 rounded-lg sm:rounded-xl font-semibold text-xs sm:text-sm text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg transition-all duration-200"
+                className="flex items-center justify-center gap-1.5 px-2 py-2.5 sm:py-3 rounded-lg sm:rounded-xl font-semibold text-xs sm:text-sm text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg transition-all duration-200"
               >
                 <Search className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                 <span>NIN Validation</span>
@@ -203,7 +203,7 @@ export default function Dashboard() {
 
               <TabsTrigger 
                 value="bvn" 
-                className="flex items-center justify-center gap-1.5 px-2 py-2.5 sm:py-3 rounded-lg sm:rounded-xl font-semibold text-xs sm:text-sm text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 data-[state=active]:bg-emerald-600 data-[state=active]:text-white data-[state=active]:shadow-lg transition-all duration-200"
+                className="flex items-center justify-center gap-1.5 px-2 py-2.5 sm:py-3 rounded-lg sm:rounded-xl font-semibold text-xs sm:text-sm text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg transition-all duration-200"
               >
                 <CreditCard className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                 <span>BVN</span>
@@ -211,42 +211,42 @@ export default function Dashboard() {
 
               <TabsTrigger 
                 value="clearance" 
-                className="flex items-center justify-center gap-1.5 px-2 py-2.5 sm:py-3 rounded-lg sm:rounded-xl font-semibold text-xs sm:text-sm text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg transition-all duration-200"
+                className="flex items-center justify-center gap-1.5 px-2 py-2.5 sm:py-3 rounded-lg sm:rounded-xl font-semibold text-xs sm:text-sm text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg transition-all duration-200"
               >
                 <ShieldCheck className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                 <span>Clearance</span>
               </TabsTrigger>
               <TabsTrigger 
                 value="nin-search" 
-                className="flex items-center justify-center gap-1.5 px-2 py-2.5 sm:py-3 rounded-lg sm:rounded-xl font-semibold text-xs sm:text-sm text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg transition-all duration-200"
+                className="flex items-center justify-center gap-1.5 px-2 py-2.5 sm:py-3 rounded-lg sm:rounded-xl font-semibold text-xs sm:text-sm text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg transition-all duration-200"
               >
                 <FileSearch className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                 <span>NIN</span>
               </TabsTrigger>
               <TabsTrigger 
                 value="personalization" 
-                className="flex items-center justify-center gap-1.5 px-2 py-2.5 sm:py-3 rounded-lg sm:rounded-xl font-semibold text-xs sm:text-sm text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg transition-all duration-200"
+                className="flex items-center justify-center gap-1.5 px-2 py-2.5 sm:py-3 rounded-lg sm:rounded-xl font-semibold text-xs sm:text-sm text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg transition-all duration-200"
               >
                 <UserCheck className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                 <span>Personalization</span>
               </TabsTrigger>
               <TabsTrigger 
                 value="analytics" 
-                className="flex items-center justify-center gap-1.5 px-2 py-2.5 sm:py-3 rounded-lg sm:rounded-xl font-semibold text-xs sm:text-sm text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg transition-all duration-200"
+                className="flex items-center justify-center gap-1.5 px-2 py-2.5 sm:py-3 rounded-lg sm:rounded-xl font-semibold text-xs sm:text-sm text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg transition-all duration-200"
               >
                 <Activity className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                 <span>Analytics</span>
               </TabsTrigger>
               <TabsTrigger 
                 value="print-nin" 
-                className="flex items-center justify-center gap-1.5 px-2 py-2.5 sm:py-3 rounded-lg sm:rounded-xl font-semibold text-xs sm:text-sm text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg transition-all duration-200"
+                className="flex items-center justify-center gap-1.5 px-2 py-2.5 sm:py-3 rounded-lg sm:rounded-xl font-semibold text-xs sm:text-sm text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg transition-all duration-200"
               >
                 <Printer className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                 <span>Print NIN</span>
               </TabsTrigger>
               <TabsTrigger 
                 value="wallet" 
-                className="flex items-center justify-center gap-1.5 px-2 py-2.5 sm:py-3 rounded-lg sm:rounded-xl font-semibold text-xs sm:text-sm text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 data-[state=active]:bg-green-600 data-[state=active]:text-white data-[state=active]:shadow-lg transition-all duration-200"
+                className="flex items-center justify-center gap-1.5 px-2 py-2.5 sm:py-3 rounded-lg sm:rounded-xl font-semibold text-xs sm:text-sm text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg transition-all duration-200"
               >
                 <Wallet className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                 <span>Wallet</span>

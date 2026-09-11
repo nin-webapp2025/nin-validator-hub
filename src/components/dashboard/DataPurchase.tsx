@@ -93,7 +93,7 @@ export function DataPurchase() {
     <Card className="border-slate-200 shadow-lg dark:border-slate-700 dark:bg-slate-800">
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-lg">
-          <Database className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+          <Database className="h-5 w-5 text-primary" />
           Buy Mobile Data
         </CardTitle>
         <CardDescription>Choose an available bundle and pay securely from your wallet.</CardDescription>
@@ -151,7 +151,7 @@ export function DataPurchase() {
 
           <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-900/60">
             <div className="flex items-center gap-2 text-sm font-semibold">
-              <Wifi className="h-4 w-4 text-blue-600" /> Bundle summary
+              <Wifi className="h-4 w-4 text-primary" /> Bundle summary
             </div>
             <div className="mt-3 flex flex-col gap-2 text-sm sm:flex-row sm:items-center sm:justify-between">
               <span className="inline-flex items-center gap-2 text-slate-500">

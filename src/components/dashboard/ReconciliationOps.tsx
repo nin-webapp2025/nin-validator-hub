@@ -84,14 +84,14 @@ const PAGE_SIZE = 12;
 const statusBadge: Record<string, string> = {
   charged: "bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300",
   refunded: "bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300",
-  pending: "bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300",
-  processing: "bg-violet-100 text-violet-800 dark:bg-violet-950 dark:text-violet-300",
+  pending: "bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-300",
+  processing: "bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300",
   completed: "bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300",
   failed: "bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300",
   error: "bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300",
   warning: "bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300",
   critical: "bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-300",
-  info: "bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300",
+  info: "bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-300",
   success: "bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300",
 };
 
@@ -348,7 +348,7 @@ export function ReconciliationOps() {
           <CardHeader className="pb-2">
             <CardDescription>Active polling jobs</CardDescription>
             <CardTitle className="flex items-center gap-2 text-2xl">
-              <Clock3 className="h-5 w-5 text-blue-500" />
+              <Clock3 className="h-5 w-5 text-primary" />
               {summaryQuery.data?.activeJobs ?? 0}
             </CardTitle>
           </CardHeader>
@@ -450,7 +450,7 @@ export function ReconciliationOps() {
                       onClick={() => setSelectedRequestId(request.id)}
                       className={`w-full rounded-xl border p-4 text-left transition-colors ${
                         isActive
-                          ? "border-blue-500 bg-blue-50 dark:border-blue-500 dark:bg-blue-950/30"
+                          ? "border-primary bg-primary/10"
                           : "border-slate-200 bg-white hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800"
                       }`}
                     >
@@ -701,7 +701,7 @@ export function ReconciliationOps() {
                 </Card>
 
                 {selectedRequest.status === "charged" && (
-                  <div className="rounded-xl border border-blue-200 bg-blue-50 p-4 text-sm text-blue-900 dark:border-blue-900/60 dark:bg-blue-950/40 dark:text-blue-100">
+                  <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900 dark:border-amber-900/60 dark:bg-amber-950/40 dark:text-amber-100">
                     This request is still in a charged state. If the provider ultimately failed, check the event trail above for refund activity or missing retries.
                   </div>
                 )}

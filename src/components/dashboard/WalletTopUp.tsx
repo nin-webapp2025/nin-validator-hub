@@ -477,7 +477,7 @@ export function WalletTopUp() {
             </Button>
           )}
 
-          <div className="flex items-start gap-2 p-3 rounded-lg bg-blue-50 dark:bg-blue-950/30 text-xs text-blue-700 dark:text-blue-300">
+          <div className="flex items-start gap-2 p-3 rounded-lg bg-slate-100 dark:bg-slate-800 text-xs text-slate-600 dark:text-slate-400">
             <Info className="h-4 w-4 shrink-0 mt-0.5" />
             <p>Payments are processed securely by Paystack. Your card details are never stored on our servers.</p>
           </div>
@@ -488,7 +488,7 @@ export function WalletTopUp() {
       <Card className="shadow-card">
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-lg">
-            <ArrowUpRight className="h-5 w-5 text-blue-600" />
+            <ArrowUpRight className="h-5 w-5 text-primary" />
             Service Pricing
           </CardTitle>
           <CardDescription>Cost per operation deducted from your wallet balance.</CardDescription>

@@ -81,7 +81,7 @@ export default function UserDashboard() {
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-purple-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 overflow-x-hidden">
+    <div className="min-h-screen bg-[radial-gradient(circle_at_top_left,#fef3c7_0%,#f8fafc_32%,#fffbeb_100%)] dark:bg-[radial-gradient(circle_at_top_left,#0f172a_0%,#020617_40%,#020617_100%)] overflow-x-hidden">
       <OnboardingWizard />
       <DashboardHeader 
         onNavigateToProfile={() => setActiveTab("profile")} 
@@ -101,7 +101,7 @@ export default function UserDashboard() {
             <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
               <div>
                 <div className="flex items-center gap-2">
-                  <User className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                  <User className="h-5 w-5 text-primary" />
                   <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">
                     Workspace
                   </p>
@@ -122,7 +122,7 @@ export default function UserDashboard() {
                     className={cn(
                       "rounded-xl px-3 py-2 text-sm font-semibold transition-all",
                       activeGroup.id === group.id
-                        ? "bg-blue-600 text-white shadow-sm"
+                        ? "bg-primary text-primary-foreground shadow-sm"
                         : "text-slate-600 hover:bg-white hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:text-slate-100"
                     )}
                   >
@@ -141,7 +141,7 @@ export default function UserDashboard() {
                       <TabsTrigger
                         key={tab.value}
                         value={tab.value}
-                        className="flex items-center gap-2 rounded-xl border border-transparent bg-white px-3 py-2 text-xs font-semibold text-slate-600 shadow-sm transition-all hover:border-slate-200 hover:text-slate-900 data-[state=active]:border-blue-200 data-[state=active]:bg-blue-600 data-[state=active]:text-white dark:bg-slate-900 dark:text-slate-300 dark:hover:border-slate-600 dark:hover:text-slate-100 dark:data-[state=active]:border-blue-500 dark:data-[state=active]:bg-blue-500 sm:text-sm"
+                        className="flex items-center gap-2 rounded-xl border border-transparent bg-white px-3 py-2 text-xs font-semibold text-slate-600 shadow-sm transition-all hover:border-slate-200 hover:text-slate-900 data-[state=active]:border-primary/40 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground dark:bg-slate-900 dark:text-slate-300 dark:hover:border-slate-600 dark:hover:text-slate-100 sm:text-sm"
                       >
                         <Icon className="h-3.5 w-3.5" />
                         <span className="whitespace-nowrap">{tab.label}</span>

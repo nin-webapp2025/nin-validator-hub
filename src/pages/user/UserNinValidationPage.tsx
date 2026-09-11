@@ -33,7 +33,7 @@ export default function UserNinValidationPage() {
             <Card className="border-slate-200 dark:border-slate-700">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-lg">
-                  <Wallet className="h-5 w-5 text-blue-600" />
+                  <Wallet className="h-5 w-5 text-primary" />
                   Validation charge and readiness
                 </CardTitle>
               </CardHeader>

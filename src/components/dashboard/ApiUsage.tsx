@@ -221,7 +221,7 @@ export function ApiUsage() {
                   {totalRequests.toLocaleString()}
                 </p>
               </div>
-              <Activity className="h-10 w-10 text-blue-600 dark:text-blue-400" />
+              <Activity className="h-10 w-10 text-primary" />
             </div>
           </CardContent>
         </Card>
@@ -250,7 +250,7 @@ export function ApiUsage() {
                   {avgRequestsPerDay.toFixed(0)}
                 </p>
               </div>
-              <TrendingUp className="h-10 w-10 text-purple-600 dark:text-purple-400" />
+              <TrendingUp className="h-10 w-10 text-slate-600 dark:text-slate-400" />
             </div>
           </CardContent>
         </Card>
@@ -267,7 +267,7 @@ export function ApiUsage() {
                   {peakHour.requests} requests
                 </p>
               </div>
-              <Clock className="h-10 w-10 text-orange-600 dark:text-orange-400" />
+              <Clock className="h-10 w-10 text-slate-600 dark:text-slate-400" />
             </div>
           </CardContent>
         </Card>
@@ -450,7 +450,7 @@ export function ApiUsage() {
                       <div className="flex items-center gap-2">
                         <Badge
                           variant="secondary"
-                          className="font-mono text-xs bg-blue-600 text-white hover:bg-blue-700"
+                          className="font-mono text-xs"
                         >
                           {activity.endpoint || "unknown"}
                         </Badge>
@@ -486,10 +486,10 @@ export function ApiUsage() {
       </Card>
 
       {/* API Health Summary */}
-      <Card className="border-slate-200 dark:border-slate-700 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-slate-800 dark:to-slate-800">
+      <Card className="border-slate-200 dark:border-slate-700 bg-gradient-to-r from-amber-50 to-white dark:from-slate-800 dark:to-slate-800">
         <CardContent className="pt-6">
           <div className="flex items-start gap-4">
-            <Zap className="h-8 w-8 text-blue-600 dark:text-blue-400 flex-shrink-0" />
+            <Zap className="h-8 w-8 text-primary flex-shrink-0" />
             <div className="flex-1">
               <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-2">
                 API Health Summary

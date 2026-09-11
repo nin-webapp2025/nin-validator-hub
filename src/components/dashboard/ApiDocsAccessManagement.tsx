@@ -162,7 +162,7 @@ export function ApiDocsAccessManagement() {
     return (
       <Card>
         <CardContent className="flex items-center justify-center py-12">
-          <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
         </CardContent>
       </Card>
     );
@@ -192,7 +192,7 @@ export function ApiDocsAccessManagement() {
       <Card>
         <CardHeader>
           <div className="flex items-center gap-2">
-            <BookOpen className="h-5 w-5 text-blue-600" />
+            <BookOpen className="h-5 w-5 text-primary" />
             <CardTitle>Users with API Docs Access</CardTitle>
           </div>
           <CardDescription>

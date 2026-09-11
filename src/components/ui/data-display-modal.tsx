@@ -84,7 +84,7 @@ export function DataDisplayModal({ open, onOpenChange, title, data }: DataDispla
 
           {/* Summary Badge */}
           <div className="mt-6 pt-6 border-t border-slate-200">
-            <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+            <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20">
               {fields.length} fields displayed
             </Badge>
           </div>

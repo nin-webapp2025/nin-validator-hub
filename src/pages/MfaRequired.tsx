@@ -170,7 +170,7 @@ export default function MfaRequired() {
     if (viewMode === "loading") {
       return (
         <div className="flex flex-col items-center justify-center py-10 text-center">
-          <Loader2 className="mb-4 h-8 w-8 animate-spin text-blue-600" />
+          <Loader2 className="mb-4 h-8 w-8 animate-spin text-primary" />
           <p className="text-sm text-slate-600 dark:text-slate-300">Checking your security status...</p>
         </div>
       );
@@ -213,7 +213,7 @@ export default function MfaRequired() {
 
     return (
       <div className="space-y-4">
-        <div className="rounded-xl border border-blue-200 bg-blue-50 p-4 text-sm text-blue-900 dark:border-blue-900/60 dark:bg-blue-950/40 dark:text-blue-100">
+        <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-800 dark:border-slate-700 dark:bg-slate-800/40 dark:text-slate-200">
           Admin access requires MFA in production. Set it up once here, then future sign-ins will require your authenticator code.
         </div>
 
@@ -260,7 +260,7 @@ export default function MfaRequired() {
     <div className="flex min-h-screen items-center justify-center bg-[radial-gradient(circle_at_top,#dbeafe_0%,#f8fafc_45%,#f8fafc_100%)] dark:bg-[radial-gradient(circle_at_top,#0f172a_0%,#020617_55%,#020617_100%)] p-4">
       <Card className="w-full max-w-lg border-slate-200/80 bg-white/95 shadow-[0_20px_70px_rgba(15,23,42,0.08)] backdrop-blur dark:border-slate-800 dark:bg-slate-900/95">
         <CardHeader className="space-y-3 text-center">
-          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 text-primary">
             <ShieldAlert className="h-7 w-7" />
           </div>
           <CardTitle className="text-2xl font-bold">Secure Admin Access</CardTitle>

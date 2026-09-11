@@ -225,10 +225,10 @@ export function Profile({ onNavigateToSettings }: ProfileProps = {}) {
 
   const getMembershipLevel = () => {
     const total = validationStats?.total || 0;
-    if (total >= 1000) return { level: "Enterprise", color: "bg-purple-500", icon: Award };
-    if (total >= 500) return { level: "Pro", color: "bg-blue-600", icon: Zap };
-    if (total >= 100) return { level: "Advanced", color: "bg-green-600", icon: TrendingUp };
-    return { level: "Starter", color: "bg-slate-600", icon: Shield };
+    if (total >= 1000) return { level: "Enterprise", color: "bg-slate-900 dark:bg-slate-700", icon: Award };
+    if (total >= 500) return { level: "Pro", color: "bg-primary", icon: Zap };
+    if (total >= 100) return { level: "Advanced", color: "bg-emerald-600", icon: TrendingUp };
+    return { level: "Starter", color: "bg-slate-500", icon: Shield };
   };
 
   const membership = getMembershipLevel();
@@ -239,7 +239,7 @@ export function Profile({ onNavigateToSettings }: ProfileProps = {}) {
       {/* Hero Profile Card */}
       <Card className="border-slate-200 dark:border-slate-700 shadow-lg sm:shadow-xl overflow-hidden relative">
         {/* Gradient Background */}
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-500 via-blue-600 to-blue-700 dark:from-blue-600 dark:via-blue-700 dark:to-blue-800" />
+        <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-amber-800 to-amber-500" />
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4xIj48cGF0aCBkPSJNMzYgMzRjMC0yLjIwOS0xLjc5MS00LTQtNHMtNCAxLjc5MS00IDQgMS43OTEgNCA0IDQgNC0xLjc5MSA0LTR6bTAgMThjMC0yLjIwOS0xLjc5MS00LTQtNHMtNCAxLjc5MS00IDQgMS43OTEgNCA0IDQgNC0xLjc5MSA0LTR6bTE4LTE4YzAtMi4yMDktMS43OTEtNC00LTRzLTQgMS43OTEtNCA0IDEuNzkxIDQgNCA0IDQtMS43OTEgNC00eiIvPjwvZz48L2c+PC9zdmc+')] opacity-30" />
         
         <CardContent className="relative pt-6 sm:pt-8 pb-4 sm:pb-6 px-4 sm:px-6">
@@ -258,7 +258,7 @@ export function Profile({ onNavigateToSettings }: ProfileProps = {}) {
                 </h2>
                 <div className="flex items-center gap-2 mb-2 sm:mb-3">
                   <Mail className="h-3 w-3 sm:h-4 sm:w-4 opacity-90 flex-shrink-0" />
-                  <p className="text-blue-100 text-sm font-medium">{user?.email}</p>
+                  <p className="text-amber-50/90 text-sm font-medium">{user?.email}</p>
                 </div>
                 <Badge className={`${membership.color} text-white border-0 shadow-lg gap-1.5 px-3 py-1`}>
                   <MembershipIcon className="h-3.5 w-3.5" />
@@ -282,24 +282,24 @@ export function Profile({ onNavigateToSettings }: ProfileProps = {}) {
             <div className="flex-1 lg:ml-auto grid grid-cols-2 lg:grid-cols-3 gap-4">
               <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
                 <div className="flex items-center gap-2 mb-2">
-                  <Activity className="h-4 w-4 text-blue-100" />
-                  <p className="text-xs text-blue-100 font-medium">Total Requests</p>
+                  <Activity className="h-4 w-4 text-amber-50/90" />
+                  <p className="text-xs text-amber-50/90 font-medium">Total Requests</p>
                 </div>
                 <p className="text-2xl font-bold text-white">{validationStats?.total || 0}</p>
               </div>
               
               <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
                 <div className="flex items-center gap-2 mb-2">
-                  <CheckCircle className="h-4 w-4 text-green-200" />
-                  <p className="text-xs text-blue-100 font-medium">Success Rate</p>
+                  <CheckCircle className="h-4 w-4 text-white/90" />
+                  <p className="text-xs text-amber-50/90 font-medium">Success Rate</p>
                 </div>
                 <p className="text-2xl font-bold text-white">{validationStats?.successRate || 0}%</p>
               </div>
               
               <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20 col-span-2 lg:col-span-1">
                 <div className="flex items-center gap-2 mb-2">
-                  <Calendar className="h-4 w-4 text-blue-100" />
-                  <p className="text-xs text-blue-100 font-medium">Member Since</p>
+                  <Calendar className="h-4 w-4 text-amber-50/90" />
+                  <p className="text-xs text-amber-50/90 font-medium">Member Since</p>
                 </div>
                 <p className="text-sm font-semibold text-white">
                   {profile?.created_at ? format(new Date(profile.created_at), 'MMM yyyy') : 'Recently'}
@@ -319,8 +319,8 @@ export function Profile({ onNavigateToSettings }: ProfileProps = {}) {
               <CardTitle className="text-sm font-semibold text-slate-600 dark:text-slate-400">
                 Validations
               </CardTitle>
-              <div className="h-10 w-10 rounded-xl bg-blue-50 dark:bg-blue-950/50 flex items-center justify-center">
-                <CheckCircle className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+              <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                <CheckCircle className="h-5 w-5 text-primary" />
               </div>
             </div>
           </CardHeader>
@@ -366,8 +366,8 @@ export function Profile({ onNavigateToSettings }: ProfileProps = {}) {
               <CardTitle className="text-sm font-semibold text-slate-600 dark:text-slate-400">
                 Personalizations
               </CardTitle>
-              <div className="h-10 w-10 rounded-xl bg-purple-50 dark:bg-purple-950/50 flex items-center justify-center">
-                <FileCheck className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+              <div className="h-10 w-10 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
+                <FileCheck className="h-5 w-5 text-slate-600 dark:text-slate-400" />
               </div>
             </div>
           </CardHeader>
@@ -408,7 +408,7 @@ export function Profile({ onNavigateToSettings }: ProfileProps = {}) {
       <Card className="border-slate-200 dark:border-slate-700 shadow-lg dark:bg-slate-800">
         <CardHeader>
           <CardTitle className="text-xl font-bold flex items-center gap-2">
-            <User className="h-5 w-5 text-blue-600" />
+            <User className="h-5 w-5 text-primary" />
             Account Information
           </CardTitle>
           <CardDescription className="text-slate-600 dark:text-slate-400">
@@ -493,7 +493,7 @@ export function Profile({ onNavigateToSettings }: ProfileProps = {}) {
             </h4>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="text-center p-4 rounded-xl bg-slate-50 dark:bg-slate-900/50">
-                <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+                <p className="text-2xl font-bold text-primary">
                   {validationStats?.total || 0}
                 </p>
                 <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">
@@ -517,7 +517,7 @@ export function Profile({ onNavigateToSettings }: ProfileProps = {}) {
                 </p>
               </div>
               <div className="text-center p-4 rounded-xl bg-slate-50 dark:bg-slate-900/50">
-                <p className="text-2xl font-bold text-purple-600 dark:text-purple-400">
+                <p className="text-2xl font-bold text-slate-600 dark:text-slate-400">
                   {validationStats?.bvnTotal || 0}
                 </p>
                 <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">

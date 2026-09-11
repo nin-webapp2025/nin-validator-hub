@@ -11,7 +11,7 @@ export default function UserProfilePage() {
             Account Center
           </p>
           <CardTitle className="mt-2 flex items-center gap-2 text-2xl text-slate-900 dark:text-slate-100">
-            <User className="h-6 w-6 text-blue-600" />
+            <User className="h-6 w-6 text-primary" />
             Profile
           </CardTitle>
           <CardDescription>

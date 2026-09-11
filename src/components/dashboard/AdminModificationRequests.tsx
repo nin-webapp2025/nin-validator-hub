@@ -18,18 +18,18 @@ import { Shield, CheckCircle, XCircle, UserCog, Loader2 } from "lucide-react";
 import type { NinModificationRequest, Priority, RequestStatus } from "@/types/modification";
 
 const STATUS_COLORS: Record<RequestStatus, string> = {
-  pending: "bg-yellow-500",
-  under_review: "bg-blue-500",
-  assigned: "bg-purple-500",
-  in_progress: "bg-indigo-500",
-  completed: "bg-green-500",
+  pending: "bg-slate-400",
+  under_review: "bg-amber-400",
+  assigned: "bg-amber-500",
+  in_progress: "bg-amber-600",
+  completed: "bg-emerald-500",
   rejected: "bg-red-500",
 };
 
 const PRIORITY_COLORS: Record<Priority, string> = {
-  low: "bg-gray-500",
-  medium: "bg-blue-500",
-  high: "bg-orange-500",
+  low: "bg-slate-400",
+  medium: "bg-amber-400",
+  high: "bg-amber-600",
   urgent: "bg-red-500",
 };
 
@@ -302,7 +302,7 @@ export function AdminModificationRequests() {
     return (
       <Card>
         <CardContent className="flex items-center justify-center py-12">
-          <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
         </CardContent>
       </Card>
     );
@@ -315,7 +315,7 @@ export function AdminModificationRequests() {
       <Card>
         <CardHeader>
           <div className="flex items-center gap-2">
-            <Shield className="h-5 w-5 text-blue-600" />
+            <Shield className="h-5 w-5 text-primary" />
             <CardTitle>NIN Modification Requests</CardTitle>
           </div>
           <CardDescription>
@@ -433,7 +433,7 @@ export function AdminModificationRequests() {
 
                       {request.status === "assigned" && (
                         <>
-                          <Badge variant="outline" className="bg-purple-100 dark:bg-purple-950/30 dark:text-purple-300">
+                          <Badge variant="outline" className="bg-slate-100 dark:bg-slate-800 dark:text-slate-300">
                             <UserCog className="mr-1 h-3 w-3" />
                             Assigned to Staff
                           </Badge>

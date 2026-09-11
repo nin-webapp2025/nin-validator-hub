@@ -493,9 +493,9 @@ export default function NinSearch() {
 
       {result && (
         <>
-          <Card className="border-blue-200 bg-gradient-to-br from-blue-50 to-white dark:from-blue-900/20 dark:to-slate-900">
+          <Card className="border-emerald-200 bg-gradient-to-br from-emerald-50 to-white dark:from-emerald-900/20 dark:to-slate-900 dark:border-emerald-800">
             <CardHeader>
-              <CardTitle className="text-blue-900 dark:text-blue-100 flex items-center justify-between">
+              <CardTitle className="text-emerald-900 dark:text-emerald-100 flex items-center justify-between">
                 <span>Search Results</span>
                 <Badge className="bg-green-100 text-green-700 border-green-200 dark:bg-green-900 dark:text-green-100">
                   Success
@@ -504,32 +504,32 @@ export default function NinSearch() {
             </CardHeader>
             <CardContent className="space-y-4">
               {photo && (
-                <div className="flex justify-center p-4 bg-white dark:bg-slate-800 rounded-lg border border-blue-100 dark:border-slate-700">
+                <div className="flex justify-center p-4 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
                   <div className="text-center">
                     <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-3">PASSPORT PHOTOGRAPH</p>
                     <img
                       src={`data:image/jpeg;base64,${photo}`}
                       alt="Passport"
-                      className="max-w-[200px] h-auto rounded-lg shadow-lg border-2 border-blue-200 dark:border-blue-800"
+                      className="max-w-[200px] h-auto rounded-lg shadow-lg border-2 border-emerald-200 dark:border-emerald-800"
                     />
                   </div>
                 </div>
               )}
 
               {signature && (
-                <div className="flex justify-center p-4 bg-white dark:bg-slate-800 rounded-lg border border-blue-100 dark:border-slate-700">
+                <div className="flex justify-center p-4 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
                   <div className="text-center">
                     <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-3">SIGNATURE</p>
                     <img
                       src={`data:image/jpeg;base64,${signature}`}
                       alt="Signature"
-                      className="max-w-[200px] h-auto rounded-lg shadow-lg border-2 border-blue-200 dark:border-blue-800"
+                      className="max-w-[200px] h-auto rounded-lg shadow-lg border-2 border-emerald-200 dark:border-emerald-800"
                     />
                   </div>
                 </div>
               )}
 
-              <div className="p-4 sm:p-6 bg-white dark:bg-slate-800 rounded-lg border border-blue-100 dark:border-slate-700">
+              <div className="p-4 sm:p-6 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
                 <div className="flex items-center justify-between mb-4">
                   <p className="text-sm font-bold text-slate-700 dark:text-slate-300">PERSONAL INFORMATION</p>
                   <Button

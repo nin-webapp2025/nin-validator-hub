@@ -15,6 +15,7 @@ import { z } from "zod";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { createRequestId } from "@/lib/request-id";
 import { enqueueProviderStatusPoll } from "@/lib/background-jobs";
+import { cn } from "@/lib/utils";
 
 const ninSchema = z.string().trim().length(11, "NIN must be exactly 11 digits").regex(/^\d+$/, "NIN must contain only numbers");
 
@@ -291,15 +292,29 @@ export function ValidationForm({ onSuccess }: ValidationFormProps) {
 
         {result && (
           <div className="mt-6 space-y-4">
-            <div className="p-4 sm:p-6 bg-gradient-to-br from-blue-50 to-white dark:from-blue-900/20 dark:to-slate-900 rounded-lg border-2 border-blue-200 dark:border-blue-800">
+            <div
+              className={cn(
+                "p-4 sm:p-6 rounded-lg border-2",
+                result.status === "success"
+                  ? "bg-gradient-to-br from-emerald-50 to-white dark:from-emerald-900/20 dark:to-slate-900 border-emerald-200 dark:border-emerald-800"
+                  : "bg-gradient-to-br from-red-50 to-white dark:from-red-900/20 dark:to-slate-900 border-red-200 dark:border-red-800",
+              )}
+            >
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
                   {result.status === "success" ? (
-                    <CheckCircle className="h-5 w-5 sm:h-6 sm:w-6 text-green-600" />
+                    <CheckCircle className="h-5 w-5 sm:h-6 sm:w-6 text-emerald-600" />
                   ) : (
                     <XCircle className="h-5 w-5 sm:h-6 sm:w-6 text-red-600" />
                   )}
-                  <h3 className="font-bold text-lg sm:text-xl text-blue-900 dark:text-blue-100">
+                  <h3
+                    className={cn(
+                      "font-bold text-lg sm:text-xl",
+                      result.status === "success"
+                        ? "text-emerald-900 dark:text-emerald-100"
+                        : "text-red-900 dark:text-red-100",
+                    )}
+                  >
                     {result.status === "success" ? "✅ Validation Successful" : "❌ Validation Failed"}
                   </h3>
                 </div>
@@ -322,7 +337,7 @@ export function ValidationForm({ onSuccess }: ValidationFormProps) {
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                     {result.data.firstname && (
-                      <div className="p-3 bg-white dark:bg-slate-800 rounded-lg border border-blue-100 dark:border-slate-700">
+                      <div className="p-3 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
                         <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">FIRST NAME</p>
                         <p className="font-semibold text-sm sm:text-base text-slate-900 dark:text-slate-100">
                           {result.data.firstname}
@@ -330,7 +345,7 @@ export function ValidationForm({ onSuccess }: ValidationFormProps) {
                       </div>
                     )}
                     {result.data.surname && (
-                      <div className="p-3 bg-white dark:bg-slate-800 rounded-lg border border-blue-100 dark:border-slate-700">
+                      <div className="p-3 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
                         <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">SURNAME</p>
                         <p className="font-semibold text-sm sm:text-base text-slate-900 dark:text-slate-100">
                           {result.data.surname}
@@ -338,7 +353,7 @@ export function ValidationForm({ onSuccess }: ValidationFormProps) {
                       </div>
                     )}
                     {result.data.middlename && (
-                      <div className="p-3 bg-white dark:bg-slate-800 rounded-lg border border-blue-100 dark:border-slate-700">
+                      <div className="p-3 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
                         <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">MIDDLE NAME</p>
                         <p className="font-semibold text-sm sm:text-base text-slate-900 dark:text-slate-100">
                           {result.data.middlename}
@@ -346,7 +361,7 @@ export function ValidationForm({ onSuccess }: ValidationFormProps) {
                       </div>
                     )}
                     {result.data.birthdate && (
-                      <div className="p-3 bg-white dark:bg-slate-800 rounded-lg border border-blue-100 dark:border-slate-700">
+                      <div className="p-3 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
                         <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">DATE OF BIRTH</p>
                         <p className="font-semibold text-sm sm:text-base text-slate-900 dark:text-slate-100">
                           {result.data.birthdate}
@@ -354,7 +369,7 @@ export function ValidationForm({ onSuccess }: ValidationFormProps) {
                       </div>
                     )}
                     {result.data.gender && (
-                      <div className="p-3 bg-white dark:bg-slate-800 rounded-lg border border-blue-100 dark:border-slate-700">
+                      <div className="p-3 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
                         <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">GENDER</p>
                         <p className="font-semibold text-sm sm:text-base text-slate-900 dark:text-slate-100">
                           {result.data.gender}
@@ -362,7 +377,7 @@ export function ValidationForm({ onSuccess }: ValidationFormProps) {
                       </div>
                     )}
                     {result.data.maritalstatus && (
-                      <div className="p-3 bg-white dark:bg-slate-800 rounded-lg border border-blue-100 dark:border-slate-700">
+                      <div className="p-3 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
                         <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">MARITAL STATUS</p>
                         <p className="font-semibold text-sm sm:text-base text-slate-900 dark:text-slate-100">
                           {result.data.maritalstatus}
@@ -370,7 +385,7 @@ export function ValidationForm({ onSuccess }: ValidationFormProps) {
                       </div>
                     )}
                     {result.data.telephoneno && (
-                      <div className="p-3 bg-white dark:bg-slate-800 rounded-lg border border-blue-100 dark:border-slate-700">
+                      <div className="p-3 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
                         <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">PHONE NUMBER</p>
                         <p className="font-semibold text-sm sm:text-base text-slate-900 dark:text-slate-100">
                           {result.data.telephoneno}
@@ -378,7 +393,7 @@ export function ValidationForm({ onSuccess }: ValidationFormProps) {
                       </div>
                     )}
                     {result.data.email && (
-                      <div className="p-3 bg-white dark:bg-slate-800 rounded-lg border border-blue-100 dark:border-slate-700 sm:col-span-2">
+                      <div className="p-3 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 sm:col-span-2">
                         <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">EMAIL</p>
                         <p className="font-semibold text-sm sm:text-base text-slate-900 dark:text-slate-100 break-all">
                           {result.data.email}
@@ -386,7 +401,7 @@ export function ValidationForm({ onSuccess }: ValidationFormProps) {
                       </div>
                     )}
                     {result.data.residence_address && (
-                      <div className="p-3 bg-white dark:bg-slate-800 rounded-lg border border-blue-100 dark:border-slate-700 sm:col-span-2">
+                      <div className="p-3 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 sm:col-span-2">
                         <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">RESIDENCE ADDRESS</p>
                         <p className="font-semibold text-sm sm:text-base text-slate-900 dark:text-slate-100">
                           {result.data.residence_address}
@@ -398,8 +413,8 @@ export function ValidationForm({ onSuccess }: ValidationFormProps) {
               )}
               
               {result.message && (
-                <div className="mt-4 p-3 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
-                  <p className="text-sm text-blue-900 dark:text-blue-100">{result.message}</p>
+                <div className="mt-4 p-3 bg-slate-100 dark:bg-slate-800 rounded-lg">
+                  <p className="text-sm text-slate-800 dark:text-slate-200">{result.message}</p>
                 </div>
               )}
             </div>

@@ -29,7 +29,7 @@ export default function StaffDashboard() {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-green-50 to-blue-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 overflow-x-hidden">
+    <div className="min-h-screen bg-[radial-gradient(circle_at_top_left,#fef3c7_0%,#f8fafc_32%,#fffbeb_100%)] dark:bg-[radial-gradient(circle_at_top_left,#0f172a_0%,#020617_40%,#020617_100%)] overflow-x-hidden">
       <DashboardHeader 
         onNavigateToProfile={() => setActiveTab("profile")} 
         onNavigateToWallet={() => setActiveTab("wallet")}
@@ -37,7 +37,7 @@ export default function StaffDashboard() {
       
       <main className="container mx-auto px-3 sm:px-4 py-6 sm:py-8">
         <div className="mb-6 flex items-center gap-2">
-          <Briefcase className="h-6 w-6 text-green-600 dark:text-green-400" />
+          <Briefcase className="h-6 w-6 text-primary" />
           <h1 className="text-2xl font-bold text-gray-900 dark:text-slate-100">Staff Dashboard</h1>
         </div>
 

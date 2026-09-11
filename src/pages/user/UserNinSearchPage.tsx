@@ -31,7 +31,7 @@ export default function UserNinSearchPage() {
             <Card className="border-slate-200 dark:border-slate-700">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-lg">
-                  <Wallet className="h-5 w-5 text-blue-600" />
+                  <Wallet className="h-5 w-5 text-primary" />
                   Search pricing and readiness
                 </CardTitle>
               </CardHeader>
@@ -93,7 +93,7 @@ function NextActionCard({
     <button
       type="button"
       onClick={onClick}
-      className="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-left transition hover:border-blue-200 hover:bg-white dark:border-slate-700 dark:bg-slate-800/70"
+      className="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-left transition hover:border-primary/30 hover:bg-white dark:border-slate-700 dark:bg-slate-800/70"
     >
       <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">{label}</p>
       <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">{description}</p>
