@@ -136,14 +136,14 @@ export function SessionTimeout() {
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <div className="flex items-center gap-3 mb-2">
-              <div className="h-12 w-12 rounded-full bg-yellow-100 dark:bg-yellow-900/30 flex items-center justify-center">
-                <AlertTriangle className="h-6 w-6 text-yellow-600 dark:text-yellow-400" />
+              <div className="h-12 w-12 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
+                <AlertTriangle className="h-6 w-6 text-amber-600 dark:text-amber-400" />
               </div>
               <DialogTitle className="text-xl">Session Expiring Soon</DialogTitle>
             </div>
             <DialogDescription className="text-base">
               Your session will expire in{" "}
-              <span className="font-bold text-yellow-600 dark:text-yellow-400 text-lg">
+              <span className="font-bold text-amber-600 dark:text-amber-400 text-lg">
                 {formatTime(timeLeft)}
               </span>{" "}
               due to inactivity.
@@ -167,7 +167,7 @@ export function SessionTimeout() {
             </Button>
             <Button
               onClick={handleContinue}
-              className="w-full sm:w-auto gap-2 bg-blue-600 hover:bg-blue-700"
+              className="w-full sm:w-auto gap-2"
             >
               <RefreshCw className="h-4 w-4" />
               Stay Signed In
@@ -205,10 +205,10 @@ export function SessionTimeout() {
       {/* Idle Indicator - Subtle Banner */}
       {isIdle && !showWarning && !showExpired && (
         <div className="fixed bottom-4 right-4 z-50 animate-in slide-in-from-bottom-4">
-          <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-3 shadow-lg max-w-sm">
+          <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-3 shadow-lg max-w-sm">
             <div className="flex items-center gap-2">
-              <AlertTriangle className="h-4 w-4 text-yellow-600 dark:text-yellow-400 flex-shrink-0" />
-              <p className="text-xs text-yellow-900 dark:text-yellow-100">
+              <AlertTriangle className="h-4 w-4 text-amber-600 dark:text-amber-400 flex-shrink-0" />
+              <p className="text-xs text-amber-900 dark:text-amber-100">
                 You've been idle. Your session will expire soon.
               </p>
             </div>

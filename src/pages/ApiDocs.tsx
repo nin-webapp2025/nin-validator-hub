@@ -569,7 +569,7 @@ export default function ApiDocs() {
 
   if (roleLoading || accessLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-white to-blue-50/30 dark:from-slate-950 dark:via-slate-900 dark:to-blue-950/20">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-white to-amber-50/30 dark:from-slate-950 dark:via-slate-900 dark:to-amber-950/10">
         <div className="flex items-center gap-3 text-slate-600 dark:text-slate-300">
           <Loader2 className="h-5 w-5 animate-spin" />
           <span>Verifying API docs access...</span>
@@ -583,7 +583,7 @@ export default function ApiDocs() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50/30 dark:from-slate-950 dark:via-slate-900 dark:to-blue-950/20">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-amber-50/30 dark:from-slate-950 dark:via-slate-900 dark:to-amber-950/10">
       {/* ── Top nav ─────────────────────────────────────────── */}
       <header className="sticky top-0 z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur border-b border-slate-200 dark:border-slate-800">
         <div className="max-w-5xl mx-auto flex items-center justify-between px-4 sm:px-6 h-14">
@@ -640,13 +640,13 @@ export default function ApiDocs() {
           <div className="grid sm:grid-cols-3 gap-4">
             <Card className="border-slate-200 dark:border-slate-700">
               <CardContent className="pt-5 space-y-2">
-                <div className="h-8 w-8 rounded-full bg-blue-100 dark:bg-blue-900/40 flex items-center justify-center text-blue-600 dark:text-blue-400 font-bold text-sm">
+                <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-sm">
                   1
                 </div>
                 <h3 className="font-semibold text-slate-900 dark:text-white">Create an Account</h3>
                 <p className="text-sm text-slate-500 dark:text-slate-400">
                   Sign up at{" "}
-                  <Link to="/auth" className="text-blue-600 hover:underline">
+                  <Link to="/auth" className="text-primary hover:underline">
                     sparkid.ng
                   </Link>{" "}
                   and log into your dashboard.
@@ -655,7 +655,7 @@ export default function ApiDocs() {
             </Card>
             <Card className="border-slate-200 dark:border-slate-700">
               <CardContent className="pt-5 space-y-2">
-                <div className="h-8 w-8 rounded-full bg-blue-100 dark:bg-blue-900/40 flex items-center justify-center text-blue-600 dark:text-blue-400 font-bold text-sm">
+                <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-sm">
                   2
                 </div>
                 <h3 className="font-semibold text-slate-900 dark:text-white">Generate an API Key</h3>
@@ -666,7 +666,7 @@ export default function ApiDocs() {
             </Card>
             <Card className="border-slate-200 dark:border-slate-700">
               <CardContent className="pt-5 space-y-2">
-                <div className="h-8 w-8 rounded-full bg-blue-100 dark:bg-blue-900/40 flex items-center justify-center text-blue-600 dark:text-blue-400 font-bold text-sm">
+                <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-sm">
                   3
                 </div>
                 <h3 className="font-semibold text-slate-900 dark:text-white">Fund Your Wallet</h3>
@@ -681,7 +681,7 @@ export default function ApiDocs() {
         {/* ── Authentication ────────────────────────────────── */}
         <section className="space-y-4">
           <h2 className="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
-            <Shield className="h-5 w-5 text-blue-500" /> Authentication
+            <Shield className="h-5 w-5 text-primary" /> Authentication
           </h2>
           <p className="text-slate-600 dark:text-slate-400">
             All API requests require your secret key in the <code className="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-sm font-mono">x-api-key</code> header.
@@ -706,7 +706,7 @@ curl -X POST https://eyntzaodrljvnzetvfdb.supabase.co/functions/v1/api-gateway \
         {/* ── Test Mode ─────────────────────────────────────── */}
         <section className="space-y-4">
           <h2 className="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
-            <Zap className="h-5 w-5 text-violet-500" /> Test Mode
+            <Zap className="h-5 w-5 text-primary" /> Test Mode
           </h2>
           <p className="text-slate-600 dark:text-slate-400">
             Test keys start with{" "}
@@ -715,18 +715,18 @@ curl -X POST https://eyntzaodrljvnzetvfdb.supabase.co/functions/v1/api-gateway \
             Use them to build and test your integration before switching to a live key.
           </p>
           <div className="grid sm:grid-cols-2 gap-4">
-            <div className="p-4 rounded-lg border border-violet-200 dark:border-violet-800 bg-violet-50 dark:bg-violet-950/20">
-              <p className="text-sm font-semibold text-violet-800 dark:text-violet-300 mb-1">sk_test_ key behaviour</p>
-              <ul className="text-sm text-violet-700 dark:text-violet-400 space-y-1 list-disc list-inside">
+            <div className="p-4 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/40">
+              <p className="text-sm font-semibold text-slate-800 dark:text-slate-200 mb-1">sk_test_ key behaviour</p>
+              <ul className="text-sm text-slate-600 dark:text-slate-400 space-y-1 list-disc list-inside">
                 <li>Returns hardcoded mock data instantly</li>
                 <li>No wallet balance required</li>
                 <li>Requests are logged to your usage stats</li>
                 <li>All actions supported</li>
               </ul>
             </div>
-            <div className="p-4 rounded-lg border border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-950/20">
-              <p className="text-sm font-semibold text-blue-800 dark:text-blue-300 mb-1">sk_live_ key behaviour</p>
-              <ul className="text-sm text-blue-700 dark:text-blue-400 space-y-1 list-disc list-inside">
+            <div className="p-4 rounded-lg border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/20">
+              <p className="text-sm font-semibold text-amber-800 dark:text-amber-300 mb-1">sk_live_ key behaviour</p>
+              <ul className="text-sm text-amber-700 dark:text-amber-400 space-y-1 list-disc list-inside">
                 <li>Calls real NIMC / Prembly APIs</li>
                 <li>Deducts wallet per operation</li>
                 <li>Returns real identity data</li>
@@ -753,7 +753,7 @@ curl -X POST https://eyntzaodrljvnzetvfdb.supabase.co/functions/v1/api-gateway \
         {/* ── Base URL ──────────────────────────────────────── */}
         <section className="space-y-4">
           <h2 className="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
-            <Globe className="h-5 w-5 text-purple-500" /> Base URL
+            <Globe className="h-5 w-5 text-primary" /> Base URL
           </h2>
           <CodeBlock code="https://eyntzaodrljvnzetvfdb.supabase.co/functions/v1/api-gateway" />
           <p className="text-sm text-slate-500 dark:text-slate-400">
@@ -788,7 +788,7 @@ curl -X POST https://eyntzaodrljvnzetvfdb.supabase.co/functions/v1/api-gateway \
               <tbody className="divide-y divide-slate-200 dark:divide-slate-700">
                 {ENDPOINTS.map((ep) => (
                   <tr key={ep.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30">
-                    <td className="px-4 py-2.5 font-mono text-xs text-blue-600 dark:text-blue-400">
+                    <td className="px-4 py-2.5 font-mono text-xs text-primary">
                       {ep.id}
                     </td>
                     <td className="px-4 py-2.5 text-slate-600 dark:text-slate-400">{ep.name}</td>
@@ -816,7 +816,7 @@ curl -X POST https://eyntzaodrljvnzetvfdb.supabase.co/functions/v1/api-gateway \
         {/* ── Rate Limits ───────────────────────────────────── */}
         <section className="space-y-4">
           <h2 className="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
-            <Clock className="h-5 w-5 text-orange-500" /> Rate Limits
+            <Clock className="h-5 w-5 text-primary" /> Rate Limits
           </h2>
           <p className="text-slate-600 dark:text-slate-400">
             Each API key has a rate limit of <strong>100 requests per minute</strong> by default.
@@ -833,7 +833,7 @@ curl -X POST https://eyntzaodrljvnzetvfdb.supabase.co/functions/v1/api-gateway \
           />
           <p className="text-sm text-slate-500 dark:text-slate-400">
             Need higher limits? Contact{" "}
-            <a href="mailto:support@sparkid.ng" className="text-blue-600 hover:underline">
+            <a href="mailto:support@sparkid.ng" className="text-primary hover:underline">
               support@sparkid.ng
             </a>
             .
@@ -843,7 +843,7 @@ curl -X POST https://eyntzaodrljvnzetvfdb.supabase.co/functions/v1/api-gateway \
         {/* ── Endpoints ─────────────────────────────────────── */}
         <section id="endpoints" className="space-y-4">
           <h2 className="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
-            <Code2 className="h-5 w-5 text-indigo-500" /> Endpoints
+            <Code2 className="h-5 w-5 text-primary" /> Endpoints
           </h2>
           <p className="text-slate-600 dark:text-slate-400">
             Click an endpoint to expand its documentation, request body, response, and code examples.
@@ -909,7 +909,7 @@ curl -X POST https://eyntzaodrljvnzetvfdb.supabase.co/functions/v1/api-gateway \
         {/* ── Playground ────────────────────────────────────── */}
         <section id="playground" className="space-y-4">
           <h2 className="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
-            <FlaskConical className="h-5 w-5 text-violet-500" /> API Playground
+            <FlaskConical className="h-5 w-5 text-primary" /> API Playground
           </h2>
           <p className="text-slate-600 dark:text-slate-400 text-sm">
             Send live requests directly from this page. Use a{" "}
@@ -964,7 +964,7 @@ curl -X POST https://eyntzaodrljvnzetvfdb.supabase.co/functions/v1/api-gateway \
                   value={playKey}
                   onChange={(e) => setPlayKey(e.target.value)}
                   placeholder="sk_test_… or sk_live_…"
-                  className="w-full h-9 rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                  className="w-full h-9 rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-primary/50"
                 />
                 <p className="text-[11px] text-slate-400">
                   Use a <span className="font-mono">sk_test_</span> key for free mock responses. Keys are never stored or logged here.
@@ -1055,7 +1055,7 @@ curl -X POST https://eyntzaodrljvnzetvfdb.supabase.co/functions/v1/api-gateway \
 
               {playResponse?.body && typeof playResponse.body === "object" &&
                 "_test_mode" in (playResponse.body as object) && (
-                <div className="flex items-center gap-2 text-xs text-violet-600 dark:text-violet-400">
+                <div className="flex items-center gap-2 text-xs text-slate-600 dark:text-slate-400">
                   <FlaskConical className="h-3.5 w-3.5" />
                   Test mode — mock response, no charge
                 </div>

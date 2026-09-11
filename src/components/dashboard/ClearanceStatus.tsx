@@ -73,16 +73,16 @@ export default function ClearanceStatus() {
   };
 
   const getStatusIcon = (status: string) => {
-    if (status === "completed") return <CheckCircle className="h-5 w-5 text-green-600" />;
-    if (status === "pending" || status === "in-progress") return <Clock className="h-5 w-5 text-yellow-600" />;
-    if (status === "submitted" || status === "unknown") return <Clock className="h-5 w-5 text-blue-600" />;
+    if (status === "completed") return <CheckCircle className="h-5 w-5 text-emerald-600" />;
+    if (status === "pending" || status === "in-progress") return <Clock className="h-5 w-5 text-amber-600" />;
+    if (status === "submitted" || status === "unknown") return <Clock className="h-5 w-5 text-slate-500" />;
     return <XCircle className="h-5 w-5 text-red-600" />;
   };
 
   const getStatusColor = (status: string) => {
-    if (status === "completed") return "border-green-200 bg-green-50";
-    if (status === "pending" || status === "in-progress") return "border-yellow-200 bg-yellow-50";
-    if (status === "submitted" || status === "unknown") return "border-blue-200 bg-blue-50";
+    if (status === "completed") return "border-emerald-200 bg-emerald-50";
+    if (status === "pending" || status === "in-progress") return "border-amber-200 bg-amber-50";
+    if (status === "submitted" || status === "unknown") return "border-slate-200 bg-slate-50";
     return "border-red-200 bg-red-50";
   };
 

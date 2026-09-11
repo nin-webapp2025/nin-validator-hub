@@ -85,7 +85,7 @@ export function VipModificationForm({ onSubmitted }: VipModificationFormProps) {
       toast({
         title: "Request Submitted Successfully",
         description: "Your modification request has been submitted and is pending admin review.",
-        className: "bg-gradient-to-r from-amber-500 to-yellow-600 text-black border-amber-600",
+        className: "bg-primary text-primary-foreground border-primary",
       });
 
       form.reset();
@@ -103,15 +103,15 @@ export function VipModificationForm({ onSubmitted }: VipModificationFormProps) {
   };
 
   return (
-    <Card className="bg-purple-900/30 backdrop-blur-lg border-amber-500/20">
+    <Card className="border-slate-200/80 bg-white/90 dark:border-slate-800 dark:bg-slate-900/90">
       <CardHeader>
         <div className="flex items-center gap-2">
-          <Crown className="h-5 w-5 text-amber-400" />
-          <CardTitle className="bg-gradient-to-r from-amber-300 to-yellow-200 bg-clip-text text-transparent">
+          <Crown className="h-5 w-5 text-primary" />
+          <CardTitle className="text-slate-900 dark:text-slate-100">
             NIN Modification Request
           </CardTitle>
         </div>
-        <CardDescription className="text-purple-200">
+        <CardDescription>
           Submit a request to modify your NIN details. Your request will be reviewed and then processed by an
           administrator or assigned staff member.
         </CardDescription>
@@ -124,15 +124,15 @@ export function VipModificationForm({ onSubmitted }: VipModificationFormProps) {
               name="nin"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-amber-100">National Identification Number (NIN)</FormLabel>
+                  <FormLabel>National Identification Number (NIN)</FormLabel>
                   <FormControl>
                     <Input
                       placeholder="12345678901"
                       {...field}
-                      className="bg-purple-950/50 border-amber-500/30 text-white placeholder:text-purple-300"
+                      className="dark:bg-slate-900"
                     />
                   </FormControl>
-                  <FormDescription className="text-purple-300">Enter your 11-digit NIN</FormDescription>
+                  <FormDescription className="text-slate-500 dark:text-slate-400">Enter your 11-digit NIN</FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
@@ -143,10 +143,10 @@ export function VipModificationForm({ onSubmitted }: VipModificationFormProps) {
               name="modification_type"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-amber-100">Modification Type</FormLabel>
+                  <FormLabel>Modification Type</FormLabel>
                   <Select onValueChange={field.onChange} defaultValue={field.value}>
                     <FormControl>
-                      <SelectTrigger className="bg-purple-950/50 border-amber-500/30 text-white">
+                      <SelectTrigger>
                         <SelectValue placeholder="Select modification type" />
                       </SelectTrigger>
                     </FormControl>
@@ -158,7 +158,7 @@ export function VipModificationForm({ onSubmitted }: VipModificationFormProps) {
                       ))}
                     </SelectContent>
                   </Select>
-                  <FormDescription className="text-purple-300">
+                  <FormDescription className="text-slate-500 dark:text-slate-400">
                     Select the type of modification you're requesting
                   </FormDescription>
                   <FormMessage />
@@ -171,15 +171,15 @@ export function VipModificationForm({ onSubmitted }: VipModificationFormProps) {
               name="current_value"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-amber-100">Current Value (Optional)</FormLabel>
+                  <FormLabel>Current Value (Optional)</FormLabel>
                   <FormControl>
                     <Input
                       placeholder="e.g., John Doe"
                       {...field}
-                      className="bg-purple-950/50 border-amber-500/30 text-white placeholder:text-purple-300"
+                      className="dark:bg-slate-900"
                     />
                   </FormControl>
-                  <FormDescription className="text-purple-300">
+                  <FormDescription className="text-slate-500 dark:text-slate-400">
                     The current value on your NIN record (if known)
                   </FormDescription>
                   <FormMessage />
@@ -192,15 +192,15 @@ export function VipModificationForm({ onSubmitted }: VipModificationFormProps) {
               name="requested_value"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-amber-100">New/Requested Value</FormLabel>
+                  <FormLabel>New/Requested Value</FormLabel>
                   <FormControl>
                     <Input
                       placeholder="e.g., Jane Doe"
                       {...field}
-                      className="bg-purple-950/50 border-amber-500/30 text-white placeholder:text-purple-300"
+                      className="dark:bg-slate-900"
                     />
                   </FormControl>
-                  <FormDescription className="text-purple-300">The new value you're requesting</FormDescription>
+                  <FormDescription className="text-slate-500 dark:text-slate-400">The new value you're requesting</FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
@@ -211,16 +211,16 @@ export function VipModificationForm({ onSubmitted }: VipModificationFormProps) {
               name="reason"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-amber-100">Reason for Modification</FormLabel>
+                  <FormLabel>Reason for Modification</FormLabel>
                   <FormControl>
                     <Textarea
                       placeholder="Provide a detailed explanation for why this modification is necessary..."
                       {...field}
                       rows={4}
-                      className="bg-purple-950/50 border-amber-500/30 text-white placeholder:text-purple-300"
+                      className="dark:bg-slate-900"
                     />
                   </FormControl>
-                  <FormDescription className="text-purple-300">
+                  <FormDescription className="text-slate-500 dark:text-slate-400">
                     Minimum 20 characters - be specific and detailed
                   </FormDescription>
                   <FormMessage />
@@ -231,7 +231,7 @@ export function VipModificationForm({ onSubmitted }: VipModificationFormProps) {
             <Button
               type="submit"
               disabled={isSubmitting}
-              className="w-full bg-gradient-to-r from-amber-500 to-yellow-600 text-black font-semibold hover:from-amber-600 hover:to-yellow-700"
+              className="w-full"
             >
               {isSubmitting ? (
                 <>

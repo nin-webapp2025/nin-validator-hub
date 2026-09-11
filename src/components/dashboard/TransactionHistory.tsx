@@ -77,7 +77,7 @@ export function TransactionHistory() {
     <Card className="shadow-card">
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-lg">
-          <Receipt className="h-5 w-5 text-purple-600" />
+          <Receipt className="h-5 w-5 text-primary" />
           Transaction History
         </CardTitle>
         <CardDescription>

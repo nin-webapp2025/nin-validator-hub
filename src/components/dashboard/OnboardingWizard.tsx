@@ -86,7 +86,7 @@ export function OnboardingWizard() {
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-      <Card className="w-full max-w-md shadow-2xl border-blue-200 dark:border-blue-800 dark:bg-slate-900 animate-in fade-in zoom-in-95">
+      <Card className="w-full max-w-md shadow-2xl border-amber-200 dark:border-amber-900 dark:bg-slate-900 animate-in fade-in zoom-in-95">
         <CardContent className="p-6 sm:p-8">
           {/* Close */}
           <div className="flex justify-end -mt-2 -mr-2">
@@ -107,9 +107,9 @@ export function OnboardingWizard() {
                 key={i}
                 className={`h-1.5 rounded-full transition-all ${
                   i === step
-                    ? "w-6 bg-blue-600"
+                    ? "w-6 bg-primary"
                     : i < step
-                    ? "w-1.5 bg-blue-400"
+                    ? "w-1.5 bg-primary/60"
                     : "w-1.5 bg-slate-300 dark:bg-slate-600"
                 }`}
               />
@@ -118,8 +118,8 @@ export function OnboardingWizard() {
 
           {/* Step content */}
           <div className="flex flex-col items-center text-center">
-            <div className="mb-4 rounded-full bg-blue-100 dark:bg-blue-950/50 p-4">
-              <Icon className="h-8 w-8 text-blue-600 dark:text-blue-400" />
+            <div className="mb-4 rounded-full bg-primary/10 p-4">
+              <Icon className="h-8 w-8 text-primary" />
             </div>
             <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-2">
               {current.title}

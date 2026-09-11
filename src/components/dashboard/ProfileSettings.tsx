@@ -279,7 +279,7 @@ export function ProfileSettings() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
     );
   }
@@ -290,7 +290,7 @@ export function ProfileSettings() {
       <Card className="border-slate-200 dark:border-slate-700 shadow-lg dark:bg-slate-800">
         <CardHeader className="space-y-1 p-4 sm:p-6">
           <CardTitle className="text-lg sm:text-2xl font-bold flex items-center gap-2">
-            <User className="h-5 w-5 sm:h-6 sm:w-6 text-blue-600" />
+            <User className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
             Profile Information
           </CardTitle>
           <CardDescription className="text-xs sm:text-sm text-slate-600 dark:text-slate-400">
@@ -301,9 +301,9 @@ export function ProfileSettings() {
           {/* Avatar Section */}
           <div className="flex flex-col xs:flex-row items-center gap-3 sm:gap-6">
             <div className="relative group">
-              <Avatar className="h-20 w-20 sm:h-24 sm:w-24 border-4 border-blue-100 dark:border-blue-900">
+              <Avatar className="h-20 w-20 sm:h-24 sm:w-24 border-4 border-amber-100 dark:border-amber-900">
                 <AvatarImage src={profile?.avatar_url} />
-                <AvatarFallback className="text-xl sm:text-2xl font-bold bg-gradient-to-br from-blue-500 to-blue-600 text-white">
+                <AvatarFallback className="text-xl sm:text-2xl font-bold bg-gradient-to-br from-slate-800 to-amber-600 text-white">
                   {getInitials()}
                 </AvatarFallback>
               </Avatar>
@@ -315,9 +315,9 @@ export function ProfileSettings() {
               <p className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
                 Profile Photo
               </p>
-              <div className="inline-flex items-center gap-2 rounded-lg bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 px-3 py-2">
-                <Camera className="h-4 w-4 text-blue-500" />
-                <span className="text-xs text-blue-600 dark:text-blue-400 font-medium">
+              <div className="inline-flex items-center gap-2 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-3 py-2">
+                <Camera className="h-4 w-4 text-slate-500" />
+                <span className="text-xs text-slate-600 dark:text-slate-400 font-medium">
                   Photo upload available soon
                 </span>
               </div>
@@ -363,7 +363,7 @@ export function ProfileSettings() {
             <Button 
               onClick={handleSaveProfile}
               disabled={updateProfileMutation.isPending}
-              className="gap-2 bg-blue-600 hover:bg-blue-700"
+              className="gap-2"
             >
               {updateProfileMutation.isPending ? (
                 <>
@@ -385,7 +385,7 @@ export function ProfileSettings() {
       <Card className="border-slate-200 dark:border-slate-700 shadow-lg dark:bg-slate-800">
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl font-bold flex items-center gap-2">
-            <Shield className="h-6 w-6 text-blue-600" />
+            <Shield className="h-6 w-6 text-primary" />
             Security
           </CardTitle>
           <CardDescription className="text-slate-600 dark:text-slate-400">
@@ -433,7 +433,7 @@ export function ProfileSettings() {
             <Button
               onClick={handlePasswordChange}
               disabled={!newPassword || !confirmPassword || updatePasswordMutation.isPending}
-              className="gap-2 bg-blue-600 hover:bg-blue-700"
+              className="gap-2"
             >
               {updatePasswordMutation.isPending ? (
                 <>
@@ -510,7 +510,6 @@ export function ProfileSettings() {
                     size="sm"
                     onClick={handleVerifyMfaEnroll}
                     disabled={mfaVerifyCode.length !== 6 || mfaLoading}
-                    className="bg-blue-600 hover:bg-blue-700"
                   >
                     {mfaLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Verify & Enable"}
                   </Button>
@@ -530,7 +529,7 @@ export function ProfileSettings() {
       <Card className="border-slate-200 dark:border-slate-700 shadow-lg dark:bg-slate-800">
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl font-bold flex items-center gap-2">
-            <Bell className="h-6 w-6 text-blue-600" />
+            <Bell className="h-6 w-6 text-primary" />
             Notifications
           </CardTitle>
           <CardDescription className="text-slate-600 dark:text-slate-400">
@@ -568,7 +567,7 @@ export function ProfileSettings() {
             <Button 
               onClick={handleSaveProfile}
               disabled={updateProfileMutation.isPending}
-              className="gap-2 bg-blue-600 hover:bg-blue-700"
+              className="gap-2"
             >
               {updateProfileMutation.isPending ? (
                 <>

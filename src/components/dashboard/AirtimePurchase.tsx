@@ -99,7 +99,7 @@ export function AirtimePurchase() {
     <Card className="border-slate-200 shadow-lg dark:border-slate-700 dark:bg-slate-800">
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-lg">
-          <Smartphone className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+          <Smartphone className="h-5 w-5 text-primary" />
           Buy Airtime
         </CardTitle>
         <CardDescription>Top up a Nigerian mobile number securely from your wallet.</CardDescription>
@@ -128,7 +128,7 @@ export function AirtimePurchase() {
                     className={cn(
                       "rounded-xl border px-3 py-3 text-sm font-semibold transition-all",
                       selectedProduct?.id === product.id
-                        ? "border-blue-500 bg-blue-600 text-white shadow-sm"
+                        ? "border-primary bg-primary text-primary-foreground shadow-sm"
                         : "border-slate-200 bg-white text-slate-700 hover:border-slate-300 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200",
                     )}
                   >
@@ -180,7 +180,7 @@ export function AirtimePurchase() {
 
           <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-900/60">
             <div className="flex items-center gap-2 text-sm font-semibold">
-              <RadioTower className="h-4 w-4 text-blue-600" /> Purchase summary
+              <RadioTower className="h-4 w-4 text-primary" /> Purchase summary
             </div>
             <dl className="mt-3 space-y-2 text-sm">
               <div className="flex justify-between"><dt className="text-slate-500">Airtime value</dt><dd>{formatNaira(numericAmount)}</dd></div>

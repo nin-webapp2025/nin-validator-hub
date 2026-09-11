@@ -127,7 +127,7 @@ export function ApiKeyManagement() {
         </CardTitle>
         <CardDescription>
           Generate API keys for programmatic access to verification endpoints.{" "}
-          <Link to="/docs/api" className="inline-flex items-center gap-1 text-blue-600 hover:underline">
+          <Link to="/docs/api" className="inline-flex items-center gap-1 text-primary hover:underline">
             View API Docs <ExternalLink className="h-3 w-3" />
           </Link>
         </CardDescription>
@@ -194,7 +194,7 @@ export function ApiKeyManagement() {
         {/* List existing keys */}
         {loading ? (
           <div className="py-8 text-center">
-            <Loader2 className="h-5 w-5 animate-spin mx-auto text-blue-600" />
+            <Loader2 className="h-5 w-5 animate-spin mx-auto text-primary" />
           </div>
         ) : keys.length === 0 ? (
           <div className="text-center py-8 text-slate-500 dark:text-slate-400">
@@ -212,7 +212,7 @@ export function ApiKeyManagement() {
                   <div className="flex items-center gap-2">
                     <p className="text-sm font-medium text-slate-900 dark:text-slate-100">{key.name}</p>
                     {key.key_prefix.startsWith("sk_test_") && (
-                      <Badge variant="secondary" className="text-[10px] px-1.5 py-0 bg-violet-100 dark:bg-violet-900/30 text-violet-700 dark:text-violet-400">
+                      <Badge variant="secondary" className="text-[10px] px-1.5 py-0 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-400">
                         TEST
                       </Badge>
                     )}

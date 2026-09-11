@@ -88,9 +88,9 @@ export function ProtectedRoute({
   // Show loading state while checking auth and role
   if (authLoading || roleLoading || mfaLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-blue-50">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-amber-50/40 dark:from-slate-950 dark:to-slate-900">
         <div className="text-center">
-          <Loader2 className="h-12 w-12 animate-spin text-blue-600 mx-auto mb-4" />
+          <Loader2 className="h-12 w-12 animate-spin text-primary mx-auto mb-4" />
           <p className="text-gray-600">Verifying access...</p>
         </div>
       </div>

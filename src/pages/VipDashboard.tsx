@@ -24,7 +24,6 @@ import { Crown, Wallet } from "lucide-react";
 
 /**
  * VIP Dashboard - Premium user experience with modification request capability
- * Enhanced UI with purple/gold theme, glassmorphism effects
  * Can submit NIN modification requests that go through admin approval
  */
 export default function VipDashboard() {
@@ -32,68 +31,68 @@ export default function VipDashboard() {
   const [modificationRefreshKey, setModificationRefreshKey] = useState(0);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-purple-800 to-black overflow-x-hidden">
-      <DashboardHeader 
-        onNavigateToProfile={() => setActiveTab("profile")} 
+    <div className="min-h-screen bg-[radial-gradient(circle_at_top_left,#fef3c7_0%,#f8fafc_32%,#fffbeb_100%)] dark:bg-[radial-gradient(circle_at_top_left,#0f172a_0%,#020617_40%,#020617_100%)] overflow-x-hidden">
+      <DashboardHeader
+        onNavigateToProfile={() => setActiveTab("profile")}
         onNavigateToWallet={() => setActiveTab("wallet")}
       />
-      
+
       <main className="container mx-auto px-3 sm:px-4 py-6 sm:py-8">
         <div className="mb-6 flex items-center gap-3">
-          <Crown className="h-7 w-7 text-amber-400" />
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-amber-300 via-yellow-200 to-amber-400 bg-clip-text text-transparent">
+          <Crown className="h-7 w-7 text-primary" />
+          <h1 className="text-3xl font-display font-bold text-slate-900 dark:text-slate-100">
             VIP Dashboard
           </h1>
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <div className="overflow-x-auto -mx-3 px-3 sm:mx-0 sm:px-0 no-scrollbar">
-            <TabsList className="inline-flex w-max sm:w-full sm:grid sm:grid-cols-4 lg:flex lg:flex-row gap-1 p-1.5 h-auto bg-purple-900/50 backdrop-blur-lg border border-amber-500/20">
+            <TabsList className="inline-flex w-max sm:w-full sm:grid sm:grid-cols-4 lg:flex lg:flex-row gap-1 p-1.5 h-auto bg-white/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800">
               <TabsTrigger 
                 value="modification" 
-                className="text-xs sm:text-sm py-2 sm:py-2.5 whitespace-nowrap data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-yellow-600 data-[state=active]:text-black"
+                className="text-xs sm:text-sm py-2 sm:py-2.5 whitespace-nowrap data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
               >
                 Modify NIN
               </TabsTrigger>
               <TabsTrigger 
                 value="validate" 
-                className="text-xs sm:text-sm py-2 sm:py-2.5 whitespace-nowrap data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-yellow-600 data-[state=active]:text-black"
+                className="text-xs sm:text-sm py-2 sm:py-2.5 whitespace-nowrap data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
               >
                 NIN Validation
               </TabsTrigger>
               <TabsTrigger 
                 value="bvn" 
-                className="text-xs sm:text-sm py-2 sm:py-2.5 whitespace-nowrap data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-yellow-600 data-[state=active]:text-black"
+                className="text-xs sm:text-sm py-2 sm:py-2.5 whitespace-nowrap data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
               >
                 BVN Verify
               </TabsTrigger>
               <TabsTrigger 
                 value="clearance" 
-                className="text-xs sm:text-sm py-2 sm:py-2.5 whitespace-nowrap data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-yellow-600 data-[state=active]:text-black"
+                className="text-xs sm:text-sm py-2 sm:py-2.5 whitespace-nowrap data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
               >
                 Clearance
               </TabsTrigger>
               <TabsTrigger 
                 value="search"
-                className="text-xs sm:text-sm py-2 sm:py-2.5 whitespace-nowrap data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-yellow-600 data-[state=active]:text-black"
+                className="text-xs sm:text-sm py-2 sm:py-2.5 whitespace-nowrap data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
               >
                 NIN Verify
               </TabsTrigger>
               <TabsTrigger 
                 value="personalization"
-                className="text-xs sm:text-sm py-2 sm:py-2.5 whitespace-nowrap data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-yellow-600 data-[state=active]:text-black"
+                className="text-xs sm:text-sm py-2 sm:py-2.5 whitespace-nowrap data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
               >
                 Personalize
               </TabsTrigger>
               <TabsTrigger 
                 value="print-nin"
-                className="text-xs sm:text-sm py-2 sm:py-2.5 whitespace-nowrap data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-yellow-600 data-[state=active]:text-black"
+                className="text-xs sm:text-sm py-2 sm:py-2.5 whitespace-nowrap data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
               >
                 Print NIN
               </TabsTrigger>
               <TabsTrigger 
                 value="wallet"
-                className="text-xs sm:text-sm py-2 sm:py-2.5 whitespace-nowrap flex items-center gap-1 data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-yellow-600 data-[state=active]:text-black"
+                className="text-xs sm:text-sm py-2 sm:py-2.5 whitespace-nowrap flex items-center gap-1 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
               >
                 <Wallet className="h-3.5 w-3.5" />
                 Wallet
@@ -107,7 +106,7 @@ export default function VipDashboard() {
           </TabsContent>
 
           <TabsContent value="validate" className="space-y-6">
-            <div className="bg-purple-900/30 backdrop-blur-lg border border-amber-500/20 rounded-lg p-6">
+            <div className="bg-white/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 rounded-lg p-6">
               <div className="grid gap-6 lg:grid-cols-2">
                 <ValidationForm />
                 <ValidationStatus />
@@ -119,7 +118,7 @@ export default function VipDashboard() {
           </TabsContent>
 
           <TabsContent value="bvn" className="space-y-6">
-            <div className="bg-purple-900/30 backdrop-blur-lg border border-amber-500/20 rounded-lg p-6">
+            <div className="bg-white/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 rounded-lg p-6">
               <BvnVerification />
               <div className="mt-6">
                 <BvnHistory />
@@ -128,7 +127,7 @@ export default function VipDashboard() {
           </TabsContent>
 
           <TabsContent value="clearance" className="space-y-6">
-            <div className="bg-purple-900/30 backdrop-blur-lg border border-amber-500/20 rounded-lg p-6">
+            <div className="bg-white/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 rounded-lg p-6">
               <div className="grid gap-6 lg:grid-cols-2">
                 <ClearanceForm />
                 <ClearanceStatus />
@@ -140,13 +139,13 @@ export default function VipDashboard() {
           </TabsContent>
 
           <TabsContent value="search" className="space-y-6">
-            <div className="bg-purple-900/30 backdrop-blur-lg border border-amber-500/20 rounded-lg p-6">
+            <div className="bg-white/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 rounded-lg p-6">
               <NinSearch />
             </div>
           </TabsContent>
 
           <TabsContent value="personalization" className="space-y-6">
-            <div className="bg-purple-900/30 backdrop-blur-lg border border-amber-500/20 rounded-lg p-6">
+            <div className="bg-white/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 rounded-lg p-6">
               <div className="grid gap-6 lg:grid-cols-2">
                 <Personalization />
                 <PersonalizationStatus />
@@ -158,13 +157,13 @@ export default function VipDashboard() {
           </TabsContent>
 
           <TabsContent value="print-nin" className="space-y-6">
-            <div className="bg-purple-900/30 backdrop-blur-lg border border-amber-500/20 rounded-lg p-6">
+            <div className="bg-white/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 rounded-lg p-6">
               <PrintNinSlip />
             </div>
           </TabsContent>
 
           <TabsContent value="wallet" className="space-y-6">
-            <div className="bg-purple-900/30 backdrop-blur-lg border border-amber-500/20 rounded-lg p-6">
+            <div className="bg-white/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 rounded-lg p-6">
               <div className="grid gap-6 lg:grid-cols-2">
                 <WalletTopUp />
                 <TransactionHistory />
@@ -173,7 +172,7 @@ export default function VipDashboard() {
           </TabsContent>
 
           <TabsContent value="profile" className="space-y-6">
-            <div className="bg-purple-900/30 backdrop-blur-lg border border-amber-500/20 rounded-lg p-6">
+            <div className="bg-white/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 rounded-lg p-6">
               <Profile />
             </div>
           </TabsContent>

@@ -18,9 +18,9 @@ interface UserWithRole {
 
 const ROLE_COLORS: Record<UserRole, string> = {
   admin: "bg-red-500",
-  staff: "bg-green-500",
-  vip: "bg-purple-500",
-  user: "bg-blue-500",
+  staff: "bg-emerald-500",
+  vip: "bg-amber-500",
+  user: "bg-slate-500",
 };
 
 function extractErrorMessage(error: unknown) {
@@ -168,7 +168,7 @@ export function UserRoleManagement() {
     return (
       <Card>
         <CardContent className="flex items-center justify-center py-12">
-          <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
         </CardContent>
       </Card>
     );
@@ -178,7 +178,7 @@ export function UserRoleManagement() {
     <Card>
       <CardHeader>
         <div className="flex items-center gap-2">
-          <Shield className="h-5 w-5 text-blue-600" />
+          <Shield className="h-5 w-5 text-primary" />
           <CardTitle>User Role Management</CardTitle>
         </div>
         <CardDescription>
@@ -252,7 +252,7 @@ export function UserRoleManagement() {
                     </Select>
 
                     {updatingUserId === user.id && (
-                      <Loader2 className="h-4 w-4 animate-spin text-blue-600" />
+                      <Loader2 className="h-4 w-4 animate-spin text-primary" />
                     )}
                   </div>
                 </div>
@@ -264,13 +264,13 @@ export function UserRoleManagement() {
         <div className="mt-6 pt-6 border-t">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
             <div>
-              <p className="text-2xl font-bold text-blue-600">
+              <p className="text-2xl font-bold text-primary">
                 {users.filter((user) => user.role === "user").length}
               </p>
               <p className="text-xs text-gray-600 dark:text-slate-400">Users</p>
             </div>
             <div>
-              <p className="text-2xl font-bold text-purple-600">
+              <p className="text-2xl font-bold text-slate-600 dark:text-slate-400">
                 {users.filter((user) => user.role === "vip").length}
               </p>
               <p className="text-xs text-gray-600 dark:text-slate-400">VIP</p>

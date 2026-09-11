@@ -41,43 +41,31 @@ export default function Landing() {
       icon: ShieldCheck,
       title: "NIN Validation",
       description: "Instantly validate National Identification Numbers and retrieve verified identity data including name, date of birth, phone number, and photo.",
-      color: "bg-blue-500",
-      lightBg: "bg-blue-50 dark:bg-blue-950/30",
     },
     {
       icon: CreditCard,
       title: "BVN Verification",
       description: "Verify Bank Verification Numbers instantly and retrieve identity details for banking and financial workflows.",
-      color: "bg-emerald-500",
-      lightBg: "bg-emerald-50 dark:bg-emerald-950/30",
     },
     {
       icon: FileSearch,
       title: "NIN Personalization",
       description: "Generate personalized NIN slips and track each request from submission to completion.",
-      color: "bg-purple-500",
-      lightBg: "bg-purple-50 dark:bg-purple-950/30",
     },
     {
       icon: Lock,
       title: "Batch Processing",
       description: "Upload CSV files to validate up to 100 NINs at once. Track progress in real-time and export results instantly for bulk verification needs.",
-      color: "bg-amber-500",
-      lightBg: "bg-amber-50 dark:bg-amber-950/30",
     },
     {
       icon: Zap,
       title: "Instant Results",
       description: "Get verification results in seconds with our lightning-fast platform. Real-time processing with 99.9% uptime and instant responses.",
-      color: "bg-rose-500",
-      lightBg: "bg-rose-50 dark:bg-rose-950/30",
     },
     {
       icon: BarChart3,
       title: "Usage Analytics",
       description: "Monitor usage, track validation activity, and review detailed account history in one place.",
-      color: "bg-indigo-500",
-      lightBg: "bg-indigo-50 dark:bg-indigo-950/30",
     },
   ];
 
@@ -89,7 +77,7 @@ export default function Landing() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-slate-50 dark:from-slate-950 dark:via-blue-950/20 dark:to-slate-950">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-amber-50/30 to-slate-50 dark:from-slate-950 dark:via-amber-950/10 dark:to-slate-950">
       {/* Navigation */}
       <nav className="sticky top-0 z-50 border-b border-slate-200/80 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-lg">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -104,25 +92,25 @@ export default function Landing() {
             <div className="hidden md:flex items-center gap-8">
               <a 
                 href="#features" 
-                className="text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                className="text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-primary transition-colors"
               >
                 Features
               </a>
               <a 
                 href="#services" 
-                className="text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                className="text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-primary transition-colors"
               >
                 Services
               </a>
               <a 
                 href="#about" 
-                className="text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                className="text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-primary transition-colors"
               >
                 About
               </a>
               <Link 
                 to="/docs/api" 
-                className="text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                className="text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-primary transition-colors"
               >
                 API Docs
               </Link>
@@ -150,7 +138,7 @@ export default function Landing() {
               </Button>
               <Button 
                 onClick={() => navigate("/auth")}
-                className="hidden sm:inline-flex bg-blue-600 hover:bg-blue-700"
+                className="hidden sm:inline-flex bg-primary hover:bg-primary/90 text-primary-foreground"
               >
                 Get Started
                 <ArrowRight className="ml-2 h-4 w-4" />
@@ -168,25 +156,25 @@ export default function Landing() {
                   <nav className="flex flex-col gap-2 mb-6">
                     <SheetClose asChild>
                       <a href="#features" className="flex items-center gap-3 px-4 py-3 rounded-xl text-base font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
-                        <Sparkles className="h-5 w-5 text-blue-600" />
+                        <Sparkles className="h-5 w-5 text-primary" />
                         Features
                       </a>
                     </SheetClose>
                     <SheetClose asChild>
                       <a href="#services" className="flex items-center gap-3 px-4 py-3 rounded-xl text-base font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
-                        <Shield className="h-5 w-5 text-blue-600" />
+                        <Shield className="h-5 w-5 text-primary" />
                         Services
                       </a>
                     </SheetClose>
                     <SheetClose asChild>
                       <a href="#about" className="flex items-center gap-3 px-4 py-3 rounded-xl text-base font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
-                        <Users className="h-5 w-5 text-blue-600" />
+                        <Users className="h-5 w-5 text-primary" />
                         About
                       </a>
                     </SheetClose>
                     <SheetClose asChild>
                       <Link to="/docs/api" className="flex items-center gap-3 px-4 py-3 rounded-xl text-base font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
-                        <BookOpen className="h-5 w-5 text-blue-600" />
+                        <BookOpen className="h-5 w-5 text-primary" />
                         API Docs
                       </Link>
                     </SheetClose>
@@ -201,7 +189,7 @@ export default function Landing() {
                     </Button>
                     <Button 
                       onClick={() => navigate("/auth")}
-                      className="w-full py-3 text-base rounded-xl bg-blue-600 hover:bg-blue-700"
+                      className="w-full py-3 text-base rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground"
                     >
                       Get Started
                       <ArrowRight className="ml-2 h-4 w-4" />
@@ -217,14 +205,14 @@ export default function Landing() {
       {/* Hero Section */}
       <section className="container mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-12 sm:pt-12 sm:pb-20 lg:pt-16 lg:pb-32">
         <div className="text-center max-w-4xl mx-auto animate-in fade-in slide-in-from-bottom-3 duration-700">
-          <Badge className="mb-6 px-4 py-1.5 bg-blue-50 dark:bg-blue-950/30 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800">
+          <Badge className="mb-6 px-4 py-1.5 bg-primary/10 text-primary border-primary/20">
             <Sparkles className="h-3 w-3 mr-1.5" />
             Trusted Identity Verification
           </Badge>
           
           <h1 className="text-3xl sm:text-5xl lg:text-7xl font-bold text-slate-900 dark:text-slate-100 mb-4 sm:mb-6 tracking-tight">
             Verify NIN & BVN
-            <span className="block mt-1 sm:mt-2 bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent">
+            <span className="block mt-1 sm:mt-2 bg-gradient-to-r from-amber-600 to-amber-400 bg-clip-text text-transparent">
               in Real-Time
             </span>
           </h1>
@@ -238,7 +226,7 @@ export default function Landing() {
             <Button 
               size="lg"
               onClick={() => navigate("/auth")}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-6 text-lg rounded-xl shadow-lg hover:shadow-xl transition-all"
+              className="bg-primary hover:bg-primary/90 text-primary-foreground text-white px-8 py-6 text-lg rounded-xl shadow-lg hover:shadow-xl transition-all"
             >
               Start Validating Now
               <ArrowRight className="ml-2 h-5 w-5" />
@@ -260,7 +248,7 @@ export default function Landing() {
               <div key={stat.label} className="animate-in fade-in slide-in-from-bottom-2 duration-500">
                 <Card className="border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900">
                   <CardContent className="p-3 sm:p-6 text-center">
-                    <stat.icon className="h-6 w-6 sm:h-8 sm:w-8 mx-auto mb-2 sm:mb-3 text-blue-600" />
+                    <stat.icon className="h-6 w-6 sm:h-8 sm:w-8 mx-auto mb-2 sm:mb-3 text-primary" />
                     <p className="text-xl sm:text-3xl font-bold text-slate-900 dark:text-slate-100 mb-1">
                       {stat.value}
                     </p>
@@ -278,7 +266,7 @@ export default function Landing() {
       {/* Features Section */}
       <section id="features" className="container mx-auto px-4 sm:px-6 lg:px-8 py-20 scroll-mt-16">
         <div className="text-center mb-16">
-          <Badge className="mb-4 px-4 py-1.5 bg-blue-50 dark:bg-blue-950/30 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800">
+          <Badge className="mb-4 px-4 py-1.5 bg-primary/10 text-primary border-primary/20">
             Features
           </Badge>
           <h2 className="text-2xl sm:text-4xl lg:text-5xl font-bold text-slate-900 dark:text-slate-100 mb-4">
@@ -294,8 +282,8 @@ export default function Landing() {
             <div key={feature.title} className="transition-transform duration-200 hover:-translate-y-2">
               <Card className="h-full border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 hover:shadow-lg dark:hover:shadow-2xl transition-all duration-300">
                 <CardContent className="p-6">
-                  <div className={`${feature.lightBg} rounded-xl p-3 w-fit mb-4`}>
-                    <feature.icon className={`h-6 w-6 ${feature.color.replace('bg-', 'text-')}`} />
+                  <div className="rounded-xl bg-primary/10 p-3 w-fit mb-4">
+                    <feature.icon className="h-6 w-6 text-primary" />
                   </div>
                   <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-3">
                     {feature.title}
@@ -313,19 +301,19 @@ export default function Landing() {
       {/* CTA Section */}
       <section id="services" className="container mx-auto px-4 sm:px-6 lg:px-8 py-20 scroll-mt-16">
         <div>
-          <Card className="bg-gradient-to-br from-blue-600 to-blue-700 border-0 shadow-2xl">
+          <Card className="bg-gradient-to-br from-slate-900 via-amber-800 to-amber-500 border-0 shadow-2xl">
             <CardContent className="p-6 sm:p-12 lg:p-16 text-center">
               <h2 className="text-2xl sm:text-4xl lg:text-5xl font-bold text-white mb-4 sm:mb-6">
                 Ready to get started?
               </h2>
-              <p className="text-base sm:text-xl text-blue-100 mb-6 sm:mb-10 max-w-2xl mx-auto">
+              <p className="text-base sm:text-xl text-amber-50/90 mb-6 sm:mb-10 max-w-2xl mx-auto">
                 Join thousands of businesses using SparkID for secure identity verification
               </p>
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                <Button 
+                <Button
                   size="lg"
                   onClick={() => navigate("/auth")}
-                  className="bg-white text-blue-600 hover:bg-blue-50 px-8 py-6 text-lg rounded-xl shadow-lg"
+                  className="bg-white text-primary hover:bg-amber-50 px-8 py-6 text-lg rounded-xl shadow-lg"
                 >
                   Create Free Account
                   <ArrowRight className="ml-2 h-5 w-5" />
@@ -403,22 +391,22 @@ export default function Landing() {
               <h4 className="text-sm font-semibold text-slate-900 dark:text-slate-100 mb-4">Services</h4>
               <ul className="space-y-3">
                 <li>
-                  <a href="#features" className="text-sm text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                  <a href="#features" className="text-sm text-slate-600 dark:text-slate-400 hover:text-primary transition-colors">
                     NIN Validation
                   </a>
                 </li>
                 <li>
-                  <a href="#features" className="text-sm text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                  <a href="#features" className="text-sm text-slate-600 dark:text-slate-400 hover:text-primary transition-colors">
                     BVN Verification
                   </a>
                 </li>
                 <li>
-                  <a href="#features" className="text-sm text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                  <a href="#features" className="text-sm text-slate-600 dark:text-slate-400 hover:text-primary transition-colors">
                     Clearance Services
                   </a>
                 </li>
                 <li>
-                  <a href="#features" className="text-sm text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                  <a href="#features" className="text-sm text-slate-600 dark:text-slate-400 hover:text-primary transition-colors">
                     Identity Search
                   </a>
                 </li>
@@ -430,22 +418,22 @@ export default function Landing() {
               <h4 className="text-sm font-semibold text-slate-900 dark:text-slate-100 mb-4">Company</h4>
               <ul className="space-y-3">
                 <li>
-                  <a href="#about" className="text-sm text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                  <a href="#about" className="text-sm text-slate-600 dark:text-slate-400 hover:text-primary transition-colors">
                     About Us
                   </a>
                 </li>
                 <li>
-                  <Link to="/auth" className="text-sm text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                  <Link to="/auth" className="text-sm text-slate-600 dark:text-slate-400 hover:text-primary transition-colors">
                     Get Started
                   </Link>
                 </li>
                 <li>
-                  <Link to="/privacy" className="text-sm text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                  <Link to="/privacy" className="text-sm text-slate-600 dark:text-slate-400 hover:text-primary transition-colors">
                     Privacy Policy
                   </Link>
                 </li>
                 <li>
-                  <Link to="/terms" className="text-sm text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                  <Link to="/terms" className="text-sm text-slate-600 dark:text-slate-400 hover:text-primary transition-colors">
                     Terms of Service
                   </Link>
                 </li>
@@ -460,13 +448,13 @@ export default function Landing() {
                 © {new Date().getFullYear()} SparkID. All rights reserved.
               </p>
               <div className="flex items-center gap-6">
-                <Link to="/docs/api" className="text-sm text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                <Link to="/docs/api" className="text-sm text-slate-600 dark:text-slate-400 hover:text-primary transition-colors">
                   API Documentation
                 </Link>
-                <a href="#services" className="text-sm text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                <a href="#services" className="text-sm text-slate-600 dark:text-slate-400 hover:text-primary transition-colors">
                   Help Center
                 </a>
-                <a href="#about" className="text-sm text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                <a href="#about" className="text-sm text-slate-600 dark:text-slate-400 hover:text-primary transition-colors">
                   Support
                 </a>
               </div>

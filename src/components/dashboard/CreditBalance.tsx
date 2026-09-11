@@ -54,7 +54,7 @@ export function CreditBalance() {
     return (
       <Card className="shadow-card">
         <CardContent className="flex items-center justify-center py-8">
-          <Loader2 className="h-5 w-5 animate-spin text-blue-600" />
+          <Loader2 className="h-5 w-5 animate-spin text-primary" />
         </CardContent>
       </Card>
     );

@@ -166,7 +166,7 @@ export function WebhookManagement() {
         {/* List existing endpoints */}
         {loading ? (
           <div className="py-8 text-center">
-            <Loader2 className="h-5 w-5 animate-spin mx-auto text-blue-600" />
+            <Loader2 className="h-5 w-5 animate-spin mx-auto text-primary" />
           </div>
         ) : endpoints.length === 0 ? (
           <div className="text-center py-8 text-slate-500 dark:text-slate-400">

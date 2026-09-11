@@ -26,7 +26,7 @@ export function UserJourneyPage({
       <Card className="border-slate-200/80 bg-white/90 shadow-[0_12px_40px_rgba(15,23,42,0.06)] dark:border-slate-800 dark:bg-slate-900/90">
         <CardHeader>
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-blue-600 dark:text-blue-400">
+            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-primary">
               {eyebrow}
             </p>
             <CardTitle className="mt-2 text-2xl font-semibold text-slate-900 dark:text-slate-100">

@@ -9,16 +9,16 @@ export function AppFooter() {
             &copy; {new Date().getFullYear()} SparkID. Secure identity operations.
           </p>
           <div className="flex flex-wrap items-center justify-center gap-3 text-xs sm:justify-end sm:text-sm text-slate-500 dark:text-slate-400">
-            <Link to="/privacy" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+            <Link to="/privacy" className="hover:text-primary transition-colors">
               Privacy
             </Link>
-            <Link to="/terms" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+            <Link to="/terms" className="hover:text-primary transition-colors">
               Terms
             </Link>
-            <Link to="/docs/api" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+            <Link to="/docs/api" className="hover:text-primary transition-colors">
               API Docs
             </Link>
-            <a href="mailto:support@sparkid.ng" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+            <a href="mailto:support@sparkid.ng" className="hover:text-primary transition-colors">
               Support
             </a>
           </div>

@@ -434,7 +434,7 @@ export default function Auth() {
           <div className="mx-auto mb-3 sm:mb-4 flex items-center justify-center">
             <img src="/logo.svg" alt="SparkID" className="h-12 sm:h-14 w-auto" />
           </div>
-          <div className="mx-auto inline-flex items-center gap-2 rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700 dark:border-blue-900 dark:bg-blue-950/40 dark:text-blue-300">
+          <div className="mx-auto inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
             <ShieldCheck className="h-3.5 w-3.5" />
             Secure identity operations
           </div>

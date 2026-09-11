@@ -174,10 +174,10 @@ export function DashboardHeader({ onNavigateToProfile, onNavigateToWallet }: Das
                   {notifications.map((n) => (
                     <div
                       key={n.id}
-                      className={`flex items-start gap-3 px-4 py-3 border-b border-slate-100 dark:border-slate-800 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors ${!n.read ? "bg-blue-50/50 dark:bg-blue-950/20" : ""}`}
+                      className={`flex items-start gap-3 px-4 py-3 border-b border-slate-100 dark:border-slate-800 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors ${!n.read ? "bg-amber-50/50 dark:bg-amber-950/10" : ""}`}
                       onClick={() => !n.read && handleMarkRead(n.id)}
                     >
-                      <div className={`mt-1 h-2 w-2 rounded-full shrink-0 ${!n.read ? "bg-blue-500" : "bg-transparent"}`} />
+                      <div className={`mt-1 h-2 w-2 rounded-full shrink-0 ${!n.read ? "bg-primary" : "bg-transparent"}`} />
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium text-slate-900 dark:text-slate-100 truncate">{n.title}</p>
                         <p className="text-xs text-slate-500 dark:text-slate-400 truncate">{n.message}</p>
@@ -196,7 +196,7 @@ export function DashboardHeader({ onNavigateToProfile, onNavigateToWallet }: Das
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="relative h-9 w-9 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 p-0">
                 <Avatar className="h-9 w-9 border border-slate-200 dark:border-slate-700">
-                  <AvatarFallback className="bg-blue-600 text-white font-semibold text-xs">
+                  <AvatarFallback className="bg-primary text-primary-foreground font-semibold text-xs">
                     {user?.email ? getInitials(user.email) : <User className="h-4 w-4" />}
                   </AvatarFallback>
                 </Avatar>
@@ -205,7 +205,7 @@ export function DashboardHeader({ onNavigateToProfile, onNavigateToWallet }: Das
             <DropdownMenuContent align="end" className="w-64 p-2 border-slate-200 dark:border-slate-700 dark:bg-slate-900 shadow-lg rounded-xl">
               <div className="flex items-center gap-3 p-3 rounded-lg bg-slate-50 dark:bg-slate-800 mb-2">
                 <Avatar className="h-10 w-10 border border-slate-200 dark:border-slate-700">
-                  <AvatarFallback className="bg-blue-600 text-white font-semibold text-sm">
+                  <AvatarFallback className="bg-primary text-primary-foreground font-semibold text-sm">
                     {user?.email ? getInitials(user.email) : <User className="h-4 w-4" />}
                   </AvatarFallback>
                 </Avatar>

@@ -65,7 +65,7 @@ export function VtuPurchaseHistory({ category }: { category: VtuCategory }) {
     <Card className="border-slate-200 dark:border-slate-700 dark:bg-slate-800">
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-lg">
-          <ReceiptText className="h-5 w-5 text-blue-600" />
+          <ReceiptText className="h-5 w-5 text-primary" />
           Recent purchases
         </CardTitle>
         <CardDescription>Provider updates and reversals appear here automatically.</CardDescription>

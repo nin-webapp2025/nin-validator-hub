@@ -74,7 +74,7 @@ export function RateLimitIndicator() {
         percentageUsed >= 90 
           ? "border-l-red-500 bg-red-50 dark:bg-red-950/20" 
           : percentageUsed >= 70 
-          ? "border-l-yellow-500 bg-yellow-50 dark:bg-yellow-950/20"
+          ? "border-l-amber-500 bg-amber-50 dark:bg-amber-950/20"
           : "border-l-green-500 bg-green-50 dark:bg-green-950/20"
       }`}
     >
@@ -83,7 +83,7 @@ export function RateLimitIndicator() {
           percentageUsed >= 90 
             ? "text-red-600 dark:text-red-400" 
             : percentageUsed >= 70 
-            ? "text-yellow-600 dark:text-yellow-400"
+            ? "text-amber-600 dark:text-amber-400"
             : "text-green-600 dark:text-green-400"
         }`} />
         <div className="flex-1 space-y-2">
@@ -111,7 +111,7 @@ export function RateLimitIndicator() {
                 percentageUsed >= 90 
                   ? "[&>div]:bg-red-600" 
                   : percentageUsed >= 70 
-                  ? "[&>div]:bg-yellow-600"
+                  ? "[&>div]:bg-amber-600"
                   : "[&>div]:bg-green-600"
               }`}
             />

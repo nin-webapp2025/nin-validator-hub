@@ -186,7 +186,7 @@ export function Analytics() {
                   {analyticsSummary?.validationTotal || 0}
                 </p>
               </div>
-              <Activity className="h-8 w-8 sm:h-10 sm:w-10 text-blue-600 dark:text-blue-400" />
+              <Activity className="h-8 w-8 sm:h-10 sm:w-10 text-primary" />
             </div>
           </CardContent>
         </Card>
@@ -219,7 +219,7 @@ export function Analytics() {
                   {weeklyTrend.reduce((sum, day) => sum + day.validations, 0)}
                 </p>
               </div>
-              <Calendar className="h-10 w-10 text-purple-600 dark:text-purple-400" />
+              <Calendar className="h-10 w-10 text-slate-600 dark:text-slate-400" />
             </div>
           </CardContent>
         </Card>
@@ -235,7 +235,7 @@ export function Analytics() {
                     (analyticsSummary?.clearanceTotal || 0)}
                 </p>
               </div>
-              <PieChartIcon className="h-10 w-10 text-orange-600 dark:text-orange-400" />
+              <PieChartIcon className="h-10 w-10 text-slate-600 dark:text-slate-400" />
             </div>
           </CardContent>
         </Card>
