@@ -13,8 +13,6 @@ import { useToast } from "@/hooks/use-toast";
 import { Loader2, Printer, Download, FileImage, FileText, ArrowLeft, Phone, Hash, Eye } from "lucide-react";
 import { z } from "zod";
 import { QRCodeSVG } from "qrcode.react";
-import html2canvas from "html2canvas";
-import jsPDF from "jspdf";
 import { createRequestId } from "@/lib/request-id";
 
 // ---------- Validation schemas ----------
@@ -853,6 +851,7 @@ export function PrintNinSlip() {
     if (!slipRef.current) return;
     setDownloading("image");
     try {
+      const { default: html2canvas } = await import("html2canvas");
       const canvas = await html2canvas(slipRef.current, {
         scale: 3,
         useCORS: true,
@@ -876,6 +875,10 @@ export function PrintNinSlip() {
     if (!slipRef.current) return;
     setDownloading("pdf");
     try {
+      const [{ default: html2canvas }, { jsPDF }] = await Promise.all([
+        import("html2canvas"),
+        import("jspdf"),
+      ]);
       const canvas = await html2canvas(slipRef.current, {
         scale: 3,
         useCORS: true,
