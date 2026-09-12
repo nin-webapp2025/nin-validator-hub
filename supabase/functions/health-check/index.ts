@@ -38,6 +38,8 @@ serve(async (req) => {
   const robosttechKey = Deno.env.get("ROBOSTTECH_API_KEY");
   const premblyKey = Deno.env.get("PREMBLY_API_KEY");
   const paystackKey = Deno.env.get("PAYSTACK_SECRET_KEY");
+  const ikonectKey = Deno.env.get("IKONECT_API_KEY");
+  const ikonectSecret = Deno.env.get("IKONECT_API_SECRET");
   const smartApiKey = Deno.env.get("SMARTAPI_API_KEY");
   const smartApiPin = Deno.env.get("SMARTAPI_PIN");
   const smartApiWebhookToken = Deno.env.get("SMARTAPI_WEBHOOK_TOKEN");
@@ -49,6 +51,8 @@ serve(async (req) => {
     ROBOSTTECH_API_KEY: !!robosttechKey,
     PREMBLY_API_KEY: !!premblyKey,
     PAYSTACK_SECRET_KEY: !!paystackKey,
+    IKONECT_API_KEY: !!ikonectKey,
+    IKONECT_API_SECRET: !!ikonectSecret,
     SMARTAPI_API_KEY: !!smartApiKey,
     SMARTAPI_PIN: !!smartApiPin,
     SMARTAPI_WEBHOOK_TOKEN: !!smartApiWebhookToken,

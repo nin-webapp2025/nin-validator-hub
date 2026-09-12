@@ -11,8 +11,10 @@ import {
   ShieldCheck,
   Sparkles,
   Smartphone,
+  Tv,
   User,
   Wallet,
+  Zap,
 } from "lucide-react";
 
 export interface UserNavItem {
@@ -98,6 +100,18 @@ export const USER_NAV_GROUPS: UserNavGroup[] = [
         path: "/dashboard/user/data",
         icon: Database,
         description: "Buy mobile data and track delivery",
+      },
+      {
+        label: "TV Subscription",
+        path: "/dashboard/user/tv",
+        icon: Tv,
+        description: "Verify smartcards and pay TV plans",
+      },
+      {
+        label: "Electricity",
+        path: "/dashboard/user/electricity",
+        icon: Zap,
+        description: "Verify meters and pay electricity bills",
       },
       {
         label: "Wallet",

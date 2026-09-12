@@ -5,6 +5,13 @@ export interface ProviderRequestBody extends Record<string, unknown> {
   phone?: string;
   number?: string;
   number_nin?: string;
+  network?: string;
+  airtime_type?: string;
+  smartcard_number?: string;
+  meter_number?: string;
+  meter_type?: string;
+  disco?: string;
+  provider_code?: string;
   bvn?: string;
   firstname?: string;
   lastname?: string;
@@ -13,6 +20,9 @@ export interface ProviderRequestBody extends Record<string, unknown> {
   dateOfBirth?: string;
   product_id?: string;
   amount?: number | string;
+  provider?: string;
+  provider_category?: string;
+  provider_network?: string;
   provider_plan_id?: string;
   provider_amount?: number | string;
   provider_reference?: string;
@@ -40,6 +50,10 @@ export interface ProviderHelpers {
   callFormUpstream: (
     url: string,
     fields: Record<string, string>,
+  ) => Promise<ProviderHttpResult>;
+  callGetUpstream: (
+    url: string,
+    headers: Record<string, string>,
   ) => Promise<ProviderHttpResult>;
 }
 

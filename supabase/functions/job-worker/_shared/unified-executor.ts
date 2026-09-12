@@ -18,6 +18,11 @@ const API_ACTION_PRICES = {
   print_nin_slip_long: 400,
   vtu_airtime: 0,
   vtu_data: 0,
+  vtu_data_catalog: 0,
+  vtu_tv: 0,
+  vtu_tv_verify: 0,
+  vtu_electricity: 0,
+  vtu_electricity_verify: 0,
   vtu_query: 0,
 } as const;
 
@@ -37,6 +42,13 @@ export interface ExecutionRequestBody extends Record<string, unknown> {
   phone?: string;
   number?: string;
   number_nin?: string;
+  network?: string;
+  airtime_type?: string;
+  smartcard_number?: string;
+  meter_number?: string;
+  meter_type?: string;
+  disco?: string;
+  provider_code?: string;
   bvn?: string;
   firstname?: string;
   lastname?: string;
@@ -45,8 +57,12 @@ export interface ExecutionRequestBody extends Record<string, unknown> {
   dateOfBirth?: string;
   product_id?: string;
   amount?: number | string;
+  provider?: string;
+  provider_category?: string;
+  provider_network?: string;
   provider_plan_id?: string;
   provider_amount?: number | string;
+  product_name?: string;
   provider_reference?: string;
 }
 
@@ -93,6 +109,8 @@ export const ACTION_TO_WALLET_OPERATION: Partial<Record<SupportedAction, string>
   print_nin_slip_long: "print_nin_slip_long",
   vtu_airtime: "airtime_purchase",
   vtu_data: "data_purchase",
+  vtu_tv: "tv_purchase",
+  vtu_electricity: "electricity_purchase",
 };
 
 export const MOCK_RESPONSES: Record<SupportedAction, unknown> = {
@@ -295,6 +313,58 @@ export const MOCK_RESPONSES: Record<SupportedAction, unknown> = {
     provider_state: "pending",
     _test_mode: true,
   },
+  vtu_data_catalog: {
+    success: true,
+    message: "Test data plans loaded.",
+    dataPlans: [
+      {
+        id: "TST_DATA_001",
+        category: "data",
+        network: "MTN",
+        name: "1GB Test Plan (30 days)",
+        retail_price: 104,
+        provider: "ikonect",
+        provider_plan_id: "TST_DATA_001",
+        provider_cost: 100,
+        fee_percent: 4,
+        fee_flat: 0,
+        min_amount: null,
+        max_amount: null,
+      },
+    ],
+    provider_state: "succeeded",
+    _test_mode: true,
+  },
+  vtu_tv: {
+    status: "pending",
+    success: true,
+    response: "Test TV subscription queued.",
+    reference: "TST_VTU_TV_001",
+    provider_state: "pending",
+    _test_mode: true,
+  },
+  vtu_tv_verify: {
+    success: true,
+    verified: true,
+    customer_name: "TEST CUSTOMER",
+    provider_state: "succeeded",
+    _test_mode: true,
+  },
+  vtu_electricity: {
+    status: "pending",
+    success: true,
+    response: "Test electricity payment queued.",
+    reference: "TST_VTU_POWER_001",
+    provider_state: "pending",
+    _test_mode: true,
+  },
+  vtu_electricity_verify: {
+    success: true,
+    verified: true,
+    customer_name: "TEST CUSTOMER",
+    provider_state: "succeeded",
+    _test_mode: true,
+  },
   vtu_query: {
     code: "200",
     status: "success",
@@ -416,18 +486,62 @@ function validationErrorFor(action: SupportedAction, body: ExecutionRequestBody)
       }
       break;
     case "vtu_airtime":
-    case "vtu_data":
+    case "vtu_tv":
+    case "vtu_electricity":
       if (!body.product_id || !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(String(body.product_id))) {
         return "Field 'product_id' must be a valid product identifier.";
       }
       if (!body.phone || !PHONE_RE.test(String(body.phone))) {
         return "Field 'phone' must be a valid Nigerian mobile number (e.g. 08012345678).";
       }
-      if (action === "vtu_airtime") {
+      if (action === "vtu_airtime" || action === "vtu_electricity") {
         const amount = Number(body.amount);
         if (!Number.isFinite(amount) || amount <= 0) {
           return "Field 'amount' must be greater than zero.";
         }
+      }
+      if (action === "vtu_tv" && !String(body.smartcard_number ?? "").trim()) {
+        return "Field 'smartcard_number' is required.";
+      }
+      if (action === "vtu_electricity") {
+        if (!String(body.meter_number ?? "").trim()) {
+          return "Field 'meter_number' is required.";
+        }
+        if (!["prepaid", "postpaid"].includes(String(body.meter_type ?? "").trim().toLowerCase())) {
+          return "Field 'meter_type' must be either 'prepaid' or 'postpaid'.";
+        }
+      }
+      break;
+    case "vtu_data": {
+      const hasStoredProduct = body.product_id &&
+        /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(String(body.product_id));
+      const livePlanId = firstStringValue(body.provider_plan_id, body.product_id);
+
+      if (!hasStoredProduct && !livePlanId) {
+        return "Field 'provider_plan_id' is required for mobile data.";
+      }
+      if (!body.phone || !PHONE_RE.test(String(body.phone))) {
+        return "Field 'phone' must be a valid Nigerian mobile number (e.g. 08012345678).";
+      }
+      break;
+    }
+    case "vtu_tv_verify":
+      if (!String(body.provider_code ?? body.provider ?? body.network ?? "").trim()) {
+        return "Field 'provider' is required.";
+      }
+      if (!String(body.smartcard_number ?? "").trim()) {
+        return "Field 'smartcard_number' is required.";
+      }
+      break;
+    case "vtu_electricity_verify":
+      if (!String(body.disco ?? body.network ?? "").trim()) {
+        return "Field 'disco' is required.";
+      }
+      if (!String(body.meter_number ?? "").trim()) {
+        return "Field 'meter_number' is required.";
+      }
+      if (!["prepaid", "postpaid"].includes(String(body.meter_type ?? "").trim().toLowerCase())) {
+        return "Field 'meter_type' must be either 'prepaid' or 'postpaid'.";
       }
       break;
     case "vtu_query":
@@ -443,6 +557,7 @@ function validationErrorFor(action: SupportedAction, body: ExecutionRequestBody)
 function inferPhase(action: SupportedAction): NormalizedPhase {
   if (action === "vtu_query") return "status";
   if (action.endsWith("_status")) return "status";
+  if (action.endsWith("_verify")) return "verify";
   if (
     action === "nin_search" ||
     action === "nin_phone" ||
@@ -634,7 +749,12 @@ async function refundIfNeeded(
 ) {
   if (!charged || !userId || !walletOperation) return;
 
-  const variablePrice = walletOperation === "airtime_purchase" || walletOperation === "data_purchase";
+  const variablePrice = [
+    "airtime_purchase",
+    "data_purchase",
+    "tv_purchase",
+    "electricity_purchase",
+  ].includes(walletOperation);
   const { error } = await serviceClient.rpc(
     variablePrice ? "wallet_refund_variable_operation" : "wallet_refund_operation",
     variablePrice
@@ -658,7 +778,10 @@ async function refundIfNeeded(
 }
 
 function isVtuPurchase(action: SupportedAction) {
-  return action === "vtu_airtime" || action === "vtu_data";
+  return action === "vtu_airtime" ||
+    action === "vtu_data" ||
+    action === "vtu_tv" ||
+    action === "vtu_electricity";
 }
 
 async function enqueueVtuStatusPoll(
@@ -701,6 +824,68 @@ async function settleVtuResult(
     return false;
   }
   return true;
+}
+
+function isUuid(value: unknown) {
+  return typeof value === "string" &&
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value);
+}
+
+async function quoteLiveDataPurchase(body: ExecutionRequestBody) {
+  const planId = firstStringValue(body.provider_plan_id, body.product_id);
+  let catalogResult: Awaited<ReturnType<typeof executeProviderRequest>>;
+
+  try {
+    catalogResult = await executeProviderRequest("vtu_data_catalog", {
+      network: body.provider_network || body.network,
+    });
+  } catch {
+    return {
+      success: false,
+      status: 502,
+      message: "Unable to load Ikonect data plans for pricing.",
+    };
+  }
+
+  const catalog = asObject(catalogResult.body);
+  const plans = Array.isArray(catalog?.dataPlans) ? catalog.dataPlans : [];
+  const selected = plans
+    .map((item) => asObject(item))
+    .find((plan) => firstStringValue(plan?.provider_plan_id, plan?.id) === planId);
+
+  if (!catalogResult.ok || !selected) {
+    const message = selected
+      ? "Unable to confirm the current data plan price."
+      : "This data plan is no longer available from Ikonect.";
+    return {
+      success: false,
+      status: catalogResult.ok ? 400 : 502,
+      message,
+    };
+  }
+
+  const providerAmount = Number(selected.provider_cost);
+  const chargeAmount = Number(selected.retail_price);
+  if (!Number.isFinite(providerAmount) || providerAmount <= 0 || !Number.isFinite(chargeAmount) || chargeAmount <= 0) {
+    return {
+      success: false,
+      status: 502,
+      message: "Ikonect returned an invalid data plan price.",
+    };
+  }
+
+  return {
+    success: true,
+    product_id: null,
+    category: "data",
+    network: firstStringValue(selected.network, body.provider_network, body.network),
+    product_name: firstStringValue(selected.name, "Mobile data bundle"),
+    provider: "ikonect",
+    provider_plan_id: firstStringValue(selected.provider_plan_id, selected.id),
+    provider_amount: providerAmount,
+    charge_amount: chargeAmount,
+    fee_amount: Math.max(0, Math.round((chargeAmount - providerAmount) * 100) / 100),
+  };
 }
 
 export async function executeUnifiedAction({
@@ -816,20 +1001,32 @@ export async function executeUnifiedAction({
     let chargeError: { message?: string } | null = null;
 
     if (vtuPurchase) {
-      const { data: quoteResult, error: quoteError } = await serviceClient.rpc(
-        "quote_vtu_purchase",
-        {
-          p_product_id: body.product_id,
-          p_amount: action === "vtu_airtime" ? Number(body.amount) : null,
-        },
-      );
+      const useLiveDataPlan = action === "vtu_data" && !isUuid(body.product_id);
+      let quoteResult: any = null;
+      let quoteError: { message?: string } | null = null;
+
+      if (useLiveDataPlan) {
+        quoteResult = await quoteLiveDataPurchase(body);
+      } else {
+        const quoted = await serviceClient.rpc(
+          "quote_vtu_purchase",
+          {
+            p_product_id: body.product_id,
+            p_amount: action === "vtu_airtime" || action === "vtu_electricity" ? Number(body.amount) : null,
+          },
+        );
+        quoteResult = quoted.data;
+        quoteError = quoted.error;
+      }
+
       const quote = asObject(quoteResult);
 
       if (quoteError || !quote?.success) {
         const message = quoteError?.message || String(quote?.message ?? "Unable to price this purchase.");
+        const status = quoteError ? 500 : Number(quote?.status ?? 400);
         return {
-          status: quoteError ? 500 : 400,
-          body: normalizeProviderResponse(action, body, quoteError ? 500 : 400, {
+          status,
+          body: normalizeProviderResponse(action, body, status, {
             success: false,
             error: message,
             message,
@@ -842,7 +1039,11 @@ export async function executeUnifiedAction({
 
       body.provider_plan_id = String(quote.provider_plan_id ?? "");
       body.provider_amount = Number(quote.provider_amount);
+      body.product_name = String(quote.product_name ?? "");
       body.provider_reference = requestKey;
+      body.provider = String(quote.provider ?? "");
+      body.provider_category = String(quote.category ?? "");
+      body.provider_network = String(quote.network ?? "");
 
       const charge = await serviceClient.rpc("wallet_charge_variable_operation", {
         p_user_id: billingUserId,
@@ -905,16 +1106,34 @@ export async function executeUnifiedAction({
     charged = true;
 
     if (vtuPurchase) {
-      const { data: prepared, error: prepareError } = await serviceClient.rpc(
-        "prepare_vtu_purchase",
-        {
-          p_user_id: billingUserId,
-          p_product_id: body.product_id,
-          p_request_key: requestKey,
-          p_phone: body.phone,
-          p_amount: action === "vtu_airtime" ? Number(body.amount) : null,
-        },
-      );
+      const useLiveDataPlan = action === "vtu_data" && !isUuid(body.product_id);
+      const { data: prepared, error: prepareError } = useLiveDataPlan
+        ? await serviceClient.rpc(
+          "prepare_external_vtu_purchase",
+          {
+            p_user_id: billingUserId,
+            p_request_key: requestKey,
+            p_category: "data",
+            p_network: body.provider_network,
+            p_product_name: body.product_name,
+            p_phone: body.phone,
+            p_provider: body.provider,
+            p_provider_plan_id: body.provider_plan_id,
+            p_provider_amount: Number(body.provider_amount),
+            p_charge_amount: Number(asObject(chargeResult)?.charged_amount ?? asObject(chargeResult)?.amount ?? 0),
+            p_fee_amount: Math.max(0, Number(asObject(chargeResult)?.charged_amount ?? asObject(chargeResult)?.amount ?? 0) - Number(body.provider_amount)),
+          },
+        )
+        : await serviceClient.rpc(
+          "prepare_vtu_purchase",
+          {
+            p_user_id: billingUserId,
+            p_product_id: body.product_id,
+            p_request_key: requestKey,
+            p_phone: body.phone,
+            p_amount: action === "vtu_airtime" || action === "vtu_electricity" ? Number(body.amount) : null,
+          },
+        );
 
       if (prepareError || !prepared?.success) {
         await refundIfNeeded(serviceClient, billingUserId, walletOperation, true, requestKey, "purchase preparation failed");
@@ -972,7 +1191,7 @@ export async function executeUnifiedAction({
       const providerReference = String(normalized?.provider_reference ?? requestKey);
       const settled = await settleVtuResult(serviceClient, requestKey, state, providerReference, upstream.body);
 
-      if (!settled || state === "pending" || state === "submitted" || state === "unknown") {
+      if (upstream.provider === "smartapi" && (!settled || state === "pending" || state === "submitted" || state === "unknown")) {
         await enqueueVtuStatusPoll(serviceClient, billingUserId, requestKey, providerReference);
       }
     }
@@ -987,10 +1206,13 @@ export async function executeUnifiedAction({
   } catch (error) {
     if (vtuPurchase && charged && billingUserId && requestKey) {
       const providerReference = String(body.provider_reference ?? requestKey);
+      const pendingProvider = String(body.provider || "provider");
       await settleVtuResult(serviceClient, requestKey, "unknown", providerReference, {
         message: "Provider confirmation is pending.",
       });
-      await enqueueVtuStatusPoll(serviceClient, billingUserId, requestKey, providerReference);
+      if (pendingProvider === "smartapi") {
+        await enqueueVtuStatusPoll(serviceClient, billingUserId, requestKey, providerReference);
+      }
 
       return {
         status: 202,
@@ -1000,7 +1222,7 @@ export async function executeUnifiedAction({
           provider_state: "unknown",
           message: "Your purchase was submitted and is awaiting provider confirmation.",
           provider_reference: providerReference,
-        }, { charged: true, requestKey, provider: "smartapi" }),
+        }, { charged: true, requestKey, provider: pendingProvider }),
         charged: true,
         isTestMode: false,
         walletOperation,

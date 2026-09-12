@@ -51,5 +51,10 @@ export const API_ACTION_PRICES: Record<string, number> = {
   print_nin_slip_long: DASHBOARD_OPERATION_PRICES.print_nin_slip_long,
   vtu_airtime: 0,
   vtu_data: 0,
+  vtu_data_catalog: 0,
+  vtu_tv: 0,
+  vtu_tv_verify: 0,
+  vtu_electricity: 0,
+  vtu_electricity_verify: 0,
   vtu_query: 0,
 };
