@@ -1,6 +1,6 @@
 /**
  * Types for NIN Modification Request System
- * Supports VIP → Admin → Staff workflow
+ * Supports User → Admin → Staff workflow
  */
 
 export type ModificationType = 

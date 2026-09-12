@@ -436,7 +436,7 @@ export default function ApiDocs() {
   // Map role → dashboard path with api-keys tab hash
   const apiKeysPath = (() => {
     if (!user) return "/auth";
-    if (role === "user" || role === "vip") return "/dashboard/user/api-keys";
+    if (role === "user") return "/dashboard/user/api-keys";
     const base = role === "admin" ? "/dashboard/admin"
       : role === "staff" ? "/dashboard/staff"
       : "/dashboard/user";
@@ -445,13 +445,12 @@ export default function ApiDocs() {
 
   const handleGetApiKey = () => {
     if (!user) { navigate("/auth"); return; }
-    if (role === "user" || role === "vip") {
+    if (role === "user") {
       navigate("/dashboard/user/api-keys");
       return;
     }
     const base = role === "admin" ? "/dashboard/admin"
       : role === "staff" ? "/dashboard/staff"
-      : role === "vip" ? "/dashboard/user"
       : "/dashboard/user";
     navigate(base, { state: { tab: "api-keys" } });
   };

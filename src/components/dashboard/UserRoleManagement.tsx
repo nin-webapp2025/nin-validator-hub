@@ -19,7 +19,6 @@ interface UserWithRole {
 const ROLE_COLORS: Record<UserRole, string> = {
   admin: "bg-red-500",
   staff: "bg-emerald-500",
-  vip: "bg-amber-500",
   user: "bg-slate-500",
 };
 
@@ -245,7 +244,6 @@ export function UserRoleManagement() {
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="user">User</SelectItem>
-                        <SelectItem value="vip">VIP</SelectItem>
                         <SelectItem value="staff">Staff</SelectItem>
                         <SelectItem value="admin">Admin</SelectItem>
                       </SelectContent>
@@ -262,18 +260,12 @@ export function UserRoleManagement() {
         )}
 
         <div className="mt-6 pt-6 border-t">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+          <div className="grid grid-cols-3 gap-4 text-center">
             <div>
               <p className="text-2xl font-bold text-primary">
                 {users.filter((user) => user.role === "user").length}
               </p>
               <p className="text-xs text-gray-600 dark:text-slate-400">Users</p>
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-slate-600 dark:text-slate-400">
-                {users.filter((user) => user.role === "vip").length}
-              </p>
-              <p className="text-xs text-gray-600 dark:text-slate-400">VIP</p>
             </div>
             <div>
               <p className="text-2xl font-bold text-green-600">
