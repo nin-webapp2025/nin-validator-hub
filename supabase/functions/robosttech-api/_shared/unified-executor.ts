@@ -831,6 +831,12 @@ function isUuid(value: unknown) {
     /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value);
 }
 
+function serviceIdentifierForReceipt(action: SupportedAction, body: ExecutionRequestBody) {
+  if (action === "vtu_tv") return firstStringValue(body.smartcard_number, body.phone);
+  if (action === "vtu_electricity") return firstStringValue(body.meter_number, body.phone);
+  return firstStringValue(body.phone);
+}
+
 async function quoteLiveDataPurchase(body: ExecutionRequestBody) {
   const planId = firstStringValue(body.provider_plan_id, body.product_id);
   let catalogResult: Awaited<ReturnType<typeof executeProviderRequest>>;
@@ -1122,6 +1128,7 @@ export async function executeUnifiedAction({
             p_provider_amount: Number(body.provider_amount),
             p_charge_amount: Number(asObject(chargeResult)?.charged_amount ?? asObject(chargeResult)?.amount ?? 0),
             p_fee_amount: Math.max(0, Number(asObject(chargeResult)?.charged_amount ?? asObject(chargeResult)?.amount ?? 0) - Number(body.provider_amount)),
+            p_service_identifier: serviceIdentifierForReceipt(action, body),
           },
         )
         : await serviceClient.rpc(
@@ -1132,6 +1139,7 @@ export async function executeUnifiedAction({
             p_request_key: requestKey,
             p_phone: body.phone,
             p_amount: action === "vtu_airtime" || action === "vtu_electricity" ? Number(body.amount) : null,
+            p_service_identifier: serviceIdentifierForReceipt(action, body),
           },
         );
 

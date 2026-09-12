@@ -1,22 +1,15 @@
 import { useEffect, useState } from "react";
 import { format } from "date-fns";
-import { Loader2, ReceiptText } from "lucide-react";
+import { Eye, Loader2, ReceiptText } from "lucide-react";
 import { formatNaira } from "@/lib/wallet";
 import type { VtuCategory } from "@/lib/vtu";
 import { rpcClient } from "@/lib/rpc-client";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { VtuReceiptDialog, type VtuReceiptRow } from "@/components/dashboard/VtuReceiptDialog";
 
-interface PurchaseRow {
-  id: string;
-  network: string;
-  product_name: string;
-  phone: string;
-  provider_reference: string | null;
-  charged_amount: number;
-  status: string;
-  created_at: string;
-}
+type PurchaseRow = VtuReceiptRow;
 
 const statusClass: Record<string, string> = {
   succeeded: "border-emerald-200 bg-emerald-50 text-emerald-700",
@@ -29,6 +22,7 @@ const statusClass: Record<string, string> = {
 export function VtuPurchaseHistory({ category }: { category: VtuCategory }) {
   const [rows, setRows] = useState<PurchaseRow[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedReceipt, setSelectedReceipt] = useState<PurchaseRow | null>(null);
 
   useEffect(() => {
     let active = true;
@@ -43,7 +37,15 @@ export function VtuPurchaseHistory({ category }: { category: VtuCategory }) {
         p_offset: 0,
       });
       if (!active) return;
-      if (!error) setRows((data ?? []) as PurchaseRow[]);
+      if (!error) {
+        setRows(((data ?? []) as PurchaseRow[]).map((row) => ({
+          ...row,
+          category,
+          charged_amount: Number(row.charged_amount ?? 0),
+          service_identifier: row.service_identifier || row.phone,
+          provider: row.provider || "ikonect",
+        })));
+      }
       setLoading(false);
 
       if ((data ?? []).some((row: PurchaseRow) => ["pending", "unknown"].includes(row.status))) {
@@ -87,17 +89,34 @@ export function VtuPurchaseHistory({ category }: { category: VtuCategory }) {
                     {row.phone} | {format(new Date(row.created_at), "d MMM yyyy, h:mm a")}
                   </p>
                 </div>
-                <div className="flex items-center gap-3 sm:justify-end">
+                <div className="flex flex-wrap items-center gap-3 sm:justify-end">
                   <span className="font-semibold tabular-nums">{formatNaira(Number(row.charged_amount))}</span>
                   <Badge variant="outline" className={statusClass[row.status] ?? statusClass.unknown}>
                     {row.status === "unknown" ? "Confirming" : row.status}
                   </Badge>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="gap-1.5"
+                    onClick={() => setSelectedReceipt(row)}
+                  >
+                    <Eye className="h-3.5 w-3.5" />
+                    Receipt
+                  </Button>
                 </div>
               </div>
             ))}
           </div>
         )}
       </CardContent>
+      <VtuReceiptDialog
+        row={selectedReceipt}
+        open={!!selectedReceipt}
+        onOpenChange={(open) => {
+          if (!open) setSelectedReceipt(null);
+        }}
+      />
     </Card>
   );
 }
