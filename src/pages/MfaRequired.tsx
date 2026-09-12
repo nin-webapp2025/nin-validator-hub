@@ -85,8 +85,10 @@ export default function MfaRequired() {
     }
 
     setFactorId(data.id);
-    setQrCode(data.totp.qr_code);
-    setSecret(data.totp.secret);
+    if (data.type === "totp") {
+      setQrCode(data.totp.qr_code);
+      setSecret(data.totp.secret);
+    }
   };
 
   const handleVerifyEnrollment = async () => {

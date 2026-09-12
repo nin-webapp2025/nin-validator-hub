@@ -31,7 +31,7 @@ export interface VtuPurchaseResult {
 
 export function createVtuReference() {
   const random = typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
-    ? crypto.randomUUID().replaceAll("-", "").slice(0, 12)
+    ? crypto.randomUUID().replace(/-/g, "").slice(0, 12)
     : Math.random().toString(36).slice(2, 14);
   return `VTU${Date.now()}${random}`.toUpperCase();
 }

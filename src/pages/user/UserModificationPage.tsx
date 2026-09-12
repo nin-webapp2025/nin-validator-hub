@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { UserJourneyPage } from "@/components/dashboard/UserJourneyPage";
-import { ModificationRequestForm } from "@/components/dashboard/ModificationRequestForm";
+import { NinModificationWizard } from "@/components/dashboard/NinModificationWizard";
 import { MyModificationRequests } from "@/components/dashboard/MyModificationRequests";
 
 export default function UserModificationPage() {
@@ -10,14 +10,15 @@ export default function UserModificationPage() {
     <UserJourneyPage
       eyebrow="Request Workflow"
       title="NIN Modification"
-      description="Submit a modification request, then track every update from review through completion in one place."
+      description="Verify your NIN, review what's on record, then pay to submit a modification request and track it through to completion."
       steps={[
         {
           id: "submit",
-          label: "Submit request",
-          title: "Start a new modification request",
-          description: "Provide your NIN details, the requested change, and the reason for the update.",
-          content: <ModificationRequestForm onSubmitted={() => setRefreshKey((current) => current + 1)} />,
+          label: "Verify & submit",
+          title: "Verify your NIN and submit a modification request",
+          description:
+            "We verify your NIN first so you can confirm your real record before deciding what to change. The modification fee is charged from your wallet only after you submit — your request is sent to the admin team right after payment succeeds.",
+          content: <NinModificationWizard onSubmitted={() => setRefreshKey((current) => current + 1)} />,
         },
         {
           id: "track",

@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/dialog";
 import { Shield, CheckCircle, XCircle, UserCog, Loader2 } from "lucide-react";
 import type { NinModificationRequest, Priority, RequestStatus } from "@/types/modification";
+import { formatNaira } from "@/lib/wallet";
 
 const STATUS_COLORS: Record<RequestStatus, string> = {
   pending: "bg-slate-400",
@@ -122,7 +123,8 @@ export function AdminModificationRequests() {
       case "reject":
         return {
           title: "Reject Request",
-          description: "Provide a reason for rejecting this modification request.",
+          description:
+            "Provide a reason for rejecting this modification request. If a fee was paid, it will be refunded to the user's wallet automatically.",
           buttonLabel: "Reject Request",
         };
       default:
@@ -275,7 +277,7 @@ export function AdminModificationRequests() {
         },
         reject: {
           title: "Request rejected",
-          description: "The request has been rejected and the user has been notified.",
+          description: "The request has been rejected, the fee (if any) refunded, and the user notified.",
         },
       };
 
@@ -350,6 +352,9 @@ export function AdminModificationRequests() {
                         <Badge className={PRIORITY_COLORS[request.priority]}>
                           {request.priority.toUpperCase()}
                         </Badge>
+                        {typeof request.fee_amount === "number" && (
+                          <Badge variant="outline">Fee Paid: {formatNaira(request.fee_amount)}</Badge>
+                        )}
                       </div>
                       <p className="text-lg font-semibold">
                         {request.modification_type.replace("_", " ").toUpperCase()}

@@ -4,6 +4,7 @@ export interface ProviderRequestBody extends Record<string, unknown> {
   trackingId?: string;
   phone?: string;
   number?: string;
+  number_nin?: string;
   bvn?: string;
   firstname?: string;
   lastname?: string;

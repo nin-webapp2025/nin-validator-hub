@@ -137,7 +137,7 @@ export default function NinSearch() {
           request_id: createRequestId("nin-search"),
           action: "nin_advance",
           nin,
-          number: nin,
+          number_nin: nin,
         },
       });
 

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import {
   Dialog,
@@ -19,106 +19,95 @@ export function SessionTimeout() {
   const [showExpired, setShowExpired] = useState(false);
   const [timeLeft, setTimeLeft] = useState(300); // 5 minutes warning
   const [isIdle, setIsIdle] = useState(false);
+  const hasExpiredRef = useRef(false);
 
   const SESSION_TIMEOUT = 30 * 60 * 1000; // 30 minutes
   const WARNING_TIME = 5 * 60 * 1000; // Show warning 5 minutes before timeout
   const IDLE_TIMEOUT = 25 * 60 * 1000; // Consider idle after 25 minutes
+  const LAST_ACTIVITY_KEY = "sparkid_last_activity_at";
 
   useEffect(() => {
-    if (!user) return;
+    if (!user) {
+      sessionStorage.removeItem(LAST_ACTIVITY_KEY);
+      hasExpiredRef.current = false;
+      return;
+    }
 
-    let lastActivity = Date.now();
-    let warningTimeout: NodeJS.Timeout;
-    let sessionTimeout: NodeJS.Timeout;
-    let idleCheckInterval: NodeJS.Timeout;
+    const now = Date.now();
+    if (!sessionStorage.getItem(LAST_ACTIVITY_KEY)) {
+      sessionStorage.setItem(LAST_ACTIVITY_KEY, String(now));
+    }
+    hasExpiredRef.current = false;
 
-    const resetTimers = () => {
-      lastActivity = Date.now();
+    const getLastActivity = () => {
+      const value = Number(sessionStorage.getItem(LAST_ACTIVITY_KEY));
+      return Number.isFinite(value) && value > 0 ? value : now;
+    };
+
+    const expireSession = () => {
+      if (hasExpiredRef.current) return;
+      hasExpiredRef.current = true;
+      setShowExpired(true);
+      setShowWarning(false);
+      setIsIdle(true);
+
+      window.setTimeout(() => {
+        void signOut();
+        navigate("/auth", { replace: true });
+      }, 3000);
+    };
+
+    const checkSessionAge = () => {
+      const elapsed = Date.now() - getLastActivity();
+      const remainingMs = SESSION_TIMEOUT - elapsed;
+
+      if (remainingMs <= 0) {
+        expireSession();
+        return;
+      }
+
+      setIsIdle(elapsed >= IDLE_TIMEOUT);
+      setTimeLeft(Math.max(0, Math.ceil(remainingMs / 1000)));
+      setShowWarning(remainingMs <= WARNING_TIME);
+      setShowExpired(false);
+    };
+
+    const recordActivity = () => {
+      if (hasExpiredRef.current) return;
+      sessionStorage.setItem(LAST_ACTIVITY_KEY, String(Date.now()));
       setIsIdle(false);
       setShowWarning(false);
       setShowExpired(false);
-
-      // Clear existing timers
-      clearTimeout(warningTimeout);
-      clearTimeout(sessionTimeout);
-
-      // Set warning timer (25 minutes of inactivity)
-      warningTimeout = setTimeout(() => {
-        setShowWarning(true);
-        setTimeLeft(300); // 5 minutes
-      }, SESSION_TIMEOUT - WARNING_TIME);
-
-      // Set session expiry timer (30 minutes of inactivity)
-      sessionTimeout = setTimeout(() => {
-        setShowExpired(true);
-        setShowWarning(false);
-        // Auto sign out after showing expired message
-        setTimeout(() => {
-          signOut();
-          navigate("/auth");
-        }, 3000);
-      }, SESSION_TIMEOUT);
-    };
-
-    const checkIdle = () => {
-      const idleTime = Date.now() - lastActivity;
-      if (idleTime > IDLE_TIMEOUT) {
-        setIsIdle(true);
-      }
-    };
-
-    // Activity event handlers
-    const handleActivity = () => {
-      resetTimers();
     };
 
     // Track user activity
     const events = ["mousedown", "keydown", "scroll", "touchstart", "click"];
     events.forEach((event) => {
-      document.addEventListener(event, handleActivity);
+      document.addEventListener(event, recordActivity, { passive: true });
     });
 
-    // Start timers
-    resetTimers();
-
-    // Check idle status every 30 seconds
-    idleCheckInterval = setInterval(checkIdle, 30000);
-
-    // Countdown timer for warning
-    const countdownInterval = setInterval(() => {
-      if (showWarning) {
-        setTimeLeft((prev) => {
-          if (prev <= 1) {
-            clearInterval(countdownInterval);
-            return 0;
-          }
-          return prev - 1;
-        });
-      }
-    }, 1000);
+    checkSessionAge();
+    const sessionCheckInterval = window.setInterval(checkSessionAge, 1000);
 
     // Cleanup
     return () => {
       events.forEach((event) => {
-        document.removeEventListener(event, handleActivity);
+        document.removeEventListener(event, recordActivity);
       });
-      clearTimeout(warningTimeout);
-      clearTimeout(sessionTimeout);
-      clearInterval(idleCheckInterval);
-      clearInterval(countdownInterval);
+      window.clearInterval(sessionCheckInterval);
     };
-  }, [user, showWarning, signOut, navigate]);
+  }, [user, signOut, navigate]);
 
   const handleContinue = () => {
     setShowWarning(false);
     setIsIdle(false);
-    // Trigger activity to reset timers
-    document.dispatchEvent(new Event("mousedown"));
+    sessionStorage.setItem("sparkid_last_activity_at", String(Date.now()));
   };
 
   const handleSignOut = () => {
-    signOut();
-    navigate("/auth");
+    sessionStorage.removeItem("sparkid_last_activity_at");
+    void signOut();
+    navigate("/auth", { replace: true });
   };
 
   const formatTime = (seconds: number) => {

@@ -1,4 +1,4 @@
-const CACHE_NAME = "sparkid-v2";
+const CACHE_NAME = "sparkid-v3";
 const APP_SHELL_URLS = ["/", "/auth", "/logo.svg", "/manifest.json"];
 
 self.addEventListener("install", (event) => {

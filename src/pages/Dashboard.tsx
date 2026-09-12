@@ -23,7 +23,6 @@ import { Profile } from "@/components/dashboard/Profile";
 import { BatchValidation } from "@/components/dashboard/BatchValidation";
 import { Analytics } from "@/components/dashboard/Analytics";
 import { RateLimitIndicator } from "@/components/dashboard/RateLimitIndicator";
-import { SessionTimeout } from "@/components/dashboard/SessionTimeout";
 import { BvnVerification } from "@/components/dashboard/BvnVerification";
 import { BvnHistory } from "@/components/dashboard/BvnHistory";
 import { PrintNinSlip } from "@/components/dashboard/PrintNinSlip";
@@ -136,7 +135,6 @@ export default function Dashboard() {
   return (
     <>
       <CommandMenu onTabChange={setActiveTab} />
-      <SessionTimeout />
       <ErrorBoundary>
         <div className="min-h-screen bg-[#fafbfc] dark:bg-slate-950">
           <DashboardHeader 

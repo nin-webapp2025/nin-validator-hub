@@ -77,22 +77,64 @@ function isBusinessFailure(payload: unknown): boolean {
     obj.personalized === false;
 }
 
+function firstStringValue(...values: unknown[]) {
+  for (const value of values) {
+    if (typeof value === "string" && value.trim()) return value.trim();
+    if (typeof value === "number" && Number.isFinite(value)) return String(value);
+  }
+  return "";
+}
+
+function trackingIdFromBody(body: ProviderRequestBody) {
+  return firstStringValue(body.tracking_id, body.trackingId);
+}
+
+function ninFromBody(body: ProviderRequestBody) {
+  return firstStringValue(body.nin, body.number_nin, body.number);
+}
+
+function premblyHeaders(apiKey: string, appId?: string): Record<string, string> {
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+    "accept": "application/json",
+    "X-Api-Key": apiKey,
+    "api-key": apiKey,
+  };
+
+  if (appId) {
+    headers["app-id"] = appId;
+    headers["app_id"] = appId;
+  }
+
+  return headers;
+}
+
 const requestBuilders: Record<string, (body: ProviderRequestBody) => Record<string, unknown>> = {
-  validate: (body) => ({ nin: body.nin }),
+  validate: (body) => ({
+    nin: ninFromBody(body),
+    tracking_id: trackingIdFromBody(body) || undefined,
+  }),
   validation_status: (body) => ({ nin: body.nin }),
   personalization: (body) => ({ tracking_id: body.tracking_id || body.trackingId }),
   personalization_status: (body) => ({ tracking_id: body.tracking_id || body.trackingId }),
-  clearance: (body) => ({ tracking_id: body.tracking_id || body.trackingId }),
+  clearance: (body) => {
+    const trackingId = trackingIdFromBody(body);
+    return trackingId ? { tracking_id: trackingId } : { nin: ninFromBody(body) };
+  },
   clearance_status: (body) => ({ tracking_id: body.tracking_id || body.trackingId }),
-  nin_search: (body) => ({ nin: body.nin }),
   nin_phone: (body) => ({ phone: body.phone }),
-  nin_demo: (body) => ({
-    firstname: String(body.firstname ?? "").trim().toUpperCase(),
-    lastname: String(body.lastname ?? "").trim().toUpperCase(),
-    middlename: String(body.middlename ?? "").trim().toUpperCase(),
-    gender: String(body.gender ?? "").trim().toLowerCase(),
-    dateOfBirth: String(body.dateOfBirth ?? "").trim(),
-  }),
+  nin_demo: (body) => {
+    const nin = ninFromBody(body);
+    if (nin) return { nin };
+
+    return {
+      firstname: String(body.firstname ?? "").trim().toUpperCase(),
+      lastname: String(body.lastname ?? "").trim().toUpperCase(),
+      middlename: String(body.middlename ?? "").trim().toUpperCase(),
+      gender: String(body.gender ?? "").trim().toLowerCase(),
+      dateOfBirth: String(body.dateOfBirth ?? "").trim(),
+    };
+  },
 };
 
 const endpointMap: Record<string, string> = {
@@ -102,7 +144,6 @@ const endpointMap: Record<string, string> = {
   personalization_status: "/personalization_status",
   clearance: "/clearance",
   clearance_status: "/clearance_status",
-  nin_search: "/nin_search",
   nin_phone: "/nin_phone",
   nin_demo: "/nin_demo",
 };
@@ -156,6 +197,8 @@ async function executePrintSlip(
 ): Promise<ProviderResult> {
   const robosttechKey = Deno.env.get("ROBOSTTECH_API_KEY");
   const premblyKey = Deno.env.get("PREMBLY_API_KEY");
+  const premblyAppId = Deno.env.get("PREMBLY_APP_ID")?.trim() ||
+    Deno.env.get("PREMBLY_APPID")?.trim();
 
   if (!robosttechKey || !premblyKey) {
     return {
@@ -166,7 +209,7 @@ async function executePrintSlip(
     };
   }
 
-  let ninToLookup = String(body.nin || body.number || "").trim();
+  let ninToLookup = firstStringValue(body.nin, body.number_nin, body.number);
 
   if (!ninToLookup && body.phone) {
     const lookup = await helpers.callUpstream(
@@ -203,13 +246,9 @@ async function executePrintSlip(
   }
 
   const slipLookup = await helpers.callUpstream(
-    "https://api.prembly.com/verification/nin_advance",
-    {
-      "Content-Type": "application/json",
-      "X-Api-Key": premblyKey,
-      "accept": "application/json",
-    },
-    { number: ninToLookup },
+    "https://api.prembly.com/verification/vnin",
+    premblyHeaders(premblyKey, premblyAppId),
+    { number_nin: ninToLookup },
   );
 
   return {

@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Loader2, RefreshCw, ClipboardList } from "lucide-react";
 import type { NinModificationRequest, Priority, RequestStatus } from "@/types/modification";
+import { formatNaira } from "@/lib/wallet";
 
 const STATUS_COLORS: Record<RequestStatus, string> = {
   pending: "bg-slate-400",
@@ -123,11 +124,21 @@ export function MyModificationRequests({ refreshKey = 0 }: MyModificationRequest
                       <Badge className={PRIORITY_COLORS[request.priority]}>
                         {request.priority.toUpperCase()}
                       </Badge>
+                      {typeof request.fee_amount === "number" && (
+                        <Badge variant="outline" className="border-slate-300 dark:border-slate-600">
+                          Fee Paid: {formatNaira(request.fee_amount)}
+                        </Badge>
+                      )}
                     </div>
                     <p className="text-base font-semibold text-slate-900 dark:text-slate-100">
                       {request.modification_type.replace("_", " ").toUpperCase()}
                     </p>
                     <p className="mt-1 text-slate-500 dark:text-slate-400">NIN: {request.nin}</p>
+                    {request.status === "rejected" && typeof request.fee_amount === "number" && (
+                      <p className="mt-1 text-xs font-medium text-emerald-600 dark:text-emerald-400">
+                        {formatNaira(request.fee_amount)} was refunded to your wallet.
+                      </p>
+                    )}
                     <div className="mt-3 space-y-1">
                       {request.current_value && (
                         <p>
