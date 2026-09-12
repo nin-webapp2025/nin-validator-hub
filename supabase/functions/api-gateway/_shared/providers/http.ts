@@ -41,3 +41,16 @@ export async function callFormUpstream(
   const { raw, data } = await parseUpstreamResponse(response);
   return { response, raw, data };
 }
+
+export async function callGetUpstream(
+  url: string,
+  headers: Record<string, string>,
+): Promise<ProviderHttpResult> {
+  const response = await fetch(url, {
+    method: "GET",
+    headers,
+  });
+
+  const { raw, data } = await parseUpstreamResponse(response);
+  return { response, raw, data };
+}

@@ -24,6 +24,8 @@ const UserPersonalizationPage = lazy(() => import("@/pages/user/UserPersonalizat
 const UserPrintNinPage = lazy(() => import("@/pages/user/UserPrintNinPage"));
 const UserAirtimePage = lazy(() => import("@/pages/user/UserAirtimePage"));
 const UserDataPage = lazy(() => import("@/pages/user/UserDataPage"));
+const UserTvPage = lazy(() => import("@/pages/user/UserTvPage"));
+const UserElectricityPage = lazy(() => import("@/pages/user/UserElectricityPage"));
 const UserWalletPage = lazy(() => import("@/pages/user/UserWalletPage"));
 const UserApiKeysPage = lazy(() => import("@/pages/user/UserApiKeysPage"));
 const UserProfilePage = lazy(() => import("@/pages/user/UserProfilePage"));
@@ -105,6 +107,8 @@ export default function DashboardRoutes() {
               <Route path="print-nin" element={<UserPrintNinPage />} />
               <Route path="airtime" element={<UserAirtimePage />} />
               <Route path="data" element={<UserDataPage />} />
+              <Route path="tv" element={<UserTvPage />} />
+              <Route path="electricity" element={<UserElectricityPage />} />
               <Route path="wallet" element={<UserWalletPage />} />
               <Route path="api-keys" element={<UserApiKeysPage />} />
               <Route path="profile" element={<UserProfilePage />} />

@@ -1,7 +1,7 @@
 import { supabase } from "@/integrations/supabase/client";
 import { rpcClient } from "@/lib/rpc-client";
 
-export type VtuCategory = "airtime" | "data";
+export type VtuCategory = "airtime" | "data" | "tv" | "electricity";
 
 export interface VtuProduct {
   id: string;
@@ -9,6 +9,9 @@ export interface VtuProduct {
   network: string;
   name: string;
   retail_price: number | null;
+  provider?: string;
+  provider_plan_id?: string;
+  provider_cost?: number | null;
   fee_percent: number;
   fee_flat: number;
   min_amount: number | null;
@@ -37,6 +40,10 @@ export function createVtuReference() {
 }
 
 export async function listVtuProducts(category: VtuCategory): Promise<VtuProduct[]> {
+  if (category === "data") {
+    return listLiveDataProducts();
+  }
+
   const { data, error } = await rpcClient.rpc<VtuProduct[]>("list_vtu_products", {
     p_category: category,
   });
@@ -45,7 +52,33 @@ export async function listVtuProducts(category: VtuCategory): Promise<VtuProduct
   return ((data ?? []) as VtuProduct[]).map((product) => ({
     ...product,
     retail_price: product.retail_price === null ? null : Number(product.retail_price),
+    provider_cost: product.provider_cost === null || product.provider_cost === undefined ? null : Number(product.provider_cost),
     fee_percent: Number(product.fee_percent ?? 0),
+    fee_flat: Number(product.fee_flat ?? 0),
+    min_amount: product.min_amount === null ? null : Number(product.min_amount),
+    max_amount: product.max_amount === null ? null : Number(product.max_amount),
+  }));
+}
+
+export async function listLiveDataProducts(): Promise<VtuProduct[]> {
+  const { data, error } = await supabase.functions.invoke("robosttech-api", {
+    body: { action: "vtu_data_catalog" },
+  });
+
+  if (error) throw new Error(error.message || "Unable to load available data bundles.");
+
+  const result = (data ?? {}) as { success?: boolean; message?: string; dataPlans?: VtuProduct[] };
+  if (result.success === false) {
+    throw new Error(result.message || "Unable to load available data bundles.");
+  }
+
+  return (result.dataPlans ?? []).map((product) => ({
+    ...product,
+    id: String(product.provider_plan_id || product.id),
+    category: "data",
+    retail_price: product.retail_price === null ? null : Number(product.retail_price),
+    provider_cost: product.provider_cost === null || product.provider_cost === undefined ? null : Number(product.provider_cost),
+    fee_percent: Number(product.fee_percent ?? 4),
     fee_flat: Number(product.fee_flat ?? 0),
     min_amount: product.min_amount === null ? null : Number(product.min_amount),
     max_amount: product.max_amount === null ? null : Number(product.max_amount),
@@ -57,15 +90,26 @@ export async function purchaseVtu(input: {
   productId: string;
   phone: string;
   amount?: number;
+  smartcardNumber?: string;
+  meterNumber?: string;
+  meterType?: "prepaid" | "postpaid";
 }): Promise<VtuPurchaseResult> {
   const requestId = createVtuReference();
   const { data, error } = await supabase.functions.invoke("robosttech-api", {
     body: {
-      action: input.category === "airtime" ? "vtu_airtime" : "vtu_data",
+      action: input.category === "airtime"
+        ? "vtu_airtime"
+        : input.category === "data"
+        ? "vtu_data"
+        : input.category === "tv"
+        ? "vtu_tv"
+        : "vtu_electricity",
       request_id: requestId,
-      product_id: input.productId,
+      ...(input.category === "data" ? { provider_plan_id: input.productId } : { product_id: input.productId }),
       phone: input.phone,
-      ...(input.category === "airtime" ? { amount: input.amount } : {}),
+      ...(input.category === "airtime" || input.category === "electricity" ? { amount: input.amount } : {}),
+      ...(input.category === "tv" ? { smartcard_number: input.smartcardNumber } : {}),
+      ...(input.category === "electricity" ? { meter_number: input.meterNumber, meter_type: input.meterType } : {}),
     },
   });
 
@@ -81,4 +125,36 @@ export async function purchaseVtu(input: {
   }
 
   return result;
+}
+
+export async function verifyTvSmartcard(input: {
+  provider: string;
+  smartcardNumber: string;
+}): Promise<Record<string, unknown>> {
+  const { data, error } = await supabase.functions.invoke("robosttech-api", {
+    body: {
+      action: "vtu_tv_verify",
+      provider: input.provider,
+      smartcard_number: input.smartcardNumber,
+    },
+  });
+  if (error) throw new Error(error.message || "Unable to verify this smartcard.");
+  return (data ?? {}) as Record<string, unknown>;
+}
+
+export async function verifyElectricityMeter(input: {
+  disco: string;
+  meterNumber: string;
+  meterType: "prepaid" | "postpaid";
+}): Promise<Record<string, unknown>> {
+  const { data, error } = await supabase.functions.invoke("robosttech-api", {
+    body: {
+      action: "vtu_electricity_verify",
+      disco: input.disco,
+      meter_number: input.meterNumber,
+      meter_type: input.meterType,
+    },
+  });
+  if (error) throw new Error(error.message || "Unable to verify this meter.");
+  return (data ?? {}) as Record<string, unknown>;
 }
