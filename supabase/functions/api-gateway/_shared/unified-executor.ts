@@ -23,7 +23,7 @@ const API_ACTION_PRICES = {
 
 const NIN_RE = /^\d{11}$/;
 const BVN_RE = /^\d{11}$/;
-const PHONE_RE = /^0[7-9][01]\d{8}$/;
+const PHONE_RE = /^0\d{10}$/;
 
 export type SupportedAction = keyof typeof API_ACTION_PRICES;
 
@@ -36,6 +36,7 @@ export interface ExecutionRequestBody extends Record<string, unknown> {
   trackingId?: string;
   phone?: string;
   number?: string;
+  number_nin?: string;
   bvn?: string;
   firstname?: string;
   lastname?: string;
@@ -311,6 +312,18 @@ function asObject(value: unknown): Record<string, unknown> | null {
     : null;
 }
 
+function firstStringValue(...values: unknown[]) {
+  for (const value of values) {
+    if (typeof value === "string" && value.trim()) return value.trim();
+    if (typeof value === "number" && Number.isFinite(value)) return String(value);
+  }
+  return "";
+}
+
+function hasValidNin(value: unknown) {
+  return typeof value === "string" && NIN_RE.test(value);
+}
+
 function validationErrorFor(action: SupportedAction, body: ExecutionRequestBody): string | null {
   switch (action) {
     case "validate":
@@ -321,6 +334,14 @@ function validationErrorFor(action: SupportedAction, body: ExecutionRequestBody)
       }
       break;
     case "nin_demo": {
+      const lookupNumber = firstStringValue(body.nin, body.number_nin, body.number);
+      if (lookupNumber) {
+        if (!NIN_RE.test(lookupNumber)) {
+          return "Field 'nin'/'number_nin'/'number' must be an 11-digit number.";
+        }
+        break;
+      }
+
       const firstname = String(body.firstname ?? "").trim();
       const lastname = String(body.lastname ?? "").trim();
       const gender = String(body.gender ?? "").trim().toLowerCase();
@@ -338,29 +359,31 @@ function validationErrorFor(action: SupportedAction, body: ExecutionRequestBody)
     }
     case "nin_basic":
     case "nin_advance":
-      if (!body.nin && !body.number) {
-        return "Field 'nin' or 'number' (11-digit) is required.";
+      if (!body.nin && !body.number_nin && !body.number) {
+        return "Field 'nin', 'number_nin', or 'number' (11-digit) is required.";
       }
       if (
         (body.nin && !NIN_RE.test(String(body.nin))) ||
+        (body.number_nin && !NIN_RE.test(String(body.number_nin))) ||
         (body.number && !NIN_RE.test(String(body.number)))
       ) {
-        return "Field 'nin'/'number' must be an 11-digit number.";
+        return "Field 'nin'/'number_nin'/'number' must be an 11-digit number.";
       }
       break;
     case "print_nin_slip_premium":
     case "print_nin_slip_long":
-      if (!body.phone && !body.nin && !body.number) {
-        return "Provide either 'phone' or 'nin'/'number' for the print request.";
+      if (!body.phone && !body.nin && !body.number_nin && !body.number) {
+        return "Provide either 'phone' or 'nin'/'number_nin'/'number' for the print request.";
       }
       if (body.phone && !PHONE_RE.test(String(body.phone))) {
         return "Field 'phone' must be a valid Nigerian mobile number (e.g. 08012345678).";
       }
       if (
         (body.nin && !NIN_RE.test(String(body.nin))) ||
+        (body.number_nin && !NIN_RE.test(String(body.number_nin))) ||
         (body.number && !NIN_RE.test(String(body.number)))
       ) {
-        return "Field 'nin'/'number' must be an 11-digit number.";
+        return "Field 'nin'/'number_nin'/'number' must be an 11-digit number.";
       }
       break;
     case "nin_phone":
@@ -382,10 +405,14 @@ function validationErrorFor(action: SupportedAction, body: ExecutionRequestBody)
       break;
     case "personalization":
     case "personalization_status":
-    case "clearance":
     case "clearance_status":
       if (!body.tracking_id && !body.trackingId) {
         return "Field 'tracking_id' is required.";
+      }
+      break;
+    case "clearance":
+      if (!body.tracking_id && !body.trackingId && !hasValidNin(body.nin)) {
+        return "Field 'tracking_id' or 'nin' is required.";
       }
       break;
     case "vtu_airtime":
@@ -470,6 +497,7 @@ function extractNin(payload: Record<string, unknown>, fallbackBody: ExecutionReq
   return firstString(payload, ["nin", "NIN"]) ||
     firstString(record ?? {}, ["nin", "NIN", "vnin", "idNumber"]) ||
     (typeof fallbackBody.nin === "string" ? fallbackBody.nin.trim() : undefined) ||
+    (typeof fallbackBody.number_nin === "string" ? fallbackBody.number_nin.trim() : undefined) ||
     (typeof fallbackBody.number === "string" ? fallbackBody.number.trim() : undefined);
 }
 
@@ -501,16 +529,16 @@ function deriveNormalizedState(
   if (statusValue === "unknown" && payload.provider_state) return "unknown";
   if (statusCode >= 400) return "failed";
 
-  if (success === false || approved === false || personalized === false) {
-    return "failed";
-  }
-
   if (["pending", "processing", "sent", "uploaded", "in-progress", "in_progress"].includes(statusValue)) {
     return "pending";
   }
 
   if (action === "validation_status" && (payload["in-progress"] === true || statusValue === "sent")) {
     return "pending";
+  }
+
+  if (success === false || approved === false || personalized === false) {
+    return "failed";
   }
 
   if (action === "clearance" && statusValue === "submitted") return "submitted";

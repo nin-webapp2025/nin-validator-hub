@@ -163,7 +163,7 @@ const ENDPOINTS = [
     id: "nin_search",
     name: "NIN Verification",
     method: "POST",
-    description: "Search for identity information using a NIN.",
+    description: "Search for identity information using Prembly vnin.",
     price: API_ACTION_PRICES.nin_search,
     body: { action: "nin_search", nin: "12345678901" },
     response: {
@@ -189,9 +189,9 @@ const ENDPOINTS = [
     id: "nin_advance",
     name: "NIN Advanced Lookup",
     method: "POST",
-    description: "Advanced NIN verification with full biographical data (Prembly).",
+    description: "Advanced NIN verification with full biographical data (Prembly vnin).",
     price: API_ACTION_PRICES.nin_advance,
-    body: { action: "nin_advance", number: "12345678901" },
+    body: { action: "nin_advance", number_nin: "12345678901" },
     response: {
       success: true,
       data: {
@@ -481,7 +481,7 @@ export default function ApiDocs() {
       setHasAccess(allowed);
       setAccessLoading(false);
 
-      if (!allowed && role !== "user") {
+      if (!allowed) {
         navigate("/dashboard", { replace: true });
       }
     };

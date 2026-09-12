@@ -33,9 +33,9 @@ function DeferredVercelInsights() {
       });
     };
 
-    if ("requestIdleCallback" in window) {
+    if (typeof window.requestIdleCallback === "function") {
       const id = window.requestIdleCallback(loadInsights, { timeout: 3000 });
-      return () => window.cancelIdleCallback(id);
+      return () => window.cancelIdleCallback?.(id);
     }
 
     const id = window.setTimeout(loadInsights, 1500);

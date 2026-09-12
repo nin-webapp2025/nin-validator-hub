@@ -16,6 +16,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { createRequestId } from "@/lib/request-id";
 import { enqueueProviderStatusPoll } from "@/lib/background-jobs";
 import { cn } from "@/lib/utils";
+import { Badge } from "@/components/ui/badge";
 
 const ninSchema = z.string().trim().length(11, "NIN must be exactly 11 digits").regex(/^\d+$/, "NIN must contain only numbers");
 
@@ -33,6 +34,10 @@ interface ValidationResult {
     birthdate?: string;
     gender?: string;
     photo?: string;
+    maritalstatus?: string;
+    telephoneno?: string;
+    email?: string;
+    residence_address?: string;
   };
   message?: string;
 }

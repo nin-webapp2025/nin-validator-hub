@@ -39,7 +39,7 @@ type SearchMode = "nin" | "phone";
 
 // ---------- Helper: extract NIN data from various API response shapes ----------
 function extractNinData(payload: any): NinData | null {
-  // Prembly nin_advance response shape
+  // Prembly vnin response shape
   const d =
     payload?.nin_data ||
     payload?.data ||
@@ -774,8 +774,8 @@ export function PrintNinSlip() {
       //   }
       // }
 
-      // For NIN input: use nin_advance (Prembly) which returns full data + photo
-      // For phone input: first get NIN from nin_phone, then look up nin_advance
+      // For NIN input: use Prembly vnin, which returns full data + photo.
+      // For phone input: first get NIN from nin_phone, then look up Prembly vnin.
       const slipAction =
         slipType === "premium"
           ? "print_nin_slip_premium"
@@ -785,7 +785,7 @@ export function PrintNinSlip() {
 
       if (searchMode === "nin") {
         const { data, error } = await supabase.functions.invoke("robosttech-api", {
-          body: { request_id: requestId, action: slipAction, nin: ninInput, number: ninInput },
+          body: { request_id: requestId, action: slipAction, nin: ninInput, number_nin: ninInput },
         });
         if (error) throw error;
         finalPayload = data;
@@ -829,7 +829,6 @@ export function PrintNinSlip() {
       // Notification
       if (user?.id) {
         createNotification({
-          userId: user.id,
           title: "NIN Slip Generated",
           message: `${slipType === "premium" ? "Premium" : "Long"} NIN Slip for NIN ***${extracted.nin.slice(-4)} is ready to download.`,
           type: "success",

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -223,8 +223,10 @@ export function ProfileSettings() {
     }
     setMfaEnrolling(true);
     setMfaFactorId(data.id);
-    setMfaQrCode(data.totp.qr_code);
-    setMfaSecret(data.totp.secret);
+    if (data.type === "totp") {
+      setMfaQrCode(data.totp.qr_code);
+      setMfaSecret(data.totp.secret);
+    }
   };
 
   const handleVerifyMfaEnroll = async () => {

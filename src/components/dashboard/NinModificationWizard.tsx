@@ -173,7 +173,7 @@ export function NinModificationWizard({ onSubmitted }: NinModificationWizardProp
           request_id: createRequestId("nin-modify-verify"),
           action: "nin_advance",
           nin,
-          number: nin,
+          number_nin: nin,
         },
       });
 

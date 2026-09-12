@@ -4,6 +4,7 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import { AuthProvider } from "@/hooks/useAuth";
 import { useRole } from "@/hooks/useRole";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
+import { SessionTimeout } from "@/components/dashboard/SessionTimeout";
 
 const Dashboard = lazy(() => import("@/pages/Dashboard"));
 const AdminDashboard = lazy(() => import("@/pages/AdminDashboard"));
@@ -59,6 +60,7 @@ export default function DashboardRoutes() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
+        <SessionTimeout />
         <Suspense fallback={<RouteFallback />}>
           <Routes>
             <Route

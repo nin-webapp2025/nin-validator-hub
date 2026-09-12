@@ -49,4 +49,7 @@ export const API_ACTION_PRICES: Record<string, number> = {
   bvn_advance: DASHBOARD_OPERATION_PRICES.bvn_verification,
   print_nin_slip_premium: DASHBOARD_OPERATION_PRICES.print_nin_slip_premium,
   print_nin_slip_long: DASHBOARD_OPERATION_PRICES.print_nin_slip_long,
+  vtu_airtime: 0,
+  vtu_data: 0,
+  vtu_query: 0,
 };

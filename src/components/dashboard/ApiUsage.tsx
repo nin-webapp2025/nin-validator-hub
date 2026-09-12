@@ -48,14 +48,45 @@ const STATUS_COLORS = {
   pending: "#f59e0b",
 };
 
+type UsageSummary = {
+  totalRequests: number;
+  successfulRequests: number;
+  failedRequests: number;
+};
+
+type UsageWindowItem = {
+  status: string;
+  created_at: string;
+  nin?: string | null;
+  tracking_id?: string | null;
+};
+
+type UsageWindow = {
+  validation: UsageWindowItem[];
+  personalization: UsageWindowItem[];
+  clearance: UsageWindowItem[];
+};
+
+const emptyUsageSummary: UsageSummary = {
+  totalRequests: 0,
+  successfulRequests: 0,
+  failedRequests: 0,
+};
+
+const emptyUsageWindow: UsageWindow = {
+  validation: [],
+  personalization: [],
+  clearance: [],
+};
+
 export function ApiUsage() {
   const { user } = useAuth();
   const analyticsWindowStart = subDays(new Date(), 30).toISOString();
 
-  const { data: usageSummary } = useQuery({
+  const { data: usageSummary = emptyUsageSummary } = useQuery<UsageSummary>({
     queryKey: ["api-usage-summary", user?.id],
     queryFn: async () => {
-      if (!user) return [];
+      if (!user) return emptyUsageSummary;
       const [
         { count: validationTotal },
         { count: validationSuccess },
@@ -81,26 +112,26 @@ export function ApiUsage() {
     enabled: !!user,
   });
 
-  const { data: usageWindow } = useQuery({
+  const { data: usageWindow = emptyUsageWindow } = useQuery<UsageWindow>({
     queryKey: ["api-usage-window", user?.id, analyticsWindowStart],
     queryFn: async () => {
-      if (!user) return [];
+      if (!user) return emptyUsageWindow;
       const [validation, personalization, clearance] = await Promise.all([
         supabase
           .from("validation_history")
-          .select("status, created_at")
+          .select("status, created_at, nin, tracking_id")
           .eq("user_id", user.id)
           .gte("created_at", analyticsWindowStart)
           .order("created_at", { ascending: false }),
         supabase
           .from("personalization_history")
-          .select("status, created_at")
+          .select("status, created_at, nin, tracking_id")
           .eq("user_id", user.id)
           .gte("created_at", analyticsWindowStart)
           .order("created_at", { ascending: false }),
         supabase
           .from("clearance_history")
-          .select("status, created_at")
+          .select("status, created_at, nin")
           .eq("user_id", user.id)
           .gte("created_at", analyticsWindowStart)
           .order("created_at", { ascending: false }),

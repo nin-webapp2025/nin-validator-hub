@@ -18,13 +18,7 @@ interface ClearanceHistoryProps {
   history?: Array<{
     id: string;
     nin: string;
-    response: {
-      success?: boolean;
-      message?: string;
-      approved?: boolean;
-      status?: string;
-      tracking_id?: string;
-    };
+    response: any;
     created_at: string;
   }>;
   isAdmin?: boolean;
@@ -198,8 +192,8 @@ export function ClearanceHistory({ history: historyProp, isAdmin }: ClearanceHis
                         </p>
                         <div className="flex items-center gap-2 mt-1 flex-wrap">
                           {item.response?.approved !== undefined && (
-                            <Badge variant={item.response.approved ? "default" : "destructive"} className="text-xs">
-                              {item.response.approved ? "Approved" : "Not Approved"}
+                            <Badge variant={item.response?.approved ? "default" : "destructive"} className="text-xs">
+                              {item.response?.approved ? "Approved" : "Not Approved"}
                             </Badge>
                           )}
                           <span className="text-xs text-slate-500 dark:text-slate-400">•</span>
@@ -213,7 +207,7 @@ export function ClearanceHistory({ history: historyProp, isAdmin }: ClearanceHis
                     <div className="flex items-center gap-2">
                       {item.response?.status && (
                         <Badge variant="outline" className="capitalize">
-                          {item.response.status}
+                          {item.response?.status}
                         </Badge>
                       )}
                       <CollapsibleTrigger asChild>
@@ -229,7 +223,7 @@ export function ClearanceHistory({ history: historyProp, isAdmin }: ClearanceHis
                       <div className="text-sm">
                         <span className="text-slate-500 dark:text-slate-400">Message:</span>
                         <p className="mt-1 text-slate-900 dark:text-slate-100">
-                          {item.response.message}
+                          {item.response?.message}
                         </p>
                       </div>
                     )}
