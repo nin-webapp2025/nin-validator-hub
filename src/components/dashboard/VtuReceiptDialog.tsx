@@ -80,10 +80,10 @@ function electricityUnits(row: VtuReceiptRow) {
 }
 
 function formatUnits(value: number) {
-  return `${value.toLocaleString("en-NG", {
+  return value.toLocaleString("en-NG", {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
-  })} units`;
+  });
 }
 
 function safeFilename(value: string) {
@@ -212,7 +212,6 @@ export function VtuReceiptDialog({
             <div className="border-t border-slate-700 pt-5">
               <Detail label="Transaction type" value={categoryLabel[row.category]} />
               <Detail label="Amount" value={formatNaira(Number(row.charged_amount))} />
-              {row.category === "electricity" ? <Detail label="Electricity value" value={formatNaira(Number(row.face_value ?? row.charged_amount))} /> : null}
               {units !== null ? <Detail label="Units bought" value={formatUnits(units)} /> : null}
               <Detail label={operatorLabel(row.category)} value={row.network} />
               <Detail label={identifierLabel[row.category]} value={serviceIdentifier(row)} />
