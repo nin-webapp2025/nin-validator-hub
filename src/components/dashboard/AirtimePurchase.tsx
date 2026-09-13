@@ -10,6 +10,7 @@ import { formatNaira } from "@/lib/wallet";
 import { listVtuProducts, purchaseVtu, type VtuProduct } from "@/lib/vtu";
 import { cn } from "@/lib/utils";
 import { trackApiRequest } from "./RateLimitIndicator";
+import { VtuReceiptDialog, type VtuReceiptRow } from "@/components/dashboard/VtuReceiptDialog";
 
 const QUICK_AMOUNTS = [200, 500, 1000, 2000, 5000];
 
@@ -23,6 +24,7 @@ export function AirtimePurchase() {
   const [catalogError, setCatalogError] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [result, setResult] = useState<{ state: string; message: string; reference?: string } | null>(null);
+  const [receipt, setReceipt] = useState<VtuReceiptRow | null>(null);
 
   useEffect(() => {
     let active = true;
@@ -80,8 +82,22 @@ export function AirtimePurchase() {
       });
       const state = response.normalized?.state ?? response.status ?? "pending";
       const message = response.normalized?.message || response.message || response.response || "Purchase submitted.";
-      const reference = response.normalized?.provider_reference || response.reference;
+      const reference = response.normalized?.provider_reference || response.reference || response.normalized?.request_id || "";
+      const now = new Date().toISOString();
       setResult({ state, message, reference });
+      setReceipt({
+        id: reference || `airtime-${Date.now()}`,
+        category: "airtime",
+        network: selectedProduct.network,
+        product_name: selectedProduct.name,
+        phone,
+        service_identifier: phone,
+        provider_reference: reference || null,
+        charged_amount: total,
+        status: state,
+        completed_at: state === "succeeded" ? now : null,
+        created_at: now,
+      });
       toast({
         title: state === "succeeded" ? "Airtime delivered" : "Purchase submitted",
         description: message,
@@ -96,6 +112,7 @@ export function AirtimePurchase() {
   };
 
   return (
+    <>
     <Card className="border-slate-200 shadow-lg dark:border-slate-700 dark:bg-slate-800">
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-lg">
@@ -206,5 +223,13 @@ export function AirtimePurchase() {
         </form>
       </CardContent>
     </Card>
+    <VtuReceiptDialog
+      row={receipt}
+      open={!!receipt}
+      onOpenChange={(open) => {
+        if (!open) setReceipt(null);
+      }}
+    />
+    </>
   );
 }

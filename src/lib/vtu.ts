@@ -28,6 +28,7 @@ export interface VtuPurchaseResult {
     state?: string;
     message?: string;
     provider_reference?: string;
+    request_id?: string;
     charged?: boolean;
   };
 }
