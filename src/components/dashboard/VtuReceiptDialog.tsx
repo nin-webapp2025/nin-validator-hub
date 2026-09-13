@@ -105,11 +105,28 @@ async function downloadReceiptPdf(row: VtuReceiptRow, element: HTMLElement) {
   pdf.save(`sparklabid-${row.category}-receipt-${safeFilename(receiptReference(row))}.pdf`);
 }
 
+function ReceiptLogo() {
+  return (
+    <svg viewBox="0 0 800 200" role="img" aria-label="SparklabID" className="h-auto w-32 sm:w-36">
+      <g>
+        <path fill="#F59E0B" d="M 60 50 L 120 90 L 90 100 L 140 160 L 80 110 L 110 100 Z" />
+        <path fill="#F59E0B" d="M 50 65 L 70 75 L 60 80 Z" />
+        <path fill="#F59E0B" d="M 140 75 L 160 85 L 150 90 Z" />
+        <path fill="#F59E0B" d="M 85 45 L 95 35 L 100 45 Z" />
+        <path fill="#F59E0B" d="M 70 140 L 60 150 L 55 140 Z" />
+      </g>
+      <text x="225" y="130" fontFamily="Arial, sans-serif" fontSize="76" fontWeight="bold" fill="#F59E0B">Sparklab</text>
+      <text x="570" y="130" fontFamily="Arial, sans-serif" fontSize="76" fontWeight="bold" fill="#1E293B">ID</text>
+      <text x="245" y="160" fontFamily="Arial, sans-serif" fontSize="20" fontWeight="600" letterSpacing="3" fill="#1E293B">IDENTITY VERIFICATION</text>
+    </svg>
+  );
+}
+
 function Detail({ label, value }: { label: string; value: string }) {
   return (
-    <div className="grid grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] items-start gap-6 py-5">
-      <p className="text-sm font-medium text-slate-400 sm:text-base">{label}</p>
-      <p className="break-words text-right text-sm font-semibold leading-snug text-slate-950 sm:text-base">{value || "N/A"}</p>
+    <div className="grid grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] items-start gap-5 py-3">
+      <p className="text-xs font-medium text-slate-400 sm:text-sm">{label}</p>
+      <p className="break-words text-right text-xs font-semibold leading-snug text-slate-950 sm:text-sm">{value || "N/A"}</p>
     </div>
   );
 }
@@ -155,24 +172,24 @@ export function VtuReceiptDialog({
         <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_24px_60px_rgba(15,23,42,0.10)] dark:border-slate-800">
           <div
             ref={receiptRef}
-            className="mx-auto min-h-[980px] w-full max-w-[640px] bg-white px-7 py-9 text-slate-950 sm:px-10 sm:py-10"
+            className="mx-auto w-full max-w-[560px] bg-white px-7 py-7 text-slate-950 sm:px-9 sm:py-8"
           >
-            <div className="flex items-start justify-between gap-6">
-              <img src="/logo.svg" alt="SparklabID" className="h-auto w-36 sm:w-40" />
-              <p className="pt-1 text-right text-lg font-black text-slate-950 sm:text-2xl">Transaction Receipt</p>
+            <div className="flex items-start justify-between gap-5">
+              <ReceiptLogo />
+              <p className="pt-1 text-right text-base font-black text-slate-950 sm:text-xl">Transaction Receipt</p>
             </div>
 
-            <div className="py-12 text-center">
-              <p className="font-display text-4xl font-black tracking-tight text-primary tabular-nums sm:text-5xl">
+            <div className="py-8 text-center">
+              <p className="font-display text-3xl font-black tracking-tight text-primary tabular-nums sm:text-4xl">
                 {formatNaira(Number(row.charged_amount))}
               </p>
-              <p className="mt-6 text-2xl font-semibold uppercase tracking-wide text-slate-950">
+              <p className="mt-4 text-xl font-semibold uppercase tracking-wide text-slate-950">
                 {statusLabel(row.status)}
               </p>
-              <p className="mt-5 text-sm font-medium text-slate-400 sm:text-base">{displayDate(row.completed_at || row.created_at)}</p>
+              <p className="mt-3 text-xs font-medium text-slate-400 sm:text-sm">{displayDate(row.completed_at || row.created_at)}</p>
             </div>
 
-            <div className="border-t border-slate-700 pt-9">
+            <div className="border-t border-slate-700 pt-5">
               <Detail label="Transaction type" value={categoryLabel[row.category]} />
               <Detail label="Amount" value={formatNaira(Number(row.charged_amount))} />
               <Detail label={operatorLabel(row.category)} value={row.network} />
@@ -182,13 +199,13 @@ export function VtuReceiptDialog({
               <Detail label="Transaction number" value={receiptReference(row)} />
             </div>
 
-            <div className="pt-20 text-center">
-              <p className="text-sm font-bold text-slate-400 sm:text-base">Support</p>
-              <p className="mt-3 text-sm font-black text-primary sm:text-base">support@sparkid.ng</p>
+            <div className="pt-8 text-center">
+              <p className="text-xs font-bold text-slate-400 sm:text-sm">Support</p>
+              <p className="mt-2 text-xs font-black text-primary sm:text-sm">support@sparkid.ng</p>
             </div>
 
-            <div className="mt-8 border-t border-dashed border-slate-500 pt-5">
-              <p className="text-sm font-semibold leading-snug text-slate-900 sm:text-base">
+            <div className="mt-5 border-t border-dashed border-slate-500 pt-4">
+              <p className="text-xs font-semibold leading-snug text-slate-900 sm:text-sm">
                 SparklabID provides secure identity services, wallet payments, airtime, data, TV, and electricity transactions.
                 Keep this receipt for your records and share the transaction number with support if you need help.
               </p>
