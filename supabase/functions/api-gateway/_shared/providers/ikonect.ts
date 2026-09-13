@@ -12,6 +12,7 @@ const SUPPORTED_ACTIONS = new Set([
   "vtu_data",
   "vtu_data_catalog",
   "vtu_tv",
+  "vtu_tv_catalog",
   "vtu_tv_verify",
   "vtu_electricity",
   "vtu_electricity_verify",
@@ -97,6 +98,17 @@ function catalogUrl(body: ProviderRequestBody) {
   return url.toString();
 }
 
+function servicesUrl(body: ProviderRequestBody) {
+  const url = new URL(`${IKONECT_API_URL}/services/`);
+  const type = firstStringValue(body.type, body.category);
+  const provider = normalizeNetwork(body.provider_network || body.provider_code || body.provider || body.network);
+
+  url.searchParams.set("type", type || "tv");
+  if (provider) url.searchParams.set("provider", provider);
+
+  return url.toString();
+}
+
 function requestFor(action: string, body: ProviderRequestBody) {
   const network = normalizeNetwork(body.provider_network || body.network);
   const amount = Number(body.provider_amount ?? body.amount);
@@ -127,7 +139,7 @@ function requestFor(action: string, body: ProviderRequestBody) {
         payload: {
           provider: normalizeNetwork(body.provider_network || body.provider_code || body.provider),
           smartcard_number: firstStringValue(body.smartcard_number),
-          plan_id: Number(firstStringValue(body.provider_plan_id)),
+          plan_id: firstStringValue(body.provider_plan_id),
           phone: firstStringValue(body.phone),
         },
       };
@@ -257,6 +269,57 @@ function normalizeResponse(payload: unknown, httpOk: boolean, fallbackReference:
   };
 }
 
+function normalizeTvCatalog(payload: unknown, httpOk: boolean) {
+  const source = asObject(payload);
+  const rawPlans = Array.isArray(source.tvPlans)
+    ? source.tvPlans
+    : Array.isArray(source.data)
+    ? source.data
+    : Array.isArray(source.plans)
+    ? source.plans
+    : [];
+
+  const tvPlans = rawPlans
+    .map((item) => {
+      const plan = asObject(item);
+      const serviceId = normalizeNetwork(plan.serviceID || plan.serviceId || plan.provider);
+      const providerPlanId = firstStringValue(plan.variationCode, plan.variation_code, plan.plan_id, plan.id, plan.serviceID);
+      const providerCost = Number(plan.amount ?? plan.price ?? plan.cost);
+      const name = firstStringValue(plan.planName, plan.name, plan.plan);
+      const provider = firstStringValue(plan.provider, serviceId).toUpperCase();
+
+      if (!serviceId || !providerPlanId || !Number.isFinite(providerCost) || providerCost <= 0 || !name) {
+        return null;
+      }
+
+      const retailPrice = roundMoney(providerCost * DATA_MARKUP_MULTIPLIER);
+
+      return {
+        id: providerPlanId,
+        category: "tv",
+        network: serviceId,
+        name,
+        retail_price: retailPrice,
+        provider: "ikonect",
+        provider_plan_id: providerPlanId,
+        provider_cost: roundMoney(providerCost),
+        fee_percent: 4,
+        fee_flat: 0,
+        min_amount: null,
+        max_amount: null,
+        display_provider: provider,
+      };
+    })
+    .filter(Boolean);
+
+  return {
+    success: httpOk && source.success !== false,
+    message: firstStringValue(source.message, `${tvPlans.length} TV plans loaded.`),
+    tvPlans,
+    provider_state: httpOk && source.success !== false ? "succeeded" : "failed",
+  };
+}
+
 function resultStatus(httpOk: boolean, state: string) {
   if (!httpOk) return 502;
   if (state === "succeeded") return 200;
@@ -288,6 +351,22 @@ export const ikonectAdapter: ProviderAdapter = {
         providerHeaders(apiKey, apiSecret),
       );
       const normalized = normalizeDataCatalog(upstream.data, upstream.response.ok);
+      const state = String(normalized.provider_state);
+
+      return {
+        status: resultStatus(upstream.response.ok, state),
+        ok: upstream.response.ok && state === "succeeded",
+        body: normalized,
+        provider: "ikonect",
+      };
+    }
+
+    if (action === "vtu_tv_catalog") {
+      const upstream = await helpers.callGetUpstream(
+        servicesUrl({ ...body, type: "tv" }),
+        providerHeaders(apiKey, apiSecret),
+      );
+      const normalized = normalizeTvCatalog(upstream.data, upstream.response.ok);
       const state = String(normalized.provider_state);
 
       return {

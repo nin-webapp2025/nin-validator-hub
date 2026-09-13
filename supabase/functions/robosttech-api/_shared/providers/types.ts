@@ -26,6 +26,7 @@ export interface ProviderRequestBody extends Record<string, unknown> {
   provider_plan_id?: string;
   provider_amount?: number | string;
   provider_reference?: string;
+  type?: string;
 }
 
 export interface ProviderResult {

@@ -57,6 +57,9 @@ export async function listVtuProducts(category: VtuCategory): Promise<VtuProduct
   if (category === "data") {
     return listLiveDataProducts();
   }
+  if (category === "tv") {
+    return listLiveTvProducts();
+  }
 
   const { data, error } = await rpcClient.rpc<VtuProduct[]>("list_vtu_products", {
     p_category: category,
@@ -68,6 +71,31 @@ export async function listVtuProducts(category: VtuCategory): Promise<VtuProduct
     retail_price: product.retail_price === null ? null : Number(product.retail_price),
     provider_cost: product.provider_cost === null || product.provider_cost === undefined ? null : Number(product.provider_cost),
     fee_percent: Number(product.fee_percent ?? 0),
+    fee_flat: Number(product.fee_flat ?? 0),
+    min_amount: product.min_amount === null ? null : Number(product.min_amount),
+    max_amount: product.max_amount === null ? null : Number(product.max_amount),
+  }));
+}
+
+export async function listLiveTvProducts(): Promise<VtuProduct[]> {
+  const { data, error } = await supabase.functions.invoke("robosttech-api", {
+    body: { action: "vtu_tv_catalog" },
+  });
+
+  if (error) throw new Error(error.message || "Unable to load available TV plans.");
+
+  const result = (data ?? {}) as { success?: boolean; message?: string; tvPlans?: VtuProduct[] };
+  if (result.success === false) {
+    throw new Error(result.message || "Unable to load available TV plans.");
+  }
+
+  return (result.tvPlans ?? []).map((product) => ({
+    ...product,
+    id: String(product.provider_plan_id || product.id),
+    category: "tv",
+    retail_price: product.retail_price === null ? null : Number(product.retail_price),
+    provider_cost: product.provider_cost === null || product.provider_cost === undefined ? null : Number(product.provider_cost),
+    fee_percent: Number(product.fee_percent ?? 4),
     fee_flat: Number(product.fee_flat ?? 0),
     min_amount: product.min_amount === null ? null : Number(product.min_amount),
     max_amount: product.max_amount === null ? null : Number(product.max_amount),
@@ -119,7 +147,7 @@ export async function purchaseVtu(input: {
         ? "vtu_tv"
         : "vtu_electricity",
       request_id: requestId,
-      ...(input.category === "data" ? { provider_plan_id: input.productId } : { product_id: input.productId }),
+      ...(input.category === "data" || input.category === "tv" ? { provider_plan_id: input.productId } : { product_id: input.productId }),
       phone: input.phone,
       ...(input.category === "airtime" || input.category === "electricity" ? { amount: input.amount } : {}),
       ...(input.category === "tv" ? { smartcard_number: input.smartcardNumber } : {}),

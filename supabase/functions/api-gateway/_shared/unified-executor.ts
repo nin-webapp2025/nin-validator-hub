@@ -20,6 +20,7 @@ const API_ACTION_PRICES = {
   vtu_data: 0,
   vtu_data_catalog: 0,
   vtu_tv: 0,
+  vtu_tv_catalog: 0,
   vtu_tv_verify: 0,
   vtu_electricity: 0,
   vtu_electricity_verify: 0,
@@ -334,6 +335,28 @@ export const MOCK_RESPONSES: Record<SupportedAction, unknown> = {
     provider_state: "succeeded",
     _test_mode: true,
   },
+  vtu_tv_catalog: {
+    success: true,
+    message: "Test TV plans loaded.",
+    tvPlans: [
+      {
+        id: "dstv-padi",
+        category: "tv",
+        network: "dstv",
+        name: "DStv Padi",
+        retail_price: 4992,
+        provider: "ikonect",
+        provider_plan_id: "dstv-padi",
+        provider_cost: 4800,
+        fee_percent: 4,
+        fee_flat: 0,
+        min_amount: null,
+        max_amount: null,
+      },
+    ],
+    provider_state: "succeeded",
+    _test_mode: true,
+  },
   vtu_tv: {
     status: "pending",
     success: true,
@@ -476,7 +499,6 @@ function validationErrorFor(action: SupportedAction, body: ExecutionRequestBody)
       }
       break;
     case "vtu_airtime":
-    case "vtu_tv":
     case "vtu_electricity":
       if (!body.product_id || !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(String(body.product_id))) {
         return "Field 'product_id' must be a valid product identifier.";
@@ -490,9 +512,6 @@ function validationErrorFor(action: SupportedAction, body: ExecutionRequestBody)
           return "Field 'amount' must be greater than zero.";
         }
       }
-      if (action === "vtu_tv" && !String(body.smartcard_number ?? "").trim()) {
-        return "Field 'smartcard_number' is required.";
-      }
       if (action === "vtu_electricity") {
         if (!String(body.meter_number ?? "").trim()) {
           return "Field 'meter_number' is required.";
@@ -502,6 +521,22 @@ function validationErrorFor(action: SupportedAction, body: ExecutionRequestBody)
         }
       }
       break;
+    case "vtu_tv": {
+      const hasStoredProduct = body.product_id &&
+        /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(String(body.product_id));
+      const livePlanId = firstStringValue(body.provider_plan_id, body.product_id);
+
+      if (!hasStoredProduct && !livePlanId) {
+        return "Field 'provider_plan_id' is required for TV subscriptions.";
+      }
+      if (!body.phone || !PHONE_RE.test(String(body.phone))) {
+        return "Field 'phone' must be a valid Nigerian mobile number (e.g. 08012345678).";
+      }
+      if (!String(body.smartcard_number ?? "").trim()) {
+        return "Field 'smartcard_number' is required.";
+      }
+      break;
+    }
     case "vtu_data": {
       const hasStoredProduct = body.product_id &&
         /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(String(body.product_id));
@@ -857,6 +892,63 @@ async function quoteLiveDataPurchase(body: ExecutionRequestBody) {
   };
 }
 
+async function quoteLiveTvPurchase(body: ExecutionRequestBody) {
+  const planId = firstStringValue(body.provider_plan_id, body.product_id);
+  let catalogResult: Awaited<ReturnType<typeof executeProviderRequest>>;
+
+  try {
+    catalogResult = await executeProviderRequest("vtu_tv_catalog", {
+      provider: body.provider_network || body.network || body.provider,
+    });
+  } catch {
+    return {
+      success: false,
+      status: 502,
+      message: "Unable to load Ikonect TV plans for pricing.",
+    };
+  }
+
+  const catalog = asObject(catalogResult.body);
+  const plans = Array.isArray(catalog?.tvPlans) ? catalog.tvPlans : [];
+  const selected = plans
+    .map((item) => asObject(item))
+    .find((plan) => firstStringValue(plan?.provider_plan_id, plan?.id) === planId);
+
+  if (!catalogResult.ok || !selected) {
+    const message = selected
+      ? "Unable to confirm the current TV plan price."
+      : "This TV subscription plan is no longer available from Ikonect.";
+    return {
+      success: false,
+      status: catalogResult.ok ? 400 : 502,
+      message,
+    };
+  }
+
+  const providerAmount = Number(selected.provider_cost);
+  const chargeAmount = Number(selected.retail_price);
+  if (!Number.isFinite(providerAmount) || providerAmount <= 0 || !Number.isFinite(chargeAmount) || chargeAmount <= 0) {
+    return {
+      success: false,
+      status: 502,
+      message: "Ikonect returned an invalid TV plan price.",
+    };
+  }
+
+  return {
+    success: true,
+    product_id: null,
+    category: "tv",
+    network: firstStringValue(selected.network, body.provider_network, body.network, body.provider),
+    product_name: firstStringValue(selected.name, "TV subscription"),
+    provider: "ikonect",
+    provider_plan_id: firstStringValue(selected.provider_plan_id, selected.id),
+    provider_amount: providerAmount,
+    charge_amount: chargeAmount,
+    fee_amount: Math.max(0, Math.round((chargeAmount - providerAmount) * 100) / 100),
+  };
+}
+
 export async function executeUnifiedAction({
   action,
   body,
@@ -950,11 +1042,14 @@ export async function executeUnifiedAction({
 
     if (vtuPurchase) {
       const useLiveDataPlan = action === "vtu_data" && !isUuid(body.product_id);
+      const useLiveTvPlan = action === "vtu_tv" && !isUuid(body.product_id);
       let quoteResult: any = null;
       let quoteError: { message?: string } | null = null;
 
       if (useLiveDataPlan) {
         quoteResult = await quoteLiveDataPurchase(body);
+      } else if (useLiveTvPlan) {
+        quoteResult = await quoteLiveTvPurchase(body);
       } else {
         const quoted = await serviceClient.rpc(
           "quote_vtu_purchase",
@@ -1054,14 +1149,14 @@ export async function executeUnifiedAction({
     charged = true;
 
     if (vtuPurchase) {
-      const useLiveDataPlan = action === "vtu_data" && !isUuid(body.product_id);
-      const { data: prepared, error: prepareError } = useLiveDataPlan
+      const useLiveExternalPlan = (action === "vtu_data" || action === "vtu_tv") && !isUuid(body.product_id);
+      const { data: prepared, error: prepareError } = useLiveExternalPlan
         ? await serviceClient.rpc(
           "prepare_external_vtu_purchase",
           {
             p_user_id: billingUserId,
             p_request_key: requestKey,
-            p_category: "data",
+            p_category: body.provider_category,
             p_network: body.provider_network,
             p_product_name: body.product_name,
             p_phone: body.phone,
