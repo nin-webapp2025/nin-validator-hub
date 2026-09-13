@@ -129,7 +129,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signOut = async () => {
     await supabase.auth.signOut();
-    sessionStorage.removeItem("sparkid_last_activity_at");
+    sessionStorage.removeItem("sparklabid_last_activity_at");
     // Belt-and-suspenders: the override is already scoped per user id, but
     // clearing it here too keeps localStorage tidy across sign-outs.
     clearDevRoleOverride();

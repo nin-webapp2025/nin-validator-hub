@@ -24,7 +24,7 @@ export function SessionTimeout() {
   const SESSION_TIMEOUT = 30 * 60 * 1000; // 30 minutes
   const WARNING_TIME = 5 * 60 * 1000; // Show warning 5 minutes before timeout
   const IDLE_TIMEOUT = 25 * 60 * 1000; // Consider idle after 25 minutes
-  const LAST_ACTIVITY_KEY = "sparkid_last_activity_at";
+  const LAST_ACTIVITY_KEY = "sparklabid_last_activity_at";
 
   useEffect(() => {
     if (!user) {
@@ -101,11 +101,11 @@ export function SessionTimeout() {
   const handleContinue = () => {
     setShowWarning(false);
     setIsIdle(false);
-    sessionStorage.setItem("sparkid_last_activity_at", String(Date.now()));
+    sessionStorage.setItem("sparklabid_last_activity_at", String(Date.now()));
   };
 
   const handleSignOut = () => {
-    sessionStorage.removeItem("sparkid_last_activity_at");
+    sessionStorage.removeItem("sparklabid_last_activity_at");
     void signOut();
     navigate("/auth", { replace: true });
   };

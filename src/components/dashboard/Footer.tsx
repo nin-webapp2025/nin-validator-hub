@@ -17,7 +17,7 @@ export function Footer() {
             <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
               <img 
                 src="/logo.svg" 
-                alt="SparkID" 
+                alt="Sparklabid"
                 className="h-10 sm:h-14 w-auto dark:brightness-110"
               />
               <Badge variant="outline" className="text-xs font-semibold px-2 sm:px-3 py-0.5 sm:py-1 bg-amber-50 dark:bg-amber-950/50 border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-300">
@@ -226,7 +226,7 @@ export function Footer() {
           <div className="flex flex-col lg:flex-row justify-between items-center gap-6">
             <div className="flex flex-col sm:flex-row items-center gap-4 text-center sm:text-left">
               <p className="text-sm text-slate-600 dark:text-slate-400 font-medium">
-                © {currentYear} <span className="font-bold text-slate-900 dark:text-slate-100">SparkID</span>. All rights reserved.
+                © {currentYear} <span className="font-bold text-slate-900 dark:text-slate-100">Sparklabid</span>. All rights reserved.
               </p>
               <Badge variant="outline" className="text-xs px-2 py-0.5 bg-green-50 dark:bg-green-950/50 border-green-200 dark:border-green-800 text-green-700 dark:text-green-300">
                 Operational

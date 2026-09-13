@@ -47,10 +47,6 @@ export interface ProviderHelpers {
     headers: Record<string, string>,
     requestBody: Record<string, unknown>,
   ) => Promise<ProviderHttpResult>;
-  callFormUpstream: (
-    url: string,
-    fields: Record<string, string>,
-  ) => Promise<ProviderHttpResult>;
   callGetUpstream: (
     url: string,
     headers: Record<string, string>,

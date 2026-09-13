@@ -966,10 +966,6 @@ export type Database = {
         }
         Returns: undefined
       }
-      admin_import_smartapi_data_products: {
-        Args: { p_plans: Json; p_retail_multiplier?: number }
-        Returns: Json
-      }
       admin_process_modification_request: {
         Args: {
           p_action: string
@@ -1114,8 +1110,11 @@ export type Database = {
           network: string
           phone: string
           product_name: string
+          provider: string
           provider_reference: string
+          service_identifier: string
           status: string
+          token: string | null
         }[]
       }
       list_vtu_products: {

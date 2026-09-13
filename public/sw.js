@@ -1,4 +1,4 @@
-const CACHE_NAME = "sparkid-v3";
+const CACHE_NAME = "sparklabid-v4";
 const APP_SHELL_URLS = ["/", "/auth", "/logo.svg", "/manifest.json"];
 
 self.addEventListener("install", (event) => {
@@ -84,7 +84,7 @@ self.addEventListener("push", (event) => {
   };
 
   event.waitUntil(
-    self.registration.showNotification("SparkID - Identity Verification", options)
+    self.registration.showNotification("Sparklabid - Identity Verification", options)
   );
 });
 

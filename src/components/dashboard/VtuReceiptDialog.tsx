@@ -19,6 +19,7 @@ export interface VtuReceiptRow {
   product_name: string;
   phone: string;
   service_identifier?: string | null;
+  token?: string | null;
   provider?: string | null;
   provider_reference: string | null;
   charged_amount: number;
@@ -84,7 +85,7 @@ async function renderReceiptCanvas(element: HTMLElement) {
 async function downloadReceiptImage(row: VtuReceiptRow, element: HTMLElement, type: "png" | "jpeg") {
   const canvas = await renderReceiptCanvas(element);
   const link = document.createElement("a");
-  link.download = `sparkid-${row.category}-receipt-${safeFilename(receiptReference(row))}.${type === "jpeg" ? "jpg" : "png"}`;
+  link.download = `sparklabid-${row.category}-receipt-${safeFilename(receiptReference(row))}.${type === "jpeg" ? "jpg" : "png"}`;
   link.href = canvas.toDataURL(type === "jpeg" ? "image/jpeg" : "image/png", 0.95);
   link.click();
 }
@@ -101,7 +102,7 @@ async function downloadReceiptPdf(row: VtuReceiptRow, element: HTMLElement) {
     format: [canvas.width, canvas.height],
   });
   pdf.addImage(imgData, "PNG", 0, 0, canvas.width, canvas.height);
-  pdf.save(`sparkid-${row.category}-receipt-${safeFilename(receiptReference(row))}.pdf`);
+  pdf.save(`sparklabid-${row.category}-receipt-${safeFilename(receiptReference(row))}.pdf`);
 }
 
 function Detail({ label, value }: { label: string; value: string }) {
@@ -157,7 +158,7 @@ export function VtuReceiptDialog({
             className="mx-auto min-h-[980px] w-full max-w-[640px] bg-white px-7 py-9 text-slate-950 sm:px-10 sm:py-10"
           >
             <div className="flex items-start justify-between gap-6">
-              <img src="/logo.svg" alt="SparkID" className="h-auto w-36 sm:w-40" />
+              <img src="/logo.svg" alt="Sparklabid" className="h-auto w-36 sm:w-40" />
               <p className="pt-1 text-right text-lg font-black text-slate-950 sm:text-2xl">Transaction Receipt</p>
             </div>
 
@@ -176,7 +177,8 @@ export function VtuReceiptDialog({
               <Detail label="Amount" value={formatNaira(Number(row.charged_amount))} />
               <Detail label={operatorLabel(row.category)} value={row.network} />
               <Detail label={identifierLabel[row.category]} value={serviceIdentifier(row)} />
-              <Detail label="Paid with" value="SparkID Wallet" />
+              {row.category === "electricity" && row.token ? <Detail label="Token" value={row.token} /> : null}
+              <Detail label="Paid with" value="Sparklabid Wallet" />
               <Detail label="Transaction number" value={receiptReference(row)} />
             </div>
 
@@ -187,7 +189,7 @@ export function VtuReceiptDialog({
 
             <div className="mt-8 border-t border-dashed border-slate-500 pt-5">
               <p className="text-sm font-semibold leading-snug text-slate-900 sm:text-base">
-                SparkID provides secure identity services, wallet payments, airtime, data, TV, and electricity transactions.
+                Sparklabid provides secure identity services, wallet payments, airtime, data, TV, and electricity transactions.
                 Keep this receipt for your records and share the transaction number with support if you need help.
               </p>
             </div>

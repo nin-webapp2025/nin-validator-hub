@@ -97,7 +97,7 @@ function PaystackButton({
 const MAX_VERIFY_RETRIES = 3;
 
 /** Persists pending payment info to localStorage so it survives page refreshes */
-const PENDING_REF_KEY = "sparkid_pending_wallet_ref";
+const PENDING_REF_KEY = "sparklabid_pending_wallet_ref";
 
 interface PendingPayment {
   reference: string;

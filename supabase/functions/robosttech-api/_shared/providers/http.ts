@@ -28,20 +28,6 @@ export async function callUpstream(
   return { response, raw, data };
 }
 
-export async function callFormUpstream(
-  url: string,
-  fields: Record<string, string>,
-): Promise<ProviderHttpResult> {
-  const body = new FormData();
-  for (const [key, value] of Object.entries(fields)) {
-    body.append(key, value);
-  }
-
-  const response = await fetch(url, { method: "POST", body });
-  const { raw, data } = await parseUpstreamResponse(response);
-  return { response, raw, data };
-}
-
 export async function callGetUpstream(
   url: string,
   headers: Record<string, string>,

@@ -8,7 +8,7 @@ import { Shield, Search, Bell, Settings, ArrowRight, X, Sparkles } from "lucide-
 const steps = [
   {
     icon: Sparkles,
-    title: "Welcome to SparkID!",
+    title: "Welcome to Sparklabid!",
     description:
       "Your identity verification platform. Let's take a quick tour of the features available to you.",
   },

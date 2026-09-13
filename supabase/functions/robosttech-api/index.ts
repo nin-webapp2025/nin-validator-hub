@@ -98,7 +98,7 @@ serve(async (req) => {
 
     let authenticatedUserId: string | null = null;
     const walletOperation = ACTION_TO_WALLET_OPERATION[action];
-    const requiresAuthentication = !!walletOperation || action === "vtu_query";
+    const requiresAuthentication = !!walletOperation;
 
     if (requiresAuthentication) {
       const authHeader = req.headers.get("Authorization");

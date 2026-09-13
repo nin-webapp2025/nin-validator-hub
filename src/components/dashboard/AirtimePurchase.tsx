@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { formatNaira } from "@/lib/wallet";
-import { listVtuProducts, purchaseVtu, type VtuProduct } from "@/lib/vtu";
+import { calculateVariableVtuCharge, listVtuProducts, purchaseVtu, type VtuProduct } from "@/lib/vtu";
 import { cn } from "@/lib/utils";
 import { trackApiRequest } from "./RateLimitIndicator";
 import { VtuReceiptDialog, type VtuReceiptRow } from "@/components/dashboard/VtuReceiptDialog";
@@ -44,7 +44,8 @@ export function AirtimePurchase() {
     [productId, products],
   );
   const numericAmount = Number(amount || 0);
-  const total = numericAmount;
+  const pricing = calculateVariableVtuCharge(numericAmount, selectedProduct);
+  const total = pricing.chargeAmount;
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -201,7 +202,7 @@ export function AirtimePurchase() {
             </div>
             <dl className="mt-3 space-y-2 text-sm">
               <div className="flex justify-between"><dt className="text-slate-500">Airtime value</dt><dd>{formatNaira(numericAmount)}</dd></div>
-              <div className="flex justify-between"><dt className="text-slate-500">Service fee</dt><dd>{formatNaira(0)}</dd></div>
+              <div className="flex justify-between"><dt className="text-slate-500">Service fee</dt><dd>{formatNaira(pricing.feeAmount)}</dd></div>
               <div className="flex justify-between border-t border-slate-200 pt-2 font-semibold dark:border-slate-700"><dt>Wallet charge</dt><dd>{formatNaira(total)}</dd></div>
             </dl>
           </div>

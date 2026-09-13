@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { formatNaira } from "@/lib/wallet";
-import { listVtuProducts, purchaseVtu, verifyElectricityMeter, type VtuProduct } from "@/lib/vtu";
+import { calculateVariableVtuCharge, listVtuProducts, purchaseVtu, verifyElectricityMeter, type VtuProduct } from "@/lib/vtu";
 import { trackApiRequest } from "./RateLimitIndicator";
 import { VtuReceiptDialog, type VtuReceiptRow } from "@/components/dashboard/VtuReceiptDialog";
 
@@ -25,7 +25,7 @@ export function ElectricityPurchase() {
   const [verifying, setVerifying] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [verification, setVerification] = useState<Record<string, unknown> | null>(null);
-  const [result, setResult] = useState<{ state: string; message: string; reference?: string } | null>(null);
+  const [result, setResult] = useState<{ state: string; message: string; reference?: string; token?: string } | null>(null);
   const [receipt, setReceipt] = useState<VtuReceiptRow | null>(null);
 
   useEffect(() => {
@@ -43,6 +43,7 @@ export function ElectricityPurchase() {
 
   const selectedProduct = useMemo(() => products.find((product) => product.id === productId) ?? products[0], [productId, products]);
   const numericAmount = Number(amount || 0);
+  const pricing = calculateVariableVtuCharge(numericAmount, selectedProduct);
 
   const handleVerify = async () => {
     if (!selectedProduct || !meterNumber.trim()) {
@@ -99,8 +100,9 @@ export function ElectricityPurchase() {
       const state = response.normalized?.state ?? response.status ?? "pending";
       const message = response.normalized?.message || response.message || response.response || "Payment submitted.";
       const reference = response.normalized?.provider_reference || response.reference || response.normalized?.request_id || "";
+      const token = response.token || "";
       const now = new Date().toISOString();
-      setResult({ state, message, reference });
+      setResult({ state, message, reference, token });
       setReceipt({
         id: reference || `electricity-${Date.now()}`,
         category: "electricity",
@@ -108,13 +110,14 @@ export function ElectricityPurchase() {
         product_name: selectedProduct.name,
         phone,
         service_identifier: meterNumber.trim(),
+        token: token || null,
         provider_reference: reference || null,
-        charged_amount: numericAmount,
+        charged_amount: pricing.chargeAmount,
         status: state,
         completed_at: state === "succeeded" ? now : null,
         created_at: now,
       });
-      toast({ title: state === "succeeded" ? "Electricity payment completed" : "Payment submitted", description: message });
+      toast({ title: state === "succeeded" ? "Electricity payment completed" : "Payment submitted", description: token ? `Token: ${token}` : message });
     } catch (error) {
       const message = error instanceof Error ? error.message : "Unable to complete this payment.";
       setResult({ state: "failed", message });
@@ -202,13 +205,23 @@ export function ElectricityPurchase() {
             <Alert variant={result.state === "failed" ? "destructive" : "default"}>
               {result.state === "failed" ? <AlertCircle className="h-4 w-4" /> : <CheckCircle2 className="h-4 w-4 text-emerald-600" />}
               <AlertTitle>{result.state === "succeeded" ? "Payment completed" : result.state === "failed" ? "Payment failed" : "Payment is processing"}</AlertTitle>
-              <AlertDescription>{result.message}{result.reference ? ` Reference: ${result.reference}` : ""}</AlertDescription>
+              <AlertDescription>
+                {result.message}{result.token ? ` Token: ${result.token}` : ""}{result.reference ? ` Reference: ${result.reference}` : ""}
+              </AlertDescription>
             </Alert>
           )}
 
+          <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-900/60">
+            <dl className="space-y-2 text-sm">
+              <div className="flex justify-between"><dt className="text-slate-500">Electricity value</dt><dd>{formatNaira(pricing.faceValue)}</dd></div>
+              <div className="flex justify-between"><dt className="text-slate-500">Service fee</dt><dd>{formatNaira(pricing.feeAmount)}</dd></div>
+              <div className="flex justify-between border-t border-slate-200 pt-2 font-semibold dark:border-slate-700"><dt>Wallet charge</dt><dd>{formatNaira(pricing.chargeAmount)}</dd></div>
+            </dl>
+          </div>
+
           <Button type="submit" className="w-full gap-2" disabled={submitting || catalogLoading || !selectedProduct}>
             {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Zap className="h-4 w-4" />}
-            {submitting ? "Processing payment" : `Pay ${formatNaira(numericAmount)}`}
+            {submitting ? "Processing payment" : `Pay ${formatNaira(pricing.chargeAmount)}`}
           </Button>
         </form>
       </CardContent>

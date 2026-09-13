@@ -23,7 +23,6 @@ const API_ACTION_PRICES = {
   vtu_tv_verify: 0,
   vtu_electricity: 0,
   vtu_electricity_verify: 0,
-  vtu_query: 0,
 } as const;
 
 const NIN_RE = /^\d{11}$/;
@@ -365,15 +364,6 @@ export const MOCK_RESPONSES: Record<SupportedAction, unknown> = {
     provider_state: "succeeded",
     _test_mode: true,
   },
-  vtu_query: {
-    code: "200",
-    status: "success",
-    success: true,
-    response: "Test transaction completed.",
-    reference: "TST_VTU_QUERY_001",
-    provider_state: "succeeded",
-    _test_mode: true,
-  },
 };
 
 function asObject(value: unknown): Record<string, unknown> | null {
@@ -544,18 +534,12 @@ function validationErrorFor(action: SupportedAction, body: ExecutionRequestBody)
         return "Field 'meter_type' must be either 'prepaid' or 'postpaid'.";
       }
       break;
-    case "vtu_query":
-      if (!String(body.provider_reference ?? body.request_id ?? "").trim()) {
-        return "Field 'provider_reference' is required.";
-      }
-      break;
   }
 
   return null;
 }
 
 function inferPhase(action: SupportedAction): NormalizedPhase {
-  if (action === "vtu_query") return "status";
   if (action.endsWith("_status")) return "status";
   if (action.endsWith("_verify")) return "verify";
   if (
@@ -784,27 +768,6 @@ function isVtuPurchase(action: SupportedAction) {
     action === "vtu_electricity";
 }
 
-async function enqueueVtuStatusPoll(
-  serviceClient: WalletRpcClient,
-  userId: string,
-  requestKey: string,
-  providerReference: string,
-) {
-  const { error } = await serviceClient.rpc("enqueue_background_job", {
-    p_type: "vtu_status_poll",
-    p_payload: {
-      user_id: userId,
-      request_key: requestKey,
-      provider_reference: providerReference,
-    },
-    p_run_at: new Date(Date.now() + 60_000).toISOString(),
-    p_unique_key: `vtu-status:${requestKey}`,
-    p_max_attempts: 20,
-  });
-
-  if (error) console.error("Unable to enqueue VTU status poll:", error.message ?? error);
-}
-
 async function settleVtuResult(
   serviceClient: WalletRpcClient,
   requestKey: string,
@@ -943,27 +906,6 @@ export async function executeUnifiedAction({
       isTestMode: true,
       walletOperation,
     };
-  }
-
-  if (action === "vtu_query" && billingUserId) {
-    const reference = String(body.provider_reference ?? body.request_id ?? "").trim();
-    const { data: authorized, error } = await serviceClient.rpc("authorize_vtu_reference", {
-      p_user_id: billingUserId,
-      p_reference: reference,
-    });
-    if (error || authorized !== true) {
-      const message = error ? "Unable to authorize this transaction query." : "Transaction not found.";
-      return {
-        status: error ? 500 : 404,
-        body: normalizeProviderResponse(action, body, error ? 500 : 404, {
-          success: false,
-          error: message,
-          message,
-        }, { charged: false, requestKey, provider: "internal" }),
-        charged: false,
-        isTestMode: false,
-      };
-    }
   }
 
   if (walletOperation) {
@@ -1197,11 +1139,7 @@ export async function executeUnifiedAction({
       const normalized = asObject(asObject(normalizedBody)?.normalized);
       const state = String(normalized?.state ?? "unknown");
       const providerReference = String(normalized?.provider_reference ?? requestKey);
-      const settled = await settleVtuResult(serviceClient, requestKey, state, providerReference, upstream.body);
-
-      if (upstream.provider === "smartapi" && (!settled || state === "pending" || state === "submitted" || state === "unknown")) {
-        await enqueueVtuStatusPoll(serviceClient, billingUserId, requestKey, providerReference);
-      }
+      await settleVtuResult(serviceClient, requestKey, state, providerReference, upstream.body);
     }
 
     return {
@@ -1218,9 +1156,6 @@ export async function executeUnifiedAction({
       await settleVtuResult(serviceClient, requestKey, "unknown", providerReference, {
         message: "Provider confirmation is pending.",
       });
-      if (pendingProvider === "smartapi") {
-        await enqueueVtuStatusPoll(serviceClient, billingUserId, requestKey, providerReference);
-      }
 
       return {
         status: 202,

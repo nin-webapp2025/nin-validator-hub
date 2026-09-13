@@ -110,7 +110,7 @@ export function DashboardHeader({ onNavigateToProfile, onNavigateToWallet }: Das
         <div className="flex items-center gap-2 sm:gap-3 min-w-0">
           <img 
             src="/logo.svg" 
-            alt="SparkID" 
+            alt="Sparklabid"
             className="h-8 sm:h-10 w-auto dark:brightness-110 shrink-0"
           />
           <Badge 

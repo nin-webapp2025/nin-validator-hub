@@ -256,92 +256,6 @@ async function processProviderStatusPoll(
   return { completed: true, state };
 }
 
-async function processVtuStatusPoll(
-  sb: ReturnType<typeof createClient>,
-  job: BackgroundJob,
-) {
-  const startedAt = Date.now();
-  const payload = job.payload ?? {};
-  const requestKey = String(payload.request_key ?? "").trim();
-  const providerReference = String(payload.provider_reference ?? requestKey).trim();
-
-  if (!requestKey || !providerReference) {
-    throw new Error("VTU status job is missing its transaction reference.");
-  }
-
-  const outcome = await executeUnifiedAction({
-    action: "vtu_query",
-    body: {
-      action: "vtu_query",
-      request_id: requestKey,
-      provider_reference: providerReference,
-    },
-    serviceClient: sb,
-  });
-  const reportedState = normalizedState(outcome.body);
-  const state = outcome.status >= 500 ? "unknown" : reportedState;
-  const normalized = asObject(asObject(outcome.body)?.normalized);
-  const resolvedReference = String(normalized?.provider_reference ?? providerReference);
-
-  const { error: settlementError } = await sb.rpc("settle_vtu_transaction", {
-    p_request_key: requestKey,
-    p_state: state,
-    p_provider_response: asObject(outcome.body) ?? { data: outcome.body },
-    p_provider_reference: resolvedReference,
-  });
-  if (settlementError) throw new Error(`Unable to settle VTU transaction: ${settlementError.message}`);
-
-  await recordOperationalEvent(sb, {
-    source: "background_job",
-    component: "job-worker",
-    eventType: "vtu_status_checked",
-    severity: severityForStatus(outcome.status),
-    message: normalizedMessage(outcome.body),
-    action: "vtu_query",
-    statusCode: outcome.status,
-    durationMs: Date.now() - startedAt,
-    requestId: requestKey,
-    userId: typeof payload.user_id === "string" ? payload.user_id : undefined,
-    jobId: job.id,
-    provider: "smartapi",
-    state,
-    createAlert: outcome.status >= 500 && job.attempt_count >= job.max_attempts,
-    alertType: "vtu_reconciliation_failure",
-    alertTitle: "VTU purchase needs reconciliation",
-    alertDedupeKey: `vtu-reconciliation:${requestKey}`,
-    metadata: {
-      attempt_count: job.attempt_count,
-      max_attempts: job.max_attempts,
-    },
-  });
-
-  if (["pending", "submitted", "unknown"].includes(state) && job.attempt_count < job.max_attempts) {
-    await sb.rpc("reschedule_background_job", {
-      p_job_id: job.id,
-      p_delay_seconds: pollDelaySeconds(job.attempt_count),
-      p_result: outcome.body,
-    });
-    return { rescheduled: true, state };
-  }
-
-  await sb.rpc("complete_background_job", {
-    p_job_id: job.id,
-    p_result: outcome.body,
-  });
-  const notificationBody = state === "unknown"
-    ? {
-      ...asObject(outcome.body),
-      normalized: {
-        ...normalized,
-        state: "unknown",
-        message: "Your purchase is awaiting manual provider confirmation.",
-      },
-    }
-    : outcome.body;
-  await notifyUser(sb, { ...payload, action: "vtu_purchase" }, notificationBody);
-  return { completed: true, state };
-}
-
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -403,12 +317,6 @@ serve(async (req) => {
       try {
         if (job.type === "provider_status_poll") {
           const result = await processProviderStatusPoll(sb, job);
-          results.push({ job_id: job.id, type: job.type, ...result });
-          continue;
-        }
-
-        if (job.type === "vtu_status_poll") {
-          const result = await processVtuStatusPoll(sb, job);
           results.push({ job_id: job.id, type: job.type, ...result });
           continue;
         }

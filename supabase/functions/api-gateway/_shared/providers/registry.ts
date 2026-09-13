@@ -1,15 +1,13 @@
-import { callFormUpstream, callGetUpstream, callUpstream } from "./http.ts";
+import { callGetUpstream, callUpstream } from "./http.ts";
 import { ikonectAdapter } from "./ikonect.ts";
 import { premblyAdapter } from "./prembly.ts";
 import { robosttechAdapter } from "./robosttech.ts";
-import { smartApiAdapter } from "./smartapi.ts";
 import type { ProviderHelpers, ProviderRequestBody, ProviderResult } from "./types.ts";
 
-const adapters = [ikonectAdapter, smartApiAdapter, premblyAdapter, robosttechAdapter];
+const adapters = [ikonectAdapter, premblyAdapter, robosttechAdapter];
 
 const helpers: ProviderHelpers = {
   callUpstream,
-  callFormUpstream,
   callGetUpstream,
 };
 

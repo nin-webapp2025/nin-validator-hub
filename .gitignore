@@ -12,6 +12,15 @@ dist
 dist-ssr
 *.local
 
+# Local Codex/tooling artifacts
+.claude/
+.playwright-cli/
+.skill-pdf-packages/
+.skill-pdf-venv/
+output/
+tmp/
+supabase/.temp/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

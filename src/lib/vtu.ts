@@ -23,6 +23,7 @@ export interface VtuPurchaseResult {
   message?: string;
   response?: string;
   reference?: string;
+  token?: string;
   status?: string;
   normalized?: {
     state?: string;
@@ -30,6 +31,18 @@ export interface VtuPurchaseResult {
     provider_reference?: string;
     request_id?: string;
     charged?: boolean;
+  };
+}
+
+export function calculateVariableVtuCharge(amount: number, product?: Pick<VtuProduct, "fee_percent" | "fee_flat"> | null) {
+  const baseAmount = Number.isFinite(amount) ? amount : 0;
+  const feePercent = Number(product?.fee_percent ?? 0);
+  const feeFlat = Number(product?.fee_flat ?? 0);
+  const feeAmount = Math.max(0, Math.round((feeFlat + (baseAmount * feePercent / 100)) * 100) / 100);
+  return {
+    faceValue: baseAmount,
+    feeAmount,
+    chargeAmount: Math.round((baseAmount + feeAmount) * 100) / 100,
   };
 }
 
@@ -122,7 +135,7 @@ export async function purchaseVtu(input: {
   if (result.success === false || state === "failed" || state === "reversed") {
     const message = result.normalized?.message || result.message || result.response || "The provider declined this purchase.";
     const refundNote = result.normalized?.charged === false
-      ? " Your SparkID wallet was not charged, or it has already been refunded."
+      ? " Your Sparklabid wallet was not charged, or it has already been refunded."
       : "";
     throw new Error(`${message}${refundNote}`);
   }

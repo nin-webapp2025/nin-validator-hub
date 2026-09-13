@@ -31,6 +31,22 @@ function firstStringValue(...values: unknown[]) {
   return "";
 }
 
+function extractElectricityToken(source: Record<string, unknown>) {
+  const nested = asObject(source.data);
+  return firstStringValue(
+    source.token,
+    source.electricity_token,
+    source.meter_token,
+    source.recharge_token,
+    source.token_value,
+    nested.token,
+    nested.electricity_token,
+    nested.meter_token,
+    nested.recharge_token,
+    nested.token_value,
+  );
+}
+
 function normalizeToken(value: unknown) {
   return firstStringValue(value).toLowerCase().replace(/\s+/g, "");
 }
@@ -235,6 +251,7 @@ function normalizeResponse(payload: unknown, httpOk: boolean, fallbackReference:
     ...source,
     success: state === "succeeded" || state === "pending",
     message: firstStringValue(source.message, source.response, source.error, "Ikonect request completed."),
+    token: extractElectricityToken(source) || undefined,
     provider_reference: providerReference || undefined,
     provider_state: state,
   };

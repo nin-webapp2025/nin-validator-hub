@@ -6,7 +6,7 @@ export function AppFooter() {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
         <div className="flex flex-col gap-3 text-center sm:flex-row sm:items-center sm:justify-between sm:text-left">
           <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
-            &copy; {new Date().getFullYear()} SparkID. Secure identity operations.
+            &copy; {new Date().getFullYear()} Sparklabid. Secure identity operations.
           </p>
           <div className="flex flex-wrap items-center justify-center gap-3 text-xs sm:justify-end sm:text-sm text-slate-500 dark:text-slate-400">
             <Link to="/privacy" className="hover:text-primary transition-colors">

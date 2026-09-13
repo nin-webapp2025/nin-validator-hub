@@ -9,7 +9,7 @@ Set these in Supabase Dashboard under **Project Settings > Edge Functions > Secr
 - `IKONECT_API_KEY`
 - `IKONECT_API_SECRET`
 
-Keep existing `JOB_WORKER_TOKEN` configured for background jobs. SmartAPI secrets can remain for older transaction status checks, but new airtime/data/TV/electricity purchases route to Ikonect.
+Keep existing `JOB_WORKER_TOKEN` configured for background jobs. Retired provider secrets and webhook setup are no longer required for the active VTU flow.
 
 ## 2. Apply migration
 
