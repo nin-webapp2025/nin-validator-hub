@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 import { format } from "date-fns";
-import { Download, FileImage, FileText, Loader2, ReceiptText } from "lucide-react";
+import { CheckCircle2, Download, FileImage, FileText, Loader2, ReceiptText } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -52,10 +52,10 @@ function statusLabel(status: string) {
 }
 
 function statusClass(status: string) {
-  if (status === "succeeded") return "border-emerald-200 bg-emerald-50 text-emerald-700";
-  if (status === "failed") return "border-red-200 bg-red-50 text-red-700";
-  if (status === "reversed") return "border-slate-200 bg-slate-100 text-slate-700";
-  return "border-amber-200 bg-amber-50 text-amber-700";
+  if (status === "succeeded") return "border-emerald-600 bg-emerald-600 text-white shadow-[0_10px_24px_rgba(5,150,105,0.2)]";
+  if (status === "failed") return "border-red-600 bg-red-600 text-white";
+  if (status === "reversed") return "border-slate-700 bg-slate-700 text-white";
+  return "border-amber-500 bg-amber-500 text-slate-950";
 }
 
 function displayDate(value: string | null | undefined) {
@@ -109,9 +109,9 @@ async function downloadReceiptPdf(row: VtuReceiptRow, element: HTMLElement) {
 
 function Detail({ label, value }: { label: string; value: string }) {
   return (
-    <div className="grid grid-cols-[7.5rem_minmax(0,1fr)] items-start gap-3 border-b border-slate-100 py-3 last:border-0 max-[430px]:grid-cols-1 max-[430px]:gap-1">
-      <p className="text-xs font-semibold text-slate-500">{label}</p>
-      <p className="break-words text-right text-sm font-bold leading-snug text-slate-950 max-[430px]:text-left">{value || "N/A"}</p>
+    <div className="border-b border-slate-100 py-3.5 last:border-0">
+      <p className="text-xs font-bold text-slate-500">{label}</p>
+      <p className="mt-1 break-words text-base font-black leading-snug text-slate-950">{value || "N/A"}</p>
     </div>
   );
 }
@@ -161,21 +161,25 @@ export function VtuReceiptDialog({
           >
             <div className="flex items-center justify-between gap-3 px-5 py-5">
               <img src="/logo.svg" alt="SparkID" className="h-auto w-36" />
-              <Badge variant="outline" className={cn("rounded-full px-3 py-1 text-[11px] font-extrabold uppercase", statusClass(row.status))}>
+              <Badge
+                variant="outline"
+                className={cn("gap-1.5 rounded-full px-4 py-1.5 text-xs font-black uppercase tracking-wide", statusClass(row.status))}
+              >
+                {row.status === "succeeded" ? <CheckCircle2 className="h-3.5 w-3.5" /> : null}
                 {statusLabel(row.status)}
               </Badge>
             </div>
 
-            <div className="mx-4 rounded-[24px] bg-[radial-gradient(circle_at_18%_10%,rgba(245,158,11,0.42),transparent_34%),linear-gradient(145deg,#111827_0%,#1e293b_48%,#78350f_100%)] px-5 py-7 text-center text-white shadow-[0_24px_50px_rgba(30,41,59,0.18)]">
-              <div className="mx-auto grid h-14 w-14 place-items-center rounded-full border border-emerald-200/50 bg-emerald-500/15 text-3xl font-black text-emerald-100">
-                ✓
+            <div className="mx-4 rounded-[24px] bg-primary px-5 py-7 text-center text-slate-950 shadow-[0_18px_40px_rgba(245,158,11,0.24)]">
+              <div className="mx-auto grid h-14 w-14 place-items-center rounded-full border border-slate-950/15 bg-white/85 text-emerald-700 shadow-sm">
+                <CheckCircle2 className="h-9 w-9" />
               </div>
-              <p className="mt-4 text-[11px] font-extrabold uppercase tracking-[0.2em] text-white/70">Amount paid</p>
-              <p className="mt-2 font-display text-4xl font-black tracking-tight text-orange-50 tabular-nums sm:text-5xl">
+              <p className="mt-4 text-[11px] font-black uppercase tracking-[0.2em] text-amber-950/70">Amount paid</p>
+              <p className="mt-2 font-display text-4xl font-black tracking-tight text-slate-950 tabular-nums sm:text-5xl">
                 {formatNaira(Number(row.charged_amount))}
               </p>
-              <p className="mt-2 text-sm font-extrabold text-amber-100">{categoryLabel[row.category]}</p>
-              <p className="mt-1 text-xs font-medium text-white/70">{displayDate(row.completed_at || row.created_at)}</p>
+              <p className="mt-2 text-sm font-black text-slate-950">{categoryLabel[row.category]}</p>
+              <p className="mt-1 text-xs font-semibold text-amber-950/70">{displayDate(row.completed_at || row.created_at)}</p>
             </div>
 
             <div className="px-5 py-5">
@@ -185,7 +189,7 @@ export function VtuReceiptDialog({
               <Detail label={row.category === "electricity" ? "Disco" : row.category === "tv" ? "TV provider" : "Network"} value={row.network} />
               <Detail label="Payment method" value="SparkID Wallet" />
 
-              <div className="mt-5 rounded-[18px] border border-amber-300 bg-gradient-to-br from-amber-50 to-orange-50 p-4">
+              <div className="mt-5 rounded-[18px] border border-amber-300 bg-amber-50 p-4">
                 <p className="text-[11px] font-extrabold uppercase tracking-[0.12em] text-amber-800">Transaction reference</p>
                 <p className="mt-1 break-words text-sm font-black text-slate-950">{receiptReference(row)}</p>
               </div>
