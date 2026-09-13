@@ -1,7 +1,6 @@
 import { useRef, useState } from "react";
 import { format } from "date-fns";
-import { CheckCircle2, Download, FileImage, FileText, Loader2, ReceiptText } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
+import { Download, FileImage, FileText, Loader2, ReceiptText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -12,7 +11,6 @@ import {
 } from "@/components/ui/dialog";
 import { formatNaira } from "@/lib/wallet";
 import type { VtuCategory } from "@/lib/vtu";
-import { cn } from "@/lib/utils";
 
 export interface VtuReceiptRow {
   id: string;
@@ -51,13 +49,6 @@ function statusLabel(status: string) {
   return "FAILED";
 }
 
-function statusClass(status: string) {
-  if (status === "succeeded") return "border-emerald-600 bg-emerald-600 text-white shadow-[0_10px_24px_rgba(5,150,105,0.2)]";
-  if (status === "failed") return "border-red-600 bg-red-600 text-white";
-  if (status === "reversed") return "border-slate-700 bg-slate-700 text-white";
-  return "border-amber-500 bg-amber-500 text-slate-950";
-}
-
 function displayDate(value: string | null | undefined) {
   if (!value) return "N/A";
   return format(new Date(value), "d MMM yyyy, h:mm a");
@@ -69,6 +60,12 @@ function receiptReference(row: VtuReceiptRow) {
 
 function serviceIdentifier(row: VtuReceiptRow) {
   return row.service_identifier || row.phone || "N/A";
+}
+
+function operatorLabel(category: VtuCategory) {
+  if (category === "electricity") return "Disco";
+  if (category === "tv") return "TV provider";
+  return "Operator";
 }
 
 function safeFilename(value: string) {
@@ -109,9 +106,9 @@ async function downloadReceiptPdf(row: VtuReceiptRow, element: HTMLElement) {
 
 function Detail({ label, value }: { label: string; value: string }) {
   return (
-    <div className="border-b border-slate-100 py-3.5 last:border-0">
-      <p className="text-xs font-bold text-slate-500">{label}</p>
-      <p className="mt-1 break-words text-base font-black leading-snug text-slate-950">{value || "N/A"}</p>
+    <div className="grid grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] items-start gap-6 py-5">
+      <p className="text-sm font-medium text-slate-400 sm:text-base">{label}</p>
+      <p className="break-words text-right text-sm font-semibold leading-snug text-slate-950 sm:text-base">{value || "N/A"}</p>
     </div>
   );
 }
@@ -145,7 +142,7 @@ export function VtuReceiptDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[92vh] max-w-lg overflow-y-auto bg-slate-50 p-4 dark:bg-slate-950 sm:p-6">
+      <DialogContent className="max-h-[92vh] max-w-2xl overflow-y-auto bg-slate-50 p-4 dark:bg-slate-950 sm:p-6">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <ReceiptText className="h-5 w-5 text-primary" />
@@ -154,52 +151,45 @@ export function VtuReceiptDialog({
           <DialogDescription>Preview and download your receipt.</DialogDescription>
         </DialogHeader>
 
-        <div className="rounded-[28px] border border-slate-200 bg-white p-2 shadow-[0_24px_60px_rgba(15,23,42,0.12)] dark:border-slate-800">
+        <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_24px_60px_rgba(15,23,42,0.10)] dark:border-slate-800">
           <div
             ref={receiptRef}
-            className="relative overflow-hidden rounded-[24px] bg-white text-slate-950 ring-1 ring-inset ring-slate-200"
+            className="mx-auto min-h-[980px] w-full max-w-[640px] bg-white px-7 py-9 text-slate-950 sm:px-10 sm:py-10"
           >
-            <div className="flex items-center justify-between gap-3 px-5 py-5">
-              <img src="/logo.svg" alt="SparkID" className="h-auto w-36" />
-              <Badge
-                variant="outline"
-                className={cn("gap-1.5 rounded-full px-4 py-1.5 text-xs font-black uppercase tracking-wide", statusClass(row.status))}
-              >
-                {row.status === "succeeded" ? <CheckCircle2 className="h-3.5 w-3.5" /> : null}
-                {statusLabel(row.status)}
-              </Badge>
+            <div className="flex items-start justify-between gap-6">
+              <img src="/logo.svg" alt="SparkID" className="h-auto w-36 sm:w-40" />
+              <p className="pt-1 text-right text-lg font-black text-slate-950 sm:text-2xl">Transaction Receipt</p>
             </div>
 
-            <div className="mx-4 rounded-[24px] bg-primary px-5 py-7 text-center text-slate-950 shadow-[0_18px_40px_rgba(245,158,11,0.24)]">
-              <div className="mx-auto grid h-14 w-14 place-items-center rounded-full border border-slate-950/15 bg-white/85 text-emerald-700 shadow-sm">
-                <CheckCircle2 className="h-9 w-9" />
-              </div>
-              <p className="mt-4 text-[11px] font-black uppercase tracking-[0.2em] text-amber-950/70">Amount paid</p>
-              <p className="mt-2 font-display text-4xl font-black tracking-tight text-slate-950 tabular-nums sm:text-5xl">
+            <div className="py-12 text-center">
+              <p className="font-display text-4xl font-black tracking-tight text-primary tabular-nums sm:text-5xl">
                 {formatNaira(Number(row.charged_amount))}
               </p>
-              <p className="mt-2 text-sm font-black text-slate-950">{categoryLabel[row.category]}</p>
-              <p className="mt-1 text-xs font-semibold text-amber-950/70">{displayDate(row.completed_at || row.created_at)}</p>
+              <p className="mt-6 text-2xl font-semibold uppercase tracking-wide text-slate-950">
+                {statusLabel(row.status)}
+              </p>
+              <p className="mt-5 text-sm font-medium text-slate-400 sm:text-base">{displayDate(row.completed_at || row.created_at)}</p>
             </div>
 
-            <div className="px-5 py-5">
-              <div className="mb-4 border-t border-dashed border-slate-300" />
-              <Detail label="Service" value={row.product_name} />
-              <Detail label={identifierLabel[row.category] === "Phone Number" ? "Recipient" : identifierLabel[row.category]} value={serviceIdentifier(row)} />
-              <Detail label={row.category === "electricity" ? "Disco" : row.category === "tv" ? "TV provider" : "Network"} value={row.network} />
-              <Detail label="Payment method" value="SparkID Wallet" />
+            <div className="border-t border-slate-700 pt-9">
+              <Detail label="Transaction type" value={categoryLabel[row.category]} />
+              <Detail label="Amount" value={formatNaira(Number(row.charged_amount))} />
+              <Detail label={operatorLabel(row.category)} value={row.network} />
+              <Detail label={identifierLabel[row.category]} value={serviceIdentifier(row)} />
+              <Detail label="Paid with" value="SparkID Wallet" />
+              <Detail label="Transaction number" value={receiptReference(row)} />
+            </div>
 
-              <div className="mt-5 rounded-[18px] border border-amber-300 bg-amber-50 p-4">
-                <p className="text-[11px] font-extrabold uppercase tracking-[0.12em] text-amber-800">Transaction reference</p>
-                <p className="mt-1 break-words text-sm font-black text-slate-950">{receiptReference(row)}</p>
-              </div>
+            <div className="pt-20 text-center">
+              <p className="text-sm font-bold text-slate-400 sm:text-base">Support</p>
+              <p className="mt-3 text-sm font-black text-primary sm:text-base">support@sparkid.ng</p>
+            </div>
 
-              <div className="mt-5 border-t border-dashed border-slate-200 pt-4 text-center">
-                <p className="text-xs font-bold text-slate-700">Need help? Share this transaction reference with support.</p>
-                <p className="mx-auto mt-2 max-w-xs text-[11px] leading-relaxed text-slate-400">
-                  This receipt confirms your SparkID wallet payment. Keep it for your records.
-                </p>
-              </div>
+            <div className="mt-8 border-t border-dashed border-slate-500 pt-5">
+              <p className="text-sm font-semibold leading-snug text-slate-900 sm:text-base">
+                SparkID provides secure identity services, wallet payments, airtime, data, TV, and electricity transactions.
+                Keep this receipt for your records and share the transaction number with support if you need help.
+              </p>
             </div>
           </div>
         </div>
