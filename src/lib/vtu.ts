@@ -120,9 +120,11 @@ export async function purchaseVtu(input: {
   window.dispatchEvent(new Event("wallet-updated"));
 
   if (result.success === false || state === "failed" || state === "reversed") {
-    throw new Error(
-      result.normalized?.message || result.message || result.response || "The provider declined this purchase.",
-    );
+    const message = result.normalized?.message || result.message || result.response || "The provider declined this purchase.";
+    const refundNote = result.normalized?.charged === false
+      ? " Your SparkID wallet was not charged, or it has already been refunded."
+      : "";
+    throw new Error(`${message}${refundNote}`);
   }
 
   return result;
