@@ -685,7 +685,7 @@ export default function ApiDocs() {
       <header className="sticky top-0 z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur border-b border-slate-200 dark:border-slate-800">
         <div className="max-w-5xl mx-auto flex items-center justify-between px-4 sm:px-6 h-14">
             <Link to="/">
-              <img src="/logo.svg" alt="Sparklabid" className="h-7" />
+              <img src="/logo.svg" alt="SparklabID" className="h-7" />
             </Link>
           <div className="flex items-center gap-2">
             <Button
@@ -710,7 +710,7 @@ export default function ApiDocs() {
             <Globe className="h-3 w-3" /> REST API v1
           </Badge>
           <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-slate-900 dark:text-white">
-            Sparklabid Developer API
+            SparklabID Developer API
           </h1>
           <p className="text-lg text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
             Integrate Nigerian identity verification into your application. Validate NINs, verify BVNs,

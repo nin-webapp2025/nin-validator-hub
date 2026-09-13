@@ -26,7 +26,7 @@ export default function PrivacyPolicy() {
           <section className="space-y-3">
             <h2 className="text-xl font-semibold">1. Information We Collect</h2>
             <p className="text-muted-foreground leading-relaxed">
-              Sparklabid collects the minimum information necessary to provide identity verification services.
+              SparklabID collects the minimum information necessary to provide identity verification services.
               This includes your email address and name for account creation, and National Identification
               Numbers (NIN) or Bank Verification Numbers (BVN) submitted for verification purposes.
             </p>

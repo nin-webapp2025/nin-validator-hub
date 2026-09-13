@@ -84,7 +84,7 @@ self.addEventListener("push", (event) => {
   };
 
   event.waitUntil(
-    self.registration.showNotification("Sparklabid - Identity Verification", options)
+    self.registration.showNotification("SparklabID - Identity Verification", options)
   );
 });
 

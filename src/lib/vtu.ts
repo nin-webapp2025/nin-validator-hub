@@ -135,7 +135,7 @@ export async function purchaseVtu(input: {
   if (result.success === false || state === "failed" || state === "reversed") {
     const message = result.normalized?.message || result.message || result.response || "The provider declined this purchase.";
     const refundNote = result.normalized?.charged === false
-      ? " Your Sparklabid wallet was not charged, or it has already been refunded."
+      ? " Your SparklabID wallet was not charged, or it has already been refunded."
       : "";
     throw new Error(`${message}${refundNote}`);
   }

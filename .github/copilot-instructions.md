@@ -1,4 +1,4 @@
-# SparkID Identity Verification - AI Agent Instructions
+# SparklabID Identity Verification - AI Agent Instructions
 
 ## Project Overview
 This is a **Vite + React + TypeScript** application for validating Nigerian National Identification Numbers (NIN) via the RobostTech API. It uses **Supabase** for authentication, database, and edge functions, with **shadcn/ui** components and **TailwindCSS** for styling.

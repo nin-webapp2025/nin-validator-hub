@@ -300,7 +300,7 @@ export default function Auth() {
         <Card className="w-full max-w-md shadow-card">
           <CardHeader className="space-y-1 text-center p-4 sm:p-6">
             <div className="mx-auto mb-3 sm:mb-4">
-              <img src="/logo.svg" alt="Sparklabid" className="h-12 sm:h-14 w-auto" />
+              <img src="/logo.svg" alt="SparklabID" className="h-12 sm:h-14 w-auto" />
             </div>
             <CardTitle className="text-xl sm:text-2xl font-bold">Two-Factor Authentication</CardTitle>
             <CardDescription className="text-xs sm:text-sm">
@@ -358,7 +358,7 @@ export default function Auth() {
             </div>
             <CardTitle className="text-xl sm:text-2xl font-bold">Account Created!</CardTitle>
             <CardDescription className="text-xs sm:text-sm">
-              Welcome to Sparklabid.
+              Welcome to SparklabID.
             </CardDescription>
           </CardHeader>
           <CardContent className="p-4 sm:p-6 text-center space-y-4">
@@ -386,7 +386,7 @@ export default function Auth() {
         <Card className="w-full max-w-md shadow-card">
           <CardHeader className="space-y-1 text-center p-4 sm:p-6">
             <div className="mx-auto mb-3 sm:mb-4 flex items-center justify-center">
-              <img src="/logo.svg" alt="Sparklabid" className="h-12 sm:h-14 w-auto" />
+              <img src="/logo.svg" alt="SparklabID" className="h-12 sm:h-14 w-auto" />
             </div>
             <CardTitle className="text-xl sm:text-2xl font-bold">Reset Password</CardTitle>
             <CardDescription className="text-xs sm:text-sm">
@@ -432,14 +432,14 @@ export default function Auth() {
       <Card className="w-full max-w-md border-slate-200/80 bg-white/95 shadow-[0_20px_70px_rgba(15,23,42,0.08)] backdrop-blur dark:border-slate-800 dark:bg-slate-900/95">
         <CardHeader className="space-y-1 text-center p-4 sm:p-6">
           <div className="mx-auto mb-3 sm:mb-4 flex items-center justify-center">
-            <img src="/logo.svg" alt="Sparklabid" className="h-12 sm:h-14 w-auto" />
+            <img src="/logo.svg" alt="SparklabID" className="h-12 sm:h-14 w-auto" />
           </div>
           <div className="mx-auto inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
             <ShieldCheck className="h-3.5 w-3.5" />
             Secure identity operations
           </div>
           <CardTitle className="text-xl sm:text-2xl font-bold">
-            {authTab === "login" ? "Welcome back" : "Create your Sparklabid account"}
+            {authTab === "login" ? "Welcome back" : "Create your SparklabID account"}
           </CardTitle>
           <CardDescription className="text-xs sm:text-sm">
             {authTab === "login"

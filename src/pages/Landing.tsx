@@ -84,7 +84,7 @@ export default function Landing() {
           <div className="flex h-16 items-center justify-between">
             <img 
               src="/logo.svg" 
-              alt="Sparklabid Identity Verification"
+              alt="SparklabID Identity Verification"
               className="h-10 w-auto dark:brightness-110 cursor-pointer"
               onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
             />
@@ -307,7 +307,7 @@ export default function Landing() {
                 Ready to get started?
               </h2>
               <p className="text-base sm:text-xl text-amber-50/90 mb-6 sm:mb-10 max-w-2xl mx-auto">
-                Join thousands of businesses using Sparklabid for secure identity verification
+                Join thousands of businesses using SparklabID for secure identity verification
               </p>
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                 <Button
@@ -341,11 +341,11 @@ export default function Landing() {
             <div className="col-span-1 md:col-span-2">
               <img 
                 src="/logo.svg" 
-                alt="Sparklabid"
+                alt="SparklabID"
                 className="h-12 w-auto mb-4 dark:brightness-110"
               />
               <p className="text-sm text-slate-600 dark:text-slate-400 max-w-md leading-relaxed mb-4">
-                Sparklabid provides secure and reliable identity verification services for Nigerian
+                SparklabID provides secure and reliable identity verification services for Nigerian
                 National Identification Numbers (NIN) and Bank Verification Numbers (BVN) with enterprise-grade technology.
               </p>
               <div className="flex items-center gap-3">
@@ -445,7 +445,7 @@ export default function Landing() {
           <div className="pt-8 border-t border-slate-200/80 dark:border-slate-800">
             <div className="flex flex-col md:flex-row items-center justify-between gap-4">
               <p className="text-sm text-slate-600 dark:text-slate-400">
-                © {new Date().getFullYear()} Sparklabid. All rights reserved.
+                © {new Date().getFullYear()} SparklabID. All rights reserved.
               </p>
               <div className="flex items-center gap-6">
                 <Link to="/docs/api" className="text-sm text-slate-600 dark:text-slate-400 hover:text-primary transition-colors">

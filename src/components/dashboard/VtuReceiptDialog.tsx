@@ -158,7 +158,7 @@ export function VtuReceiptDialog({
             className="mx-auto min-h-[980px] w-full max-w-[640px] bg-white px-7 py-9 text-slate-950 sm:px-10 sm:py-10"
           >
             <div className="flex items-start justify-between gap-6">
-              <img src="/logo.svg" alt="Sparklabid" className="h-auto w-36 sm:w-40" />
+              <img src="/logo.svg" alt="SparklabID" className="h-auto w-36 sm:w-40" />
               <p className="pt-1 text-right text-lg font-black text-slate-950 sm:text-2xl">Transaction Receipt</p>
             </div>
 
@@ -178,7 +178,7 @@ export function VtuReceiptDialog({
               <Detail label={operatorLabel(row.category)} value={row.network} />
               <Detail label={identifierLabel[row.category]} value={serviceIdentifier(row)} />
               {row.category === "electricity" && row.token ? <Detail label="Token" value={row.token} /> : null}
-              <Detail label="Paid with" value="Sparklabid Wallet" />
+              <Detail label="Paid with" value="SparklabID Wallet" />
               <Detail label="Transaction number" value={receiptReference(row)} />
             </div>
 
@@ -189,7 +189,7 @@ export function VtuReceiptDialog({
 
             <div className="mt-8 border-t border-dashed border-slate-500 pt-5">
               <p className="text-sm font-semibold leading-snug text-slate-900 sm:text-base">
-                Sparklabid provides secure identity services, wallet payments, airtime, data, TV, and electricity transactions.
+                SparklabID provides secure identity services, wallet payments, airtime, data, TV, and electricity transactions.
                 Keep this receipt for your records and share the transaction number with support if you need help.
               </p>
             </div>

@@ -132,7 +132,7 @@ export async function exportToPDF(
     doc.setFontSize(8);
     doc.setTextColor(150);
     doc.text(
-      `Sparklabid — Page ${i} of ${pageCount}`,
+      `SparklabID — Page ${i} of ${pageCount}`,
       pageWidth / 2,
       doc.internal.pageSize.getHeight() - 10,
       { align: "center" }

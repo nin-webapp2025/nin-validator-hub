@@ -26,7 +26,7 @@ export default function TermsOfService() {
           <section className="space-y-3">
             <h2 className="text-xl font-semibold">1. Acceptance of Terms</h2>
             <p className="text-muted-foreground leading-relaxed">
-              By accessing or using Sparklabid, you agree to be bound by these Terms of Service.
+              By accessing or using SparklabID, you agree to be bound by these Terms of Service.
               If you do not agree to these terms, you may not use our services.
             </p>
           </section>
@@ -34,7 +34,7 @@ export default function TermsOfService() {
           <section className="space-y-3">
             <h2 className="text-xl font-semibold">2. Service Description</h2>
             <p className="text-muted-foreground leading-relaxed">
-              Sparklabid provides identity verification services including NIN validation, BVN verification,
+              SparklabID provides identity verification services including NIN validation, BVN verification,
               clearance services, and personalization tracking for Nigerian National Identification Numbers.
               Our services are provided through authorized government API integrations.
             </p>
@@ -52,7 +52,7 @@ export default function TermsOfService() {
           <section className="space-y-3">
             <h2 className="text-xl font-semibold">4. Acceptable Use</h2>
             <p className="text-muted-foreground leading-relaxed">
-              You may not use Sparklabid to verify identities without proper authorization, attempt to
+              You may not use SparklabID to verify identities without proper authorization, attempt to
               circumvent security measures, or use the service for fraudulent purposes. Any misuse
               may result in immediate account termination.
             </p>
@@ -70,7 +70,7 @@ export default function TermsOfService() {
           <section className="space-y-3">
             <h2 className="text-xl font-semibold">6. Limitation of Liability</h2>
             <p className="text-muted-foreground leading-relaxed">
-              Sparklabid is provided "as is" without warranties of any kind. We are not liable for any
+              SparklabID is provided "as is" without warranties of any kind. We are not liable for any
               damages arising from the use of our services, including but not limited to incorrect
               verification results from third-party APIs.
             </p>

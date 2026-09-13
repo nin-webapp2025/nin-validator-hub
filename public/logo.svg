@@ -9,9 +9,9 @@
     <path fill="#F59E0B" d="M 70 140 L 60 150 L 55 140 Z"/>
   </g>
   
-  <!-- Sparklabid Text -->
+  <!-- SparklabID Text -->
   <text x="225" y="130" font-family="Arial, sans-serif" font-size="76" font-weight="bold" fill="#F59E0B">Sparklab</text>
-  <text x="570" y="130" font-family="Arial, sans-serif" font-size="76" font-weight="bold" fill="#1E293B">id</text>
+  <text x="570" y="130" font-family="Arial, sans-serif" font-size="76" font-weight="bold" fill="#1E293B">ID</text>
   
   <!-- Tagline -->
   <text x="245" y="160" font-family="Arial, sans-serif" font-size="20" font-weight="600" letter-spacing="3" fill="#1E293B">IDENTITY VERIFICATION</text>

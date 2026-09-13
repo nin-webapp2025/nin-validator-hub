@@ -1,7 +1,7 @@
 {
-  "name": "Sparklabid - Identity Verification",
-  "short_name": "Sparklabid",
-  "description": "Lightning-fast Nigerian identity verification. Verify NIN, BVN, and more with Sparklabid",
+  "name": "SparklabID - Identity Verification",
+  "short_name": "SparklabID",
+  "description": "Lightning-fast Nigerian identity verification. Verify NIN, BVN, and more with SparklabID",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",

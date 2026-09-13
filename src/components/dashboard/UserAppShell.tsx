@@ -30,7 +30,7 @@ export function UserAppShell() {
             <Card className="sticky top-24 overflow-hidden border-slate-200/80 bg-white/90 shadow-[0_14px_44px_rgba(15,23,42,0.06)] dark:border-slate-800 dark:bg-slate-900/90">
               <CardHeader className="border-b border-slate-200/80 bg-slate-50/90 dark:border-slate-800 dark:bg-slate-950/50">
                 <CardTitle className="text-lg text-slate-900 dark:text-slate-100">
-                  Sparklabid
+                  SparklabID
                 </CardTitle>
                 <CardDescription>
                   Identity services and account tools
