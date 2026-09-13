@@ -112,6 +112,7 @@ export function ElectricityPurchase() {
         service_identifier: meterNumber.trim(),
         token: token || null,
         provider_reference: reference || null,
+        face_value: pricing.faceValue,
         charged_amount: pricing.chargeAmount,
         status: state,
         completed_at: state === "succeeded" ? now : null,

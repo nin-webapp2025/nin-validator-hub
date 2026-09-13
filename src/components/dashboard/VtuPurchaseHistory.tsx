@@ -41,6 +41,7 @@ export function VtuPurchaseHistory({ category }: { category: VtuCategory }) {
         setRows(((data ?? []) as PurchaseRow[]).map((row) => ({
           ...row,
           category,
+          face_value: row.face_value === null || row.face_value === undefined ? null : Number(row.face_value),
           charged_amount: Number(row.charged_amount ?? 0),
           service_identifier: row.service_identifier || row.phone,
           token: row.token || null,

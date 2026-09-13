@@ -1106,6 +1106,7 @@ export type Database = {
           charged_amount: number
           completed_at: string
           created_at: string
+          face_value: number
           id: string
           network: string
           phone: string

@@ -22,11 +22,14 @@ export interface VtuReceiptRow {
   token?: string | null;
   provider?: string | null;
   provider_reference: string | null;
+  face_value?: number | null;
   charged_amount: number;
   status: string;
   completed_at?: string | null;
   created_at: string;
 }
+
+const ELECTRICITY_UNITS_PER_1000_NAIRA = 7.3;
 
 const categoryLabel: Record<VtuCategory, string> = {
   airtime: "Airtime Purchase",
@@ -67,6 +70,20 @@ function operatorLabel(category: VtuCategory) {
   if (category === "electricity") return "Disco";
   if (category === "tv") return "TV provider";
   return "Operator";
+}
+
+function electricityUnits(row: VtuReceiptRow) {
+  if (row.category !== "electricity") return null;
+  const electricityValue = Number(row.face_value ?? row.charged_amount);
+  if (!Number.isFinite(electricityValue) || electricityValue <= 0) return null;
+  return (electricityValue / 1000) * ELECTRICITY_UNITS_PER_1000_NAIRA;
+}
+
+function formatUnits(value: number) {
+  return `${value.toLocaleString("en-NG", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })} units`;
 }
 
 function safeFilename(value: string) {
@@ -157,6 +174,7 @@ export function VtuReceiptDialog({
       setDownloading(null);
     }
   };
+  const units = electricityUnits(row);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -192,6 +210,8 @@ export function VtuReceiptDialog({
             <div className="border-t border-slate-700 pt-5">
               <Detail label="Transaction type" value={categoryLabel[row.category]} />
               <Detail label="Amount" value={formatNaira(Number(row.charged_amount))} />
+              {row.category === "electricity" ? <Detail label="Electricity value" value={formatNaira(Number(row.face_value ?? row.charged_amount))} /> : null}
+              {units !== null ? <Detail label="Units bought" value={formatUnits(units)} /> : null}
               <Detail label={operatorLabel(row.category)} value={row.network} />
               <Detail label={identifierLabel[row.category]} value={serviceIdentifier(row)} />
               {row.category === "electricity" && row.token ? <Detail label="Token" value={row.token} /> : null}
