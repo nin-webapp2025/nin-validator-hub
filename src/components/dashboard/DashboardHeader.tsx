@@ -109,7 +109,7 @@ export function DashboardHeader({ onNavigateToProfile, onNavigateToWallet }: Das
       <div className="container mx-auto flex h-14 sm:h-16 items-center justify-between px-3 sm:px-4 lg:px-8">
         <div className="flex items-center gap-2 sm:gap-3 min-w-0">
           <img 
-            src="/logo.svg" 
+            src="/newlogo.jpeg"
             alt="SparklabID"
             className="h-8 sm:h-10 w-auto dark:brightness-110 shrink-0"
           />

@@ -83,7 +83,7 @@ export default function Landing() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between">
             <img 
-              src="/logo.svg" 
+              src="/newlogo.jpeg"
               alt="SparklabID Identity Verification"
               className="h-10 w-auto dark:brightness-110 cursor-pointer"
               onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
@@ -340,7 +340,7 @@ export default function Landing() {
             {/* Brand Section */}
             <div className="col-span-1 md:col-span-2">
               <img 
-                src="/logo.svg" 
+                src="/newlogo.jpeg"
                 alt="SparklabID"
                 className="h-12 w-auto mb-4 dark:brightness-110"
               />

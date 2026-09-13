@@ -685,7 +685,7 @@ export default function ApiDocs() {
       <header className="sticky top-0 z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur border-b border-slate-200 dark:border-slate-800">
         <div className="max-w-5xl mx-auto flex items-center justify-between px-4 sm:px-6 h-14">
             <Link to="/">
-              <img src="/logo.svg" alt="SparklabID" className="h-7" />
+              <img src="/newlogo.jpeg" alt="SparklabID" className="h-7" />
             </Link>
           <div className="flex items-center gap-2">
             <Button

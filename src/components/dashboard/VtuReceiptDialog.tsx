@@ -92,6 +92,19 @@ function safeFilename(value: string) {
 
 async function renderReceiptCanvas(element: HTMLElement) {
   const { default: html2canvas } = await import("html2canvas");
+  const images = Array.from(element.querySelectorAll("img"));
+  await Promise.all(images.map(async (image) => {
+    if (image.complete && image.naturalWidth > 0) return;
+    if (typeof image.decode === "function") {
+      await image.decode().catch(() => undefined);
+      return;
+    }
+    await new Promise<void>((resolve) => {
+      image.addEventListener("load", () => resolve(), { once: true });
+      image.addEventListener("error", () => resolve(), { once: true });
+    });
+  }));
+
   return html2canvas(element, {
     backgroundColor: "#ffffff",
     scale: Math.min(window.devicePixelRatio || 2, 3),
@@ -124,18 +137,7 @@ async function downloadReceiptPdf(row: VtuReceiptRow, element: HTMLElement) {
 
 function ReceiptLogo() {
   return (
-    <svg viewBox="0 0 800 200" role="img" aria-label="SparklabID" className="h-auto w-32 sm:w-36">
-      <g>
-        <path fill="#F59E0B" d="M 60 50 L 120 90 L 90 100 L 140 160 L 80 110 L 110 100 Z" />
-        <path fill="#F59E0B" d="M 50 65 L 70 75 L 60 80 Z" />
-        <path fill="#F59E0B" d="M 140 75 L 160 85 L 150 90 Z" />
-        <path fill="#F59E0B" d="M 85 45 L 95 35 L 100 45 Z" />
-        <path fill="#F59E0B" d="M 70 140 L 60 150 L 55 140 Z" />
-      </g>
-      <text x="225" y="130" fontFamily="Arial, sans-serif" fontSize="76" fontWeight="bold" fill="#F59E0B">Sparklab</text>
-      <text x="570" y="130" fontFamily="Arial, sans-serif" fontSize="76" fontWeight="bold" fill="#1E293B">ID</text>
-      <text x="245" y="160" fontFamily="Arial, sans-serif" fontSize="20" fontWeight="600" letterSpacing="3" fill="#1E293B">IDENTITY VERIFICATION</text>
-    </svg>
+    <img src="/newlogo.jpeg" alt="SparklabID" className="h-auto w-32 object-contain sm:w-36" />
   );
 }
 

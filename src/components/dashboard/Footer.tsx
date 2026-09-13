@@ -16,7 +16,7 @@ export function Footer() {
           <div className="lg:col-span-5">
             <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
               <img 
-                src="/logo.svg" 
+                src="/newlogo.jpeg"
                 alt="SparklabID"
                 className="h-10 sm:h-14 w-auto dark:brightness-110"
               />

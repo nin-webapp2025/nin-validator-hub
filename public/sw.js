@@ -1,5 +1,5 @@
 const CACHE_NAME = "sparklabid-v4";
-const APP_SHELL_URLS = ["/", "/auth", "/logo.svg", "/manifest.json"];
+const APP_SHELL_URLS = ["/", "/auth", "/newlogo.jpeg", "/manifest.json"];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
@@ -78,8 +78,8 @@ self.addEventListener("fetch", (event) => {
 self.addEventListener("push", (event) => {
   const options = {
     body: event.data?.text() || "New notification",
-    icon: "/logo.svg",
-    badge: "/logo.svg",
+    icon: "/newlogo.jpeg",
+    badge: "/newlogo.jpeg",
     vibrate: [200, 100, 200],
   };
 
